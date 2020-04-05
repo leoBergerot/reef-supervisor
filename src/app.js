@@ -3,6 +3,7 @@ import {BrowserRouter, Route, Switch} from "react-router-dom";
 import {Login} from "./components/auth/login";
 import {Home} from "./components/home/home";
 import {GuardRoute} from "./components/guard/route-guard";
+import {ForgotPassword} from "./components/auth/forgot-password";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
           <BrowserRouter>
               <Switch>
                   <Route path="/login" component={Login}/>
+                  <Route path="/forgot-password" component={ForgotPassword}/>
                   <GuardRoute path="/" component={Home}/>
               </Switch>
           </BrowserRouter>

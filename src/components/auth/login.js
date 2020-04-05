@@ -3,6 +3,8 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Link from "@material-ui/core/Link";
 import {GridContainerResponsive} from "../common/GridContainerReponsive";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -11,14 +13,12 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
-        [theme.breakpoints.down("sm")]: {
-            boxShadow: '0 0 0 0'
-        },
-        [theme.breakpoints.up("sm")]: {
-            maxWidth: "500px"
-        },
+        [theme.breakpoints.down("xs")]: {
+            boxShadow: '0 0 0 0',
+        }
     }
 }));
+
 export const Login = ({history}) => {
     const classes = useStyles();
     const {setAuthData} = useContext(authContext);
@@ -33,7 +33,7 @@ export const Login = ({history}) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({password: password.value, username: email.value,}) // body data type must match "Content-Type" header
+            body: JSON.stringify({password: password.value, username: email.value,})
         })
             .then(res => res.json())
             .then(
@@ -60,11 +60,16 @@ export const Login = ({history}) => {
         e.preventDefault();
     };
 
+    const handleRecoverPassword = e => {
+        history.replace('/forgot-password');
+        e.preventDefault();
+    };
+
     return (
         <GridContainerResponsive>
             <Card className={classes.root}>
                 <form onSubmit={onFormSubmit}>
-                    <CardHeader title="Login" subheader="To continue to supervisor your tank"/>
+                    <CardHeader title="Login" subheader="To continue to supervising your tank"/>
                     <CardContent>
                         <TextField
                             label="Enter your email"
@@ -89,6 +94,8 @@ export const Login = ({history}) => {
                                 setPassword({value: e.target.value, error: false, helperText: false});
                             }}
                         />
+                    </CardContent>
+                    <CardActions>
                         <Button
                             disabled={password.error || email.error}
                             variant="contained"
@@ -97,7 +104,10 @@ export const Login = ({history}) => {
                         >
                             Sign in {loading && (<CircularProgress/>)}
                         </Button>
-                    </CardContent>
+                        <Link href="#" onClick={handleRecoverPassword} variant="body2">
+                            Recover password
+                        </Link>
+                    </CardActions>
                 </form>
             </Card>
         </GridContainerResponsive>
