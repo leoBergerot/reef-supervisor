@@ -5,7 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import Link from "@material-ui/core/Link";
-import {GridContainerResponsive} from "../common/GridContainerReponsive";
+import {GridContainerResponsive} from "../common/grid-container-reponsive";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import {authContext} from "../../contexts/auth-context";
@@ -61,7 +61,7 @@ export const Login = ({history}) => {
     };
 
     const handleRecoverPassword = e => {
-        history.replace('/forgot-password');
+        history.push('/forgot-password');
         e.preventDefault();
     };
 

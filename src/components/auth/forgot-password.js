@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card/Card";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -6,81 +6,93 @@ import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
 import CardActions from "@material-ui/core/CardActions/CardActions";
 import Button from "@material-ui/core/Button";
-import {GridContainerResponsive} from "../common/GridContainerReponsive";
+import {GridContainerResponsive} from "../common/grid-container-reponsive";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Modal from "@material-ui/core/Modal";
-import Typography from "@material-ui/core/Typography";
+import {alertContext} from "../../contexts/alert-context";
+import {Recaptcha} from "../common/recaptcha";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
         [theme.breakpoints.down("xs")]: {
             boxShadow: '0 0 0 0',
         }
-    },
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    paper: {
-        backgroundColor: theme.palette.background.paper,
-        border: '1px solid #000',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-    },
+    }
 }));
 
 export const ForgotPassword = ({history}) => {
     const classes = useStyles();
     const [email, setEmail] = useState({value: null, error: false, helperText: null});
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
+    const [captchaReady, setCaptchaReady] = useState(false);
+    const [submit, setSubmit] = useState(false);
+    const [formCanSubmit, setFormCanSubmit] = useState({value: false, token: null});
+    const {setAlert} = useContext(alertContext);
 
 
-    const onFormSubmit = (e) => {
-        setLoading(true);
-
-        fetch(process.env.REACT_APP_API_URL + '/forgot-password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({email: email.value})
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setLoading(false);
-                    if (result.email) {
-                        setOpen(true);
-                        return null;
-                    } else if (result.statusCode === 400) {
-                        setEmail({value: email.value, error: true, helperText: result.message})
-                    }
-                    setLoading(false);
+    useEffect(() => {
+        if (formCanSubmit.value) {
+            fetch(process.env.REACT_APP_API_URL + '/forgot-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({email: email.value, token: formCanSubmit.token})
+            })
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        setLoading(false);
+                        if (result.email) {
+                            setAlert({
+                                open: true,
+                                message: `A email has been sended to ${email.value} , (check also your junk box)`,
+                                severity: 'success'
+                            });
+                            history.replace('/');
+                            return null;
+                        } else if (result.statusCode === 400) {
+                            setEmail({value: email.value, error: true, helperText: result.message})
+                        } else {
+                            setAlert({
+                                open: true,
+                                message: `An error occured: ${result.message}`,
+                                severity: 'error'
+                            });
+                        }
+                        setLoading(false);
+                    },
+                    (error) => {
+                        setLoading(false);
+                        setAlert({
+                            open: true,
+                            message: `${error.message}`,
+                            severity: 'error'
+                        });
+                    }
+                );
 
-                (error) => {
-                    setLoading(false);
-                    console.log(error)
-                }
-            );
-        e.preventDefault();
-    };
+            setFormCanSubmit({value: false, token: null});
+            setSubmit(false);
+        }
+    }, [formCanSubmit]);
 
-    const handleOnClose = () => {
-        setOpen(false);
-        history.replace('/')
+
+    const captchaResponse = (token) => {
+        setFormCanSubmit({value: true, token});
     };
 
     return (
         <GridContainerResponsive>
             <Card className={classes.root}>
-                <form onSubmit={onFormSubmit}>
+                <form onSubmit={(event) => {
+                    event.preventDefault();
+                    setSubmit(true)
+                }}>
                     <CardHeader title="Forgot password ?" subheader="Enter your email for recovered your account"/>
                     <CardContent>
                         <TextField
                             label="Your email"
+                            disabled={!captchaReady}
                             required
                             fullWidth
                             autoFocus
@@ -90,10 +102,12 @@ export const ForgotPassword = ({history}) => {
                             error={email.error}
                             helperText={email.helperText}
                         />
+                        <Recaptcha responseCallback={captchaResponse} setCaptchaReady={setCaptchaReady}
+                                   submit={submit}/>
                     </CardContent>
                     <CardActions>
                         <Button
-                            disabled={email.error}
+                            disabled={email.error || !captchaReady}
                             variant="contained"
                             color="primary"
                             type="submit"
@@ -103,33 +117,6 @@ export const ForgotPassword = ({history}) => {
                     </CardActions>
                 </form>
             </Card>
-            <Modal
-                open={open}
-                onClose={handleOnClose}
-                aria-labelledby="success-modal-title"
-                aria-describedby="success-modal-description"
-                className={classes.modal}
-            >
-                <Card>
-                    <CardContent>
-                        <Typography variant="h4" component="h4" id="success-modal-title">Success</Typography>
-                        <Typography id="success-modal-description" variant="body1" component="p">An email has been
-                            sended to
-                            : {email.value} to recover your password</Typography>
-                        <Typography id="success-modal-description" variant="body1" component="p">
-                            Tips : check also your junk mailbox
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Button onClick={handleOnClose}
-                            size="small"
-                            color="primary"
-                        >
-                            Ok
-                        </Button>
-                    </CardActions>
-                </Card>
-            </Modal>
         </GridContainerResponsive>
     )
-};
+}
