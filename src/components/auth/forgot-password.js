@@ -25,7 +25,7 @@ export const ForgotPassword = ({history}) => {
     const [loading, setLoading] = useState(false);
     const [captchaReady, setCaptchaReady] = useState(false);
     const [submit, setSubmit] = useState(false);
-    const [formCanSubmit, setFormCanSubmit] = useState({value: false, token: null});
+    const [formCanSubmit, setFormCanSubmit] = useState({value: false, recaptchaToken: null});
     const {setAlert} = useContext(alertContext);
 
 
@@ -36,7 +36,7 @@ export const ForgotPassword = ({history}) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({email: email.value, token: formCanSubmit.token})
+                body: JSON.stringify({email: email.value, recaptchaToken: formCanSubmit.recaptchaToken})
             })
                 .then(res => res.json())
                 .then(
@@ -71,23 +71,26 @@ export const ForgotPassword = ({history}) => {
                     }
                 );
 
-            setFormCanSubmit({value: false, token: null});
+            setFormCanSubmit({value: false, recaptchaToken: null});
             setSubmit(false);
         }
     }, [formCanSubmit]);
 
 
-    const captchaResponse = (token) => {
-        setFormCanSubmit({value: true, token});
+    const captchaResponse = (recaptchaToken) => {
+        setFormCanSubmit({value: true, recaptchaToken});
+    };
+
+    const onSubmit = (event) => {
+        event.preventDefault();
+        setSubmit(true);
+        setLoading(true);
     };
 
     return (
         <GridContainerResponsive>
             <Card className={classes.root}>
-                <form onSubmit={(event) => {
-                    event.preventDefault();
-                    setSubmit(true)
-                }}>
+                <form onSubmit={onSubmit}>
                     <CardHeader title="Forgot password ?" subheader="Enter your email for recovered your account"/>
                     <CardContent>
                         <TextField

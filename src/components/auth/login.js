@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
@@ -10,6 +10,7 @@ import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import {authContext} from "../../contexts/auth-context";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {Recaptcha} from "../common/recaptcha";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
@@ -25,39 +26,50 @@ export const Login = ({history}) => {
     const [email, setEmail] = useState({value: null, error: false, helperText: null});
     const [password, setPassword] = useState({value: null, error: false, helperText: null});
     const [loading, setLoading] = useState(false);
+    const [captchaReady, setCaptchaReady] = useState(false);
+    const [submit, setSubmit] = useState(false);
+    const [formCanSubmit, setFormCanSubmit] = useState({value: false, recaptchaToken: null});
 
-    const onFormSubmit = e => {
-        setLoading(true);
-        fetch(process.env.REACT_APP_API_URL + '/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({password: password.value, username: email.value,})
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setLoading(false);
-                    if (result.access_token) {
-                        setAuthData(result.access_token);
-                        history.replace('/');
-                        return null;
-                    } else if (result.statusCode === 403) {
-                        setPassword({value: password.value, error: true, helperText: result.message})
-                    } else if (result.statusCode === 404) {
-                        setEmail({value: email.value, error: true, helperText: result.message});
-                        setPassword({value: null, error: false, helperText: null});
-                    }
-                    setLoading(false);
+    useEffect(() => {
+        if (formCanSubmit.value) {
+            setLoading(true);
+            fetch(process.env.REACT_APP_API_URL + '/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({password: password.value, username: email.value, recaptchaToken: formCanSubmit.recaptchaToken})
+            })
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        setLoading(false);
+                        if (result.access_token) {
+                            setAuthData(result.access_token);
+                            history.replace('/');
+                            return null;
+                        } else if (result.statusCode === 403) {
+                            setPassword({value: password.value, error: true, helperText: result.message})
+                        } else if (result.statusCode === 404) {
+                            setEmail({value: email.value, error: true, helperText: result.message});
+                            setPassword({value: null, error: false, helperText: null});
+                        }
+                        setLoading(false);
+                    },
 
-                (error) => {
-                    setLoading(false);
-                    console.log(error)
-                }
-            );
-        e.preventDefault();
+                    (error) => {
+                        setLoading(false);
+                        console.log(error)
+                    }
+                );
+            setFormCanSubmit({value: false, recaptchaToken: null});
+            setSubmit(false);
+        }
+    }, [formCanSubmit]);
+
+
+    const captchaResponse = (recaptchaToken) => {
+        setFormCanSubmit({value: true, recaptchaToken});
     };
 
     const handleRecoverPassword = e => {
@@ -65,14 +77,21 @@ export const Login = ({history}) => {
         e.preventDefault();
     };
 
+    const onSubmit = (event) => {
+        event.preventDefault();
+        setSubmit(true);
+        setLoading(true);
+    };
+
     return (
         <GridContainerResponsive>
             <Card className={classes.root}>
-                <form onSubmit={onFormSubmit}>
+                <form onSubmit={onSubmit}>
                     <CardHeader title="Login" subheader="To continue to supervising your tank"/>
                     <CardContent>
                         <TextField
                             label="Enter your email"
+                            disabled={!captchaReady}
                             required
                             fullWidth
                             autoFocus
@@ -84,6 +103,7 @@ export const Login = ({history}) => {
                         />
                         <TextField
                             label="Enter your password"
+                            disabled={!captchaReady}
                             fullWidth
                             required
                             type="password"
@@ -94,10 +114,12 @@ export const Login = ({history}) => {
                                 setPassword({value: e.target.value, error: false, helperText: false});
                             }}
                         />
+                        <Recaptcha responseCallback={captchaResponse} setCaptchaReady={setCaptchaReady}
+                                   submit={submit}/>
                     </CardContent>
                     <CardActions>
                         <Button
-                            disabled={password.error || email.error}
+                            disabled={password.error || email.error || !captchaReady}
                             variant="contained"
                             color="primary"
                             type="submit"
