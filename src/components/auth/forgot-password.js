@@ -36,7 +36,7 @@ export const ForgotPassword = ({history}) => {
                         if (result.email) {
                             setAlert({
                                 open: true,
-                                message: `A email has been sended to ${email.value} , (check also your junk box)`,
+                                message: `An email has been sended to ${email.value}, (check also your junk box)`,
                                 severity: 'success'
                             });
                             history.replace('/');
@@ -115,7 +115,7 @@ export const ForgotPassword = ({history}) => {
                     <CardContent>
                         <Button
                             fullWidth={true}
-                            disabled={email.error || !captchaReady}
+                            disabled={email.error || !captchaReady || loading}
                             variant="contained"
                             color="primary"
                             type="submit"

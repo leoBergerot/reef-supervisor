@@ -11,11 +11,15 @@ import {CardContainerReponsive} from "../common/card-container-responsive";
 import isEmpty from 'validator/lib/isEmpty';
 import Typography from "@material-ui/core/Typography";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
+import {alertContext} from "../../contexts/alert-context";
 
-export const Login = ({history}) => {
+export const Login = ({history, match: {params: {enable}}}) => {
     const {setAuthData} = useContext(authContext);
+    const {setAlert} = useContext(alertContext);
+
     const [email, setEmail] = useState({value: "", error: false, helperText: null});
     const [password, setPassword] = useState({value: "", error: false, helperText: null});
+
     const [loading, setLoading] = useState(false);
     const [captchaReady, setCaptchaReady] = useState(false);
     const [submit, setSubmit] = useState(false);
@@ -44,6 +48,12 @@ export const Login = ({history}) => {
                         } else if (result.statusCode === 404) {
                             setEmail({value: email.value, error: true, helperText: result.message});
                             setPassword({value: null, error: false, helperText: null});
+                        } else if (result.statusCode === 401) {
+                            setAlert({
+                                open: true,
+                                message: result.message,
+                                severity: 'warning'
+                            });
                         }
                         setLoading(false);
                     },
@@ -58,6 +68,15 @@ export const Login = ({history}) => {
         }
     }, [formCanSubmit]);
 
+    useEffect(() => {
+        if (enable) {
+            setAlert({
+                open: true,
+                message: "Your account are successfully enabled",
+                severity: "success"
+            })
+        }
+    }, [enable]);
 
     const captchaResponse = (recaptchaToken) => {
         setFormCanSubmit({value: true, recaptchaToken});
@@ -65,6 +84,11 @@ export const Login = ({history}) => {
 
     const handleRecoverPassword = e => {
         history.push('/forgot-password');
+        e.preventDefault();
+    };
+
+    const handleRegister = e => {
+        history.push('/register');
         e.preventDefault();
     };
 
@@ -86,7 +110,6 @@ export const Login = ({history}) => {
             setLoading(true);
         }
     };
-
     return (
         <GridContainerResponsive>
             <CardContainerReponsive>
@@ -126,7 +149,7 @@ export const Login = ({history}) => {
                     <CardContent>
                         <Button
                             fullWidth={true}
-                            disabled={password.error || email.error || !captchaReady}
+                            disabled={password.error || email.error || !captchaReady || loading}
                             variant="contained"
                             color="primary"
                             type="submit"
@@ -136,7 +159,7 @@ export const Login = ({history}) => {
                     </CardContent>
                     <CardContent>
                         <Typography display="block" variant="subtitle1" gutterBottom>
-                            First visit to Reef Supervisor ? {<Link href="#" onClick={handleRecoverPassword}
+                            First visit to Reef Supervisor ? {<Link href="#" onClick={handleRegister}
                                                                     variant="body2">
                             Sign up now.
                         </Link>}

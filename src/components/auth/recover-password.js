@@ -50,10 +50,16 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                             return null;
                         } else if (result.statusCode === 400) {
                             setNewPassword({value: newPassword.value, error: true, helperText: result.message})
+                        } else if (result.statusCode === 403) {
+                            setAlert({
+                                open: true,
+                                message: `This link are expired`,
+                                severity: 'error'
+                            });
                         } else {
                             setAlert({
                                 open: true,
-                                message: `An error occured: ${result.message}`,
+                                message: `An error occurred in server`,
                                 severity: 'error'
                             });
                         }
@@ -63,7 +69,7 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                         setLoading(false);
                         setAlert({
                             open: true,
-                            message: `${error.message}`,
+                            message: `Network error`,
                             severity: 'error'
                         });
                     }
@@ -121,6 +127,7 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                         <TextField
                             margin="dense"
                             label="Password"
+                            type="password"
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -136,7 +143,7 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                     <CardContent>
                         <Button
                             fullWidth={true}
-                            disabled={newPassword.error || !captchaReady}
+                            disabled={newPassword.error || !captchaReady || loading}
                             variant="contained"
                             color="primary"
                             type="submit"
