@@ -14,7 +14,10 @@ const AlertProvider = ({children}) => {
             value={{setAlert}}
         >
             {alert.open && alert.message && alert.severity && (
-                <Snackbar open={alert.open}>
+                <Snackbar open={alert.open}
+                          onClose={handleClose}
+                          autoHideDuration={3000}
+                >
                     <Alert variant="filled"
                            severity={alert.severity}
                            onClose={handleClose}

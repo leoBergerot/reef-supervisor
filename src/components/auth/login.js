@@ -1,30 +1,21 @@
 import React, {useContext, useEffect, useState} from "react";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
 import Link from "@material-ui/core/Link";
 import {GridContainerResponsive} from "../common/grid-container-reponsive";
-import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import {authContext} from "../../contexts/auth-context";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {Recaptcha} from "../common/recaptcha";
-
-const useStyles = makeStyles((theme) => createStyles({
-    root: {
-        [theme.breakpoints.down("xs")]: {
-            boxShadow: '0 0 0 0',
-        }
-    }
-}));
+import {CardContainerReponsive} from "../common/card-container-responsive";
+import isEmpty from 'validator/lib/isEmpty';
+import Typography from "@material-ui/core/Typography";
+import {ConditionRecaptcha} from "../common/condition-recaptcha";
 
 export const Login = ({history}) => {
-    const classes = useStyles();
     const {setAuthData} = useContext(authContext);
-    const [email, setEmail] = useState({value: null, error: false, helperText: null});
-    const [password, setPassword] = useState({value: null, error: false, helperText: null});
+    const [email, setEmail] = useState({value: "", error: false, helperText: null});
+    const [password, setPassword] = useState({value: "", error: false, helperText: null});
     const [loading, setLoading] = useState(false);
     const [captchaReady, setCaptchaReady] = useState(false);
     const [submit, setSubmit] = useState(false);
@@ -79,20 +70,35 @@ export const Login = ({history}) => {
 
     const onSubmit = (event) => {
         event.preventDefault();
-        setSubmit(true);
-        setLoading(true);
+        let error = false;
+        if (isEmpty(email.value)) {
+            setEmail({value: "", error: true, helperText: "Please enter an email address"});
+            error = true;
+        }
+
+        if (isEmpty(password.value)) {
+            setPassword({value: "", error: true, helperText: "Please enter your password"});
+            error = true;
+        }
+
+        if (!error) {
+            setSubmit(true);
+            setLoading(true);
+        }
     };
 
     return (
         <GridContainerResponsive>
-            <Card className={classes.root}>
+            <CardContainerReponsive>
                 <form onSubmit={onSubmit}>
-                    <CardHeader title="Login" subheader="To continue to supervising your tank"/>
                     <CardContent>
+                        <Typography variant="h4" component="h4" gutterBottom>
+                            Sign in
+                        </Typography>
                         <TextField
-                            label="Enter your email"
+                            margin="dense"
+                            label="Email"
                             disabled={!captchaReady}
-                            required
                             fullWidth
                             autoFocus
                             onChange={e => {
@@ -102,10 +108,10 @@ export const Login = ({history}) => {
                             helperText={email.helperText}
                         />
                         <TextField
-                            label="Enter your password"
+                            margin="dense"
+                            label="Password"
                             disabled={!captchaReady}
                             fullWidth
-                            required
                             type="password"
                             value={password.value ? password.value : ""}
                             error={password.error}
@@ -117,21 +123,33 @@ export const Login = ({history}) => {
                         <Recaptcha responseCallback={captchaResponse} setCaptchaReady={setCaptchaReady}
                                    submit={submit}/>
                     </CardContent>
-                    <CardActions>
+                    <CardContent>
                         <Button
+                            fullWidth={true}
                             disabled={password.error || email.error || !captchaReady}
                             variant="contained"
                             color="primary"
                             type="submit"
                         >
-                            Sign in {loading && (<CircularProgress/>)}
+                            Sign in {loading && (<CircularProgress size={25}/>)}
                         </Button>
-                        <Link href="#" onClick={handleRecoverPassword} variant="body2">
-                            Recover password
-                        </Link>
-                    </CardActions>
+                    </CardContent>
+                    <CardContent>
+                        <Typography display="block" variant="subtitle1" gutterBottom>
+                            First visit to Reef Supervisor ? {<Link href="#" onClick={handleRecoverPassword}
+                                                                    variant="body2">
+                            Sign up now.
+                        </Link>}
+                        </Typography>
+                        <Typography display="block" variant="subtitle1" gutterBottom>
+                            Password forgotten ? {<Link href="#" onClick={handleRecoverPassword} variant="body2">
+                            Reset password.
+                        </Link>}
+                        </Typography>
+                        <ConditionRecaptcha/>
+                    </CardContent>
                 </form>
-            </Card>
+            </CardContainerReponsive>
         </GridContainerResponsive>
     )
 };

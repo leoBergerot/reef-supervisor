@@ -1,28 +1,20 @@
 import React, {useContext, useEffect, useState} from "react";
 import {alertContext} from "../../contexts/alert-context";
 import {GridContainerResponsive} from "../common/grid-container-reponsive";
-import Card from "@material-ui/core/Card/Card";
-import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
-import CardActions from "@material-ui/core/CardActions/CardActions";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import {createStyles, makeStyles} from "@material-ui/core/styles";
 import {Recaptcha} from "../common/recaptcha";
-
-
-const useStyles = makeStyles((theme) => createStyles({
-    root: {
-        [theme.breakpoints.down("xs")]: {
-            boxShadow: '0 0 0 0',
-        }
-    }
-}));
+import {CardContainerReponsive} from "../common/card-container-responsive";
+import isEmpty from "validator/lib/isEmpty";
+import Typography from "@material-ui/core/Typography";
+import {ConditionRecaptcha} from "../common/condition-recaptcha";
+import isAlphanumeric from "validator/es/lib/isAlphanumeric";
+import isLength from "validator/es/lib/isLength";
 
 export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
-    const classes = useStyles();
-    const [newPassword, setNewPassword] = useState({value: null, error: false, helperText: null});
+    const [newPassword, setNewPassword] = useState({value: "", error: false, helperText: null});
     const [loading, setLoading] = useState(false);
     const {setAlert} = useContext(alertContext);
     const [captchaReady, setCaptchaReady] = useState(false);
@@ -88,20 +80,48 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
 
     const onSubmit = (event) => {
         event.preventDefault();
-        setSubmit(true);
-        setLoading(true);
+        let error = false;
+        let helperText = "";
+
+        if (isEmpty(newPassword.value)) {
+            helperText = "Please enter your password";
+            error = true;
+        }
+
+        if (!error && !isLength(newPassword.value, 6)) {
+            helperText = "Must be at least 6 characters long",
+                error = true;
+        }
+
+        if (isAlphanumeric(newPassword.value)) {
+            helperText = (!error ? "Please enter alphanumeric password" : helperText + " and alphanumeric");
+            error = true;
+        }
+
+        if (!error) {
+            setSubmit(true);
+            setLoading(true);
+        } else {
+            setNewPassword({
+                value: newPassword.value,
+                error: true,
+                helperText: helperText
+            });
+        }
     };
 
     return (
         <GridContainerResponsive>
-            <Card className={classes.root}>
+            <CardContainerReponsive>
                 <form onSubmit={onSubmit}>
-                    <CardHeader title="Reset your password" subheader="Enter a new password"/>
                     <CardContent>
+                        <Typography variant="h4" component="h4" gutterBottom>
+                            Reset your password
+                        </Typography>
                         <TextField
+                            margin="dense"
                             label="Password"
                             disabled={!captchaReady}
-                            required
                             fullWidth
                             autoFocus
                             onChange={e => {
@@ -113,18 +133,22 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                         <Recaptcha responseCallback={captchaResponse} setCaptchaReady={setCaptchaReady}
                                    submit={submit}/>
                     </CardContent>
-                    <CardActions>
+                    <CardContent>
                         <Button
+                            fullWidth={true}
                             disabled={newPassword.error || !captchaReady}
                             variant="contained"
                             color="primary"
                             type="submit"
                         >
-                            Update {loading && (<CircularProgress/>)}
+                            Update {loading && (<CircularProgress size={25}/>)}
                         </Button>
-                    </CardActions>
+                    </CardContent>
+                    <CardContent>
+                        <ConditionRecaptcha/>
+                    </CardContent>
                 </form>
-            </Card>
+            </CardContainerReponsive>
         </GridContainerResponsive>
     );
 };
