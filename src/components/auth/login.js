@@ -41,7 +41,7 @@ export const Login = ({history, match: {params: {enable}}}) => {
                         setLoading(false);
                         if (result.access_token) {
                             setAuthData(result.access_token);
-                            history.replace('/');
+                            history.replace('/tanks');
                             return null;
                         } else if (result.statusCode === 403) {
                             setPassword({value: password.value, error: true, helperText: result.message})

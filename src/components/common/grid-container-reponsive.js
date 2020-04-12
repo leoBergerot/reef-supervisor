@@ -1,9 +1,9 @@
 import React from "react";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import {HeaderLogin} from "./header-login";
+import {HeaderLogo} from "./header-logo";
 
-const useStyles = makeStyles((theme) => createStyles({
+const noFullHeightSmallStyles = makeStyles((theme) => createStyles({
     root: {
         [theme.breakpoints.up("sm")]: {
             height: "calc(100vh - 64px)",
@@ -11,13 +11,24 @@ const useStyles = makeStyles((theme) => createStyles({
     }
 }));
 
-export const GridContainerResponsive = ({children}) => {
+const fullHeightSmallStyles = makeStyles((theme) => createStyles({
+    root: {
+        [theme.breakpoints.up("sm")]: {
+            height: "calc(100vh - 64px)",
+        },
+        [theme.breakpoints.down("sm")]: {
+            height: "calc(70vh - 54px)",
+        }
+    }
+}));
 
-    const classes = useStyles();
+export const GridContainerResponsive = ({children, fullHeightSmall}) => {
+
+    const classes = !fullHeightSmall ? noFullHeightSmallStyles() : fullHeightSmallStyles();
 
     return (
         <>
-            <HeaderLogin/>
+            <HeaderLogo/>
             <Grid
                 container
                 direction="row"

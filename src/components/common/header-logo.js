@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => createStyles({
     }
 }));
 
-export const HeaderLogin = () => {
+export const HeaderLogo = () => {
     const classes = useStyles();
     return (
         <AppBar position="static" color="transparent" className={classes.root}>

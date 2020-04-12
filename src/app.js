@@ -6,6 +6,7 @@ import {GuardRoute} from "./components/guard/route-guard";
 import {ForgotPassword} from "./components/auth/forgot-password";
 import {RecoverPassword} from "./components/auth/recover-password";
 import {Register} from "./components/auth/register";
+import {List} from "./components/tanks/list";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
                   <Route path="/forgot-password" component={ForgotPassword}/>
                   <Route path="/recover-password/:id/:token" component={RecoverPassword}/>
                   <Route path="/register" component={Register}/>
+                  <GuardRoute path="/tanks" component={List}/>
                   <GuardRoute path="/" component={Home}/>
               </Switch>
           </BrowserRouter>
