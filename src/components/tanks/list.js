@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const List = () => {
+export const List = ({history}) => {
     const {auth} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
@@ -75,7 +75,7 @@ export const List = () => {
                     </TypographyResponsive>
                     <div className={classes.listTank}>
                         {tankList.data.map((tank) => (
-                            <Card name={tank.name}/>
+                            <Card key={tank.id} data={tank} history={history}/>
                         ))}
                         <AddButton/>
                     </div>

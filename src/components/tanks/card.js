@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useContext} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {TypographyResponsive} from "../common/typography-responsive";
 import {CardActionArea} from "@material-ui/core";
 import {default as CardMu} from "@material-ui/core/Card"
 import CardMedia from "@material-ui/core/CardMedia";
+import {tankContext} from "../../contexts/tank-context";
 
 
 const useStyles = makeStyles({
@@ -21,19 +22,25 @@ const useStyles = makeStyles({
         minHeight: "84px",
     },
 });
-export const Card = ({name, img}) => {
-
+export const Card = ({data, history}) => {
     const classes = useStyles();
+    const {setTank} = useContext(tankContext);
+
+    const handleClick = (data) => {
+        setTank({data: data});
+        history.push('/')
+    };
+
     return (
         <CardMu className={classes.root}>
-            <CardActionArea>
+            <CardActionArea onClick={() => handleClick(data)}>
                 <CardMedia className={classes.img}
                            src="https://cdn.pixabay.com/photo/2016/05/14/11/54/anemone-1391724_1280.jpg"
                            component="img"
                 >
                 </CardMedia>
                 <TypographyResponsive>
-                    {name}
+                    {data.name}
                 </TypographyResponsive>
             </CardActionArea>
         </CardMu>

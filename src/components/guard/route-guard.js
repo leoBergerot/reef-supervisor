@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import React, {useContext} from 'react';
+import {Redirect, Route} from 'react-router-dom';
 import {authContext} from "../../contexts/auth-context";
 import jwt_decode from 'jwt-decode'
+import {tankContext} from "../../contexts/tank-context";
+import {List} from "../tanks/list";
 
 export const GuardRoute = ({ component: Component, ...rest }) => {
     const {auth} = useContext(authContext);
+    const {tank} = useContext(tankContext);
     const { loading } = auth;
 
     if (loading) {
@@ -21,7 +24,9 @@ export const GuardRoute = ({ component: Component, ...rest }) => {
         <Route
             {...rest}
             render={(routeProps) => (
-                auth.token && jwt_decode(auth.token).exp > Date.now().valueOf() / 1000 ? <Component {...routeProps} /> : <Redirect to="/login"/>
+                auth.token && jwt_decode(auth.token).exp > Date.now().valueOf() / 1000 ? (!tank.data ?
+                    <List {...routeProps} /> :
+                    <Component {...routeProps} />) : <Redirect to="/login"/>
             )}
         />)
 };

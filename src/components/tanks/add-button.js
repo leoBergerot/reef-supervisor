@@ -56,9 +56,14 @@ const useStyles = makeStyles((theme) => (
 export const AddButton = () => {
 
     const classes = useStyles();
-    return (
 
+    const handleOnClick = () => {
+        console.log("add tank")
+    };
+
+    return (
         <ButtonBase
+            onClick={handleOnClick}
             disableTouchRipple
             aria-label="add tank"
             className={classes.root}

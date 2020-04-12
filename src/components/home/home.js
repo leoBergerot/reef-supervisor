@@ -6,7 +6,6 @@ export const Home = () => {
     <>
         <Header>
         </Header>
-        Home
     </>
     )
 };
