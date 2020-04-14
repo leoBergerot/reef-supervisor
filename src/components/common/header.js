@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const Header = () => {
+export const Header = ({history}) => {
     const {auth, setAuthData} = useContext(authContext);
     const {tank, setTank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
@@ -46,9 +46,14 @@ export const Header = () => {
     };
 
     const handleChangeTankClick = (data) => {
-        handleClose()
+        handleClose();
         setTank({data: data});
     };
+
+    const handleManageTanks = () => {
+        handleClose();
+        history.push("/tanks/manage")
+    }
 
     useEffect(() => {
         fetch(process.env.REACT_APP_API_URL + '/tanks', {
@@ -114,7 +119,7 @@ export const Header = () => {
                             )
                         ))
                         }
-                        <MenuItem onClick={handleClose} color="inherit">Manage tanks</MenuItem>
+                        <MenuItem onClick={handleManageTanks} color="inherit">Manage tanks</MenuItem>
                         <Divider variant="middle"/>
                         <MenuItem onClick={handleClose} color="inherit">Account</MenuItem>
                         <MenuItem onClick={onLogout} color="inherit">Logout</MenuItem>

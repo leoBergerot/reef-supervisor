@@ -13,6 +13,7 @@ const noFullHeightSmallStyles = makeStyles((theme) => createStyles({
 
 const fullHeightSmallStyles = makeStyles((theme) => createStyles({
     root: {
+        backgroundColor: "#FFF !important",
         [theme.breakpoints.up("sm")]: {
             height: "calc(100vh - 64px)",
         },

@@ -1,13 +1,14 @@
-import React, {useContext} from "react";
+import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {TypographyResponsive} from "../common/typography-responsive";
 import {CardActionArea} from "@material-ui/core";
 import {default as CardMu} from "@material-ui/core/Card"
 import CardMedia from "@material-ui/core/CardMedia";
-import {tankContext} from "../../contexts/tank-context";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPen} from "@fortawesome/free-solid-svg-icons";
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     root: {
         width: "10vw",
         maxWidth: "200px",
@@ -21,24 +22,39 @@ const useStyles = makeStyles({
         minWidth: "84px",
         minHeight: "84px",
     },
-});
-export const Card = ({data, history}) => {
-    const classes = useStyles();
-    const {setTank} = useContext(tankContext);
+    edit: {
+        color: "#FFF",
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        [theme.breakpoints.up("xs")]: {
+            fontSize: "3vw"
 
-    const handleClick = (data) => {
-        setTank({data: data});
-        history.push('/')
-    };
+        },
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "6vw"
+        }
+    }
+}));
+export const Card = ({data, history, edit, handleClick}) => {
+    const classes = useStyles();
 
     return (
         <CardMu className={classes.root}>
             <CardActionArea onClick={() => handleClick(data)}>
-                <CardMedia className={classes.img}
-                           src="https://cdn.pixabay.com/photo/2016/05/14/11/54/anemone-1391724_1280.jpg"
-                           component="img"
-                >
-                </CardMedia>
+                <div style={{position: "relative"}}>
+                    <CardMedia className={classes.img}
+                               src="https://cdn.pixabay.com/photo/2016/05/14/11/54/anemone-1391724_1280.jpg"
+                               component="img"
+                    >
+                    </CardMedia>
+                    {edit && (
+                        <div className={classes.edit}>
+                            <FontAwesomeIcon icon={faPen}/>
+                        </div>
+                    )}
+                </div>
                 <TypographyResponsive>
                     {data.name}
                 </TypographyResponsive>

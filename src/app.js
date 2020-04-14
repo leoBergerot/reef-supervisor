@@ -17,7 +17,7 @@ function App() {
                   <Route path="/forgot-password" component={ForgotPassword}/>
                   <Route path="/recover-password/:id/:token" component={RecoverPassword}/>
                   <Route path="/register" component={Register}/>
-                  <GuardRoute path="/tanks" component={List}/>
+                  <GuardRoute path="/tanks/:manage?" component={List}/>
                   <GuardRoute path="/" component={Home}/>
               </Switch>
           </BrowserRouter>

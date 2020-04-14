@@ -1,10 +1,10 @@
 import React from "react";
 import {Header} from "../common/header";
 
-export const Home = () => {
+export const Home = ({history}) => {
     return(
     <>
-        <Header>
+        <Header history={history}>
         </Header>
     </>
     )
