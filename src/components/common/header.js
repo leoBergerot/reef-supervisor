@@ -5,12 +5,12 @@ import {authContext} from "../../contexts/auth-context";
 import Typography from "@material-ui/core/Typography";
 import {tankContext} from "../../contexts/tank-context";
 import IconButton from "@material-ui/core/IconButton";
-import {AccountCircle} from "@material-ui/icons";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Divider from "@material-ui/core/Divider";
 import {alertContext} from "../../contexts/alert-context";
+import Avatar from '@material-ui/core/Avatar';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -24,7 +24,7 @@ export const Header = ({history}) => {
     const {setAlert} = useContext(alertContext);
 
     const [tankList, setTankList] = useState({loading: true, data: []});
-
+    const [avatar, setAvatar] = useState(null);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -80,6 +80,26 @@ export const Header = ({history}) => {
 
     }, []);
 
+    useEffect(() => {
+        if (tank.data && tank.data.avatar) {
+            fetch(`${process.env.REACT_APP_API_URL}/tanks/${tank.data.id}/avatars`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + auth.token
+                },
+            })
+                .then(res => {
+                    if (res.status === 200) {
+                        res.blob().then(blob => {
+                            setAvatar(URL.createObjectURL(blob))
+                        })
+                    }
+                });
+        }else {
+            setAvatar(null)
+        }
+    }, [tank.data]);
 
     return (
         <AppBar position="static">
@@ -95,7 +115,9 @@ export const Header = ({history}) => {
                         onClick={handleMenu}
                         color="inherit"
                     >
-                        <AccountCircle/>
+                        {avatar ? <Avatar src={avatar}/> :
+                            <Avatar/>
+                        }
                     </IconButton>
                     <Menu
                         id="menu-appbar"

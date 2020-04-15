@@ -150,8 +150,8 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                                             message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
                                             severity: 'success'
                                         });
-                                        setTank({data: result});
                                         if (!edit) {
+                                            setTank({data: result});
                                             history.push('/');
                                         } else {
                                             result.avatar = avatar.blob;
@@ -166,8 +166,8 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                                 message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
                                 severity: 'success'
                             });
-                            setTank({data: result});
                             if (!edit) {
+                                setTank({data: result});
                                 history.push('/');
                             } else {
                                 handleEditSuccess(result);
