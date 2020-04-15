@@ -53,7 +53,7 @@ export const Header = ({history}) => {
     const handleManageTanks = () => {
         handleClose();
         history.push("/tanks/manage")
-    }
+    };
 
     useEffect(() => {
         fetch(process.env.REACT_APP_API_URL + '/tanks', {

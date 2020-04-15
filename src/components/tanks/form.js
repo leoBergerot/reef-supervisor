@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {GridContainerResponsive} from "../common/grid-container-reponsive";
@@ -11,6 +11,11 @@ import {TypographyResponsive} from "../common/typography-responsive";
 import Divider from "@material-ui/core/Divider";
 import isEmpty from "validator/lib/isEmpty";
 import {DeleteModal} from "../common/delete-modal";
+import CardMedia from "@material-ui/core/CardMedia";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPen} from "@fortawesome/free-solid-svg-icons";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import defaultAvatar from "../../../asset/images/default_avatar.svg";
 
 const useStyles = makeStyles((theme) => createStyles({
     form: {
@@ -32,13 +37,41 @@ const useStyles = makeStyles((theme) => createStyles({
         margin: "1rem 0"
     },
     fields: {
-        margin: "1rem 0"
+        margin: "1rem 0",
+        display: "flex"
     },
     actions: {
         margin: "1rem 0",
         "& button:not(:first-child)": {
             marginLeft: "1rem"
         }
+    },
+    avatar: {
+        position: "relative",
+        marginRight: "1rem",
+    },
+    img: {
+        height: "10vw",
+        width: "10vw",
+        maxWidth: "200px",
+        minWidth: "84px",
+        minHeight: "84px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    edit: {
+        color: "#FFF",
+        position: "absolute",
+        top: "93%",
+        left: "7%",
+        transform: "translate(-7%, -93%)",
+        fontSize: "0.65rem",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        padding: "0.3rem",
+        borderRadius: "50rem",
+        border: "1px solid white",
+        filter: "drop-shadow(1px 1px 2px #000)"
     }
 }));
 export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
@@ -49,9 +82,30 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     const [name, setName] = useState({value: (!!edit ? edit.name : ""), error: false, helperText: null});
     const [loading, setLoading] = useState(false);
 
+    const [avatar, setAvatar] = useState({url: null, blob: null, update: false});
+    const inputFile = useRef(null);
+
     const [openDeleteModal, setIsOpenDeleteModal] = useState(false);
 
     const classes = useStyles();
+    useEffect(() => {
+        if (edit) {
+            fetch(`${process.env.REACT_APP_API_URL}/tanks/${edit.id}/avatars`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + auth.token
+                },
+            })
+                .then(res => {
+                    if (res.status === 200) {
+                        res.blob().then(blob => {
+                            setAvatar({update: false, url: URL.createObjectURL(blob), blob: null})
+                        })
+                    }
+                });
+        }
+    }, [edit]);
 
     const onSubmit = (event) => {
         event.preventDefault();
@@ -78,16 +132,46 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                 (result) => {
                     setLoading(false);
                     if (result.name) {
-                        setAlert({
-                            open: true,
-                            message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
-                            severity: 'success'
-                        });
-                        setTank({data: result});
-                        if (!edit) {
-                            history.push('/');
+                        //update avatar
+                        if (avatar.blob && avatar.update) {
+                            const formData = new FormData();
+                            formData.append("file", avatar.blob);
+                            fetch(`${process.env.REACT_APP_API_URL}/tanks/${result.id}/avatars`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Authorization': 'Bearer ' + auth.token
+                                },
+                                body: formData
+                            }).then(
+                                res => {
+                                    if (res.status === 200) {
+                                        setAlert({
+                                            open: true,
+                                            message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                                            severity: 'success'
+                                        });
+                                        setTank({data: result});
+                                        if (!edit) {
+                                            history.push('/');
+                                        } else {
+                                            result.avatar = avatar.blob;
+                                            handleEditSuccess(result);
+                                        }
+                                    }
+                                }
+                            )
                         } else {
-                            handleEditSuccess(result);
+                            setAlert({
+                                open: true,
+                                message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                                severity: 'success'
+                            });
+                            setTank({data: result});
+                            if (!edit) {
+                                history.push('/');
+                            } else {
+                                handleEditSuccess(result);
+                            }
                         }
                         return null;
                     } else if (result.statusCode === 400) {
@@ -144,6 +228,10 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
             });
     };
 
+    const handleClickAvatar = () => {
+        inputFile.current.click()
+    };
+
     return (
         <GridContainerResponsive fullHeightSmall>
             <form onSubmit={onSubmit} className={classes.form}>
@@ -152,6 +240,33 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                 </TypographyResponsive>
                 <Divider/>
                 <div className={classes.fields}>
+                    <div className={classes.avatar}>
+                        <CardActionArea
+                            onClick={handleClickAvatar}
+                        >
+                            <CardMedia
+                                className={classes.img}
+                                src={avatar.url ? avatar.url : defaultAvatar}
+                                component="img"
+                            >
+                            </CardMedia>
+                            <div className={classes.edit}>
+                                <FontAwesomeIcon icon={faPen}/>
+                            </div>
+                            <input
+                                style={{display: "none"}}
+                                onChange={(event => {
+                                        setAvatar({
+                                            url: URL.createObjectURL(event.target.files[0]),
+                                            blob: event.target.files[0],
+                                            update: true
+                                        })
+                                    }
+                                )}
+                                type="file"
+                                ref={inputFile}/>
+                        </CardActionArea>
+                    </div>
                     <TextField
                         margin="dense"
                         label="Name"

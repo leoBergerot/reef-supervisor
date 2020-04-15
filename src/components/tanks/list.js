@@ -113,6 +113,7 @@ export const List = ({history, match: {params: {manage}}}) => {
             data = tankList.data.map((value) => {
                 if (value.id === result.id) {
                     value.name = result.name;
+                    value.avatar = result.avatar;
                 }
                 return value
             });
@@ -141,9 +142,8 @@ export const List = ({history, match: {params: {manage}}}) => {
                         {manage ? "Manage tanks :" : "Choice your tank :"}
                     </TypographyResponsive>
                     <div className={classes.listTank}>
-                        {console.log(tankList.data)}
                         {tankList.data.map((tank) => (
-                            <Card edit={!!manage} key={tank.id} data={tank} history={history}
+                            <Card edit={!!manage} key={tank.id} data={tank}
                                   handleClick={handleClick}/>
                         ))}
                         <AddButton onClick={handleOpen}/>
