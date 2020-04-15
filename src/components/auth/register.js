@@ -15,10 +15,10 @@ import isEmail from "validator/es/lib/isEmail";
 import {alertContext} from "../../contexts/alert-context";
 
 export const Register = ({history}) => {
-    const [password, setPassword] = useState({value: "azerty1@", error: false, helperText: null});
-    const [email, setEmail] = useState({value: "leo.bergerot@gmail.com", error: false, helperText: null});
-    const [firstName, setFirstName] = useState({value: "leo", error: false, helperText: null});
-    const [lastName, setLastName] = useState({value: "Bergerot", error: false, helperText: null});
+    const [password, setPassword] = useState({value: "", error: false, helperText: null});
+    const [email, setEmail] = useState({value: "", error: false, helperText: null});
+    const [firstName, setFirstName] = useState({value: "", error: false, helperText: null});
+    const [lastName, setLastName] = useState({value: "", error: false, helperText: null});
 
 
     const [loading, setLoading] = useState(false);
