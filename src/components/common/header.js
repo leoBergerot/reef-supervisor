@@ -6,11 +6,12 @@ import Typography from "@material-ui/core/Typography";
 import {tankContext} from "../../contexts/tank-context";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Divider from "@material-ui/core/Divider";
 import {alertContext} from "../../contexts/alert-context";
-import Avatar from '@material-ui/core/Avatar';
+import {Avatar} from "./avatar";
+import {MenuItemAvatar} from "./menu-item";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -77,7 +78,6 @@ export const Header = ({history}) => {
                     });
                 }
             );
-
     }, []);
 
     useEffect(() => {
@@ -109,6 +109,7 @@ export const Header = ({history}) => {
                 </Typography>
                 <div>
                     <IconButton
+                        size="small"
                         aria-label="account of current user"
                         aria-controls="menu-appbar"
                         aria-haspopup="true"
@@ -136,8 +137,8 @@ export const Header = ({history}) => {
                     >
                         {!tankList.loading && tankList.data.map((value) => (
                             tank.data.id !== value.id && (
-                                <MenuItem onClick={() => handleChangeTankClick(value)}
-                                          key={value.id}>{value.name}</MenuItem>
+                                <MenuItemAvatar onClick={() => handleChangeTankClick(value)}
+                                                key={value.id} data={value}/>
                             )
                         ))
                         }
