@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     modal: {
-        "& div:first-child ": {backgroundColor: "transparent !important"}
+        "& div:first-child ": {backgroundColor: "white !important"},
     }
 }));
 

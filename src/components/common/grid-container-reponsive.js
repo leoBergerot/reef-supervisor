@@ -13,12 +13,15 @@ const noFullHeightSmallStyles = makeStyles((theme) => createStyles({
 
 const fullHeightSmallStyles = makeStyles((theme) => createStyles({
     root: {
+        overflow: "scroll",
         backgroundColor: "#FFF !important",
-        [theme.breakpoints.up("sm")]: {
+        [theme.breakpoints.up("xs")]: {
             height: "calc(100vh - 64px)",
+            alignItems: "center"
         },
-        [theme.breakpoints.down("sm")]: {
-            height: "calc(70vh - 54px)",
+        [theme.breakpoints.down("xs")]: {
+            height: "calc(100vh - 56px)",
+            alignItems: "baseline"
         }
     }
 }));

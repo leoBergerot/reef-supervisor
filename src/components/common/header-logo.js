@@ -6,9 +6,7 @@ import {createStyles, makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
-        [theme.breakpoints.down("xs")]: {
             boxShadow: '0 0 0 0',
-        }
     }
 }));
 
