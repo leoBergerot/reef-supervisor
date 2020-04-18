@@ -1,12 +1,21 @@
 import React from "react";
 import AppBar from "@material-ui/core/AppBar/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
+import logo from "../../../asset/images/logo.svg";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
             boxShadow: '0 0 0 0',
+    },
+    logo: {
+        [theme.breakpoints.up("xs")]: {
+            height: "60px"
+        },
+        [theme.breakpoints.down("xs")]: {
+            height: "52px"
+        }
+
     }
 }));
 
@@ -15,9 +24,8 @@ export const HeaderLogo = () => {
     return (
         <AppBar position="static" color="transparent" className={classes.root}>
             <Toolbar>
-                <Typography variant="h6" component="h6">
-                    REEF SUPERVISOR
-                </Typography>
+                <img alt="logo-reef-supervisor" className={classes.logo} src={logo}>
+                </img>
             </Toolbar>
         </AppBar>
     )

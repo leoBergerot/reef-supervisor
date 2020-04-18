@@ -12,6 +12,7 @@ module.exports = (env) => {
     output: {
         filename: 'build.js',
         path: path.resolve(__dirname, 'build'),
+        publicPath: "/"
     },
     module: {
       rules: [
@@ -61,7 +62,8 @@ module.exports = (env) => {
     devServer: {
       historyApiFallback: true,
         overlay: true,
-        port: 9000
+        port: 9000,
+        publicPath: "/"
     }
   };
 
