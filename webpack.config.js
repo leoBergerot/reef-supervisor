@@ -1,5 +1,7 @@
 const path = require('path');
 const HWP = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
 
 const Dotenv = require('dotenv-webpack');
 
@@ -52,6 +54,9 @@ module.exports = (env) => {
 
               }
           ),
+            new CopyPlugin([
+                {from: 'public', to: './'},
+            ]),
         ],
     devServer: {
       historyApiFallback: true,
