@@ -21,20 +21,20 @@ export const Recaptcha = ({responseCallback, setCaptchaReady, submit}) => {
 
     useEffect(() => {
         if (submit) {
-            grecaptcha.execute();
+            window.grecaptcha.execute();
         }
     }, [submit]);
 
     const onLoad = () => {
         setTimeout(function () {
-                if (typeof grecaptcha === 'undefined' || typeof grecaptcha.render === 'undefined') {
+                if (typeof grecaptcha === 'undefined' || typeof window.grecaptcha.render === 'undefined') {
                     onLoad();
                 } else {
-                    grecaptcha.render('recaptcha', {
+                    window.grecaptcha.render('recaptcha', {
                         sitekey: process.env.REACT_APP_RECAPTCHA_KEY_SITE,
                         size: 'invisible',
                         callback: (token) => {
-                            grecaptcha.reset();
+                            window.grecaptcha.reset();
                             responseCallback(token);
                         }
                     });

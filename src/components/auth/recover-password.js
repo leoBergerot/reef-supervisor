@@ -95,8 +95,8 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
         }
 
         if (!error && !isLength(newPassword.value, 6)) {
-            helperText = "Must be at least 6 characters long",
-                error = true;
+            helperText = "Must be at least 6 characters long";
+            error = true;
         }
 
         if (isAlphanumeric(newPassword.value)) {
