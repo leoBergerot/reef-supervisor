@@ -29,7 +29,8 @@ ReactDOM.render(
           <AuthProvider key={0}/>,
           <AlertProvider key={1}/>,
           <TankProvider key={2}/>,
-          <ThemeProvider key={3} theme={theme}/>
+          <ThemeProvider key={3} theme={theme}
+          />
       ]}>
           <App/>
       </ContextProviderComposer>

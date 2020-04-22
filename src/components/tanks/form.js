@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import {GridContainerResponsive} from "../common/grid-container-reponsive";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {alertContext} from "../../contexts/alert-context";
 import {authContext} from "../../contexts/auth-context";
@@ -16,15 +15,23 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPen} from "@fortawesome/free-solid-svg-icons";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles((theme) => createStyles({
+    root: {
+        position: "absolute",
+        right: 0,
+        top: 0,
+        left:0,
+        height:"100%",
+        backgroundColor: "#fff"
+    },
     form: {
         [theme.breakpoints.up("xs")]: {
-            minWidth: "40%",
-            marginBottom: "5vh"
+            margin: "0 20vw 0 20vw",
         },
         [theme.breakpoints.down("xs")]: {
-            minWidth: "90%"
+            margin: "0 4vw 0 4vw",
         }
     },
     typography: {
@@ -233,7 +240,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     };
 
     return (
-        <GridContainerResponsive fullHeightSmall>
+        <div className={classes.root}>
             <form onSubmit={onSubmit} className={classes.form}>
                 <TypographyResponsive overrideClasses={{root: classes.typography}}>
                     {!!edit ? "Update tank" : "Add Tank"}
@@ -313,6 +320,6 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     onDelete={handleOnDelete}
                 />)}
             </form>
-        </GridContainerResponsive>
+        </div>
     )
 };

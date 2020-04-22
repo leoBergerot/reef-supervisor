@@ -3,32 +3,25 @@ import {createStyles, makeStyles} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import {HeaderLogo} from "./header-logo";
 
-const noFullHeightSmallStyles = makeStyles((theme) => createStyles({
-    root: {
-        [theme.breakpoints.up("sm")]: {
-            height: "calc(100vh - 64px)",
-        }
-    }
-}));
-
-const fullHeightSmallStyles = makeStyles((theme) => createStyles({
+const useStyles = makeStyles((theme) => createStyles({
     root: {
         overflow: "scroll",
+        position: "absolute",
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: "#FFF !important",
-        [theme.breakpoints.up("xs")]: {
-            height: "calc(100vh - 64px)",
-            alignItems: "center"
+        [theme.breakpoints.up("sm")]: {
+            top: "64px",
         },
-        [theme.breakpoints.down("xs")]: {
-            height: "calc(100vh - 56px)",
-            alignItems: "baseline"
-        }
+        [theme.breakpoints.down("sm")]: {
+            top: "56px",
+        },
     }
 }));
 
-export const GridContainerResponsive = ({children, fullHeightSmall}) => {
+export const GridContainerResponsive = ({children}) => {
 
-    const classes = !fullHeightSmall ? noFullHeightSmallStyles() : fullHeightSmallStyles();
+    const classes = useStyles();
 
     return (
         <>

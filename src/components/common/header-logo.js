@@ -1,12 +1,12 @@
 import React from "react";
 import AppBar from "@material-ui/core/AppBar/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import {createStyles, makeStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import logo from "../../../asset/images/logo.svg";
 
-const useStyles = makeStyles((theme) => createStyles({
+const useStyles = makeStyles((theme) => ({
     root: {
-            boxShadow: '0 0 0 0',
+            boxShadow: '0 0 0 0 !important',
     },
     logo: {
         [theme.breakpoints.up("xs")]: {
@@ -20,8 +20,9 @@ const useStyles = makeStyles((theme) => createStyles({
 
 export const HeaderLogo = () => {
     const classes = useStyles();
+
     return (
-        <AppBar position="static" color="transparent" className={classes.root}>
+        <AppBar position="fixed" color="inherit" className={classes.root}>
             <Toolbar>
                 <img alt="logo-reef-supervisor" className={classes.logo} src={logo}>
                 </img>

@@ -41,7 +41,15 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     modal: {
-        "& div:first-child ": {backgroundColor: "white !important"},
+        [theme.breakpoints.down("sm")]: {
+            top: "56px !important",
+        },
+        [theme.breakpoints.up("sm")]: {
+            top: "64px !important",
+        },
+        "& div:first-child ": {
+            backgroundColor: "transparent !important"
+        },
     }
 }));
 
@@ -135,7 +143,7 @@ export const List = ({history, match: {params: {manage}}}) => {
     };
 
     return (
-        <GridContainerResponsive fullHeightSmall>
+        <GridContainerResponsive>
             {!tankList.loading ?
                 <div className={classes.list}>
                     <TypographyResponsive overrideClasses={{root: classes.typography}}>

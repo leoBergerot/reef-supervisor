@@ -62,7 +62,7 @@ export const Header = ({history}) => {
 
     const handleManageTanks = () => {
         handleClose();
-        history.push("/tanks/manage")
+        history.push("/tanks/manage");
     };
 
     useEffect(() => {
@@ -111,7 +111,7 @@ export const Header = ({history}) => {
     }, [tank.data]);
 
     return (
-        <AppBar position="fixed" color="inherit">
+        <AppBar position="fixed" color="inherit" className={classes.root}>
             <Toolbar>
                 <div className={classes.divLogo}>
                     <img alt="logo-reef-supervisor" className={classes.logo} src={logo}>
