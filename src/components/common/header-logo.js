@@ -15,7 +15,6 @@ const useStyles = makeStyles((theme) => createStyles({
         [theme.breakpoints.down("xs")]: {
             height: "52px"
         }
-
     }
 }));
 

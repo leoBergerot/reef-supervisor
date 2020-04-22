@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import {authContext} from "../../contexts/auth-context";
-import Typography from "@material-ui/core/Typography";
 import {tankContext} from "../../contexts/tank-context";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
@@ -12,11 +11,21 @@ import {alertContext} from "../../contexts/alert-context";
 import {Avatar} from "./avatar";
 import {MenuItemAvatar} from "./menu-item";
 import MenuItem from "@material-ui/core/MenuItem";
+import logo from "../../../asset/images/logo.svg";
 
 const useStyles = makeStyles((theme) => ({
-    title: {
-        flexGrow: 1,
+    logo: {
+        display: "block",
+        [theme.breakpoints.up("xs")]: {
+            height: "60px"
+        },
+        [theme.breakpoints.down("xs")]: {
+            height: "52px"
+        }
     },
+    divLogo: {
+        flexGrow: 1
+    }
 }));
 
 export const Header = ({history}) => {
@@ -102,11 +111,12 @@ export const Header = ({history}) => {
     }, [tank.data]);
 
     return (
-        <AppBar position="static">
+        <AppBar position="fixed" color="inherit">
             <Toolbar>
-                <Typography variant="h6" className={classes.title}>
-                    Tank : {tank.data.name}
-                </Typography>
+                <div className={classes.divLogo}>
+                    <img alt="logo-reef-supervisor" className={classes.logo} src={logo}>
+                    </img>
+                </div>
                 <div>
                     <IconButton
                         size="small"
