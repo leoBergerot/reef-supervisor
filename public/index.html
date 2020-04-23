@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
 
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <meta name="theme-color" content="#000000" />
     <meta
             name="description"
@@ -46,4 +46,13 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script>
+    // ios key keyboard open close
+    window.visualViewport.addEventListener('resize', function (event) {
+      document.body.style.height = event.target.height+'px'
+    });
+
+    //auto scroll input ios
+    window.onscroll = function () { window.scrollTo(0, 0); };
+  </script>
 </html>

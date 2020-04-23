@@ -15,15 +15,22 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPen} from "@fortawesome/free-solid-svg-icons";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
-import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
-        position: "absolute",
+        overflow: "scroll",
+        position: "fixed",
         right: 0,
-        top: 0,
         left:0,
-        height:"100%",
+        [theme.breakpoints.up("xs")]: {
+            top: "64px",
+        },
+        [theme.breakpoints.down("xs")]: {
+            top: "56px",
+        },
+        bottom: 0,
+        top: 0,
+        height: "inherit",
         backgroundColor: "#fff"
     },
     form: {

@@ -168,7 +168,7 @@ export const Register = ({history}) => {
     };
 
     return (
-        <GridContainerResponsive>
+        <GridContainerResponsive baseline={true}>
             <CardContainerReponsive>
                 <form onSubmit={onSubmit}>
                     <CardContent>
