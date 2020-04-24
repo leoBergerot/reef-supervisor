@@ -47,12 +47,17 @@
     -->
   </body>
   <script>
-    // ios key keyboard open close
-    window.visualViewport.addEventListener('resize', function (event) {
-      document.body.style.height = event.target.height+'px'
-    });
+    if (!!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)) {
+      // ios key keyboard open close
+      window.visualViewport.addEventListener('resize', function (event) {
+        document.body.style.height = event.target.height + 'px'
+      });
+      //auto scroll input ios
+      window.onscroll = function () {
+        window.scrollTo(0, 0);
+      };
+    }
 
-    //auto scroll input ios
-    window.onscroll = function () { window.scrollTo(0, 0); };
+
   </script>
 </html>
