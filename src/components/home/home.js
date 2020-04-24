@@ -1,9 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Header} from "../common/header";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Measure} from "./measure";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {authContext} from "../../contexts/auth-context";
+import {alertContext} from "../../contexts/alert-context";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,25 +43,34 @@ const useStyles = makeStyles((theme) => ({
 
 export const Home = ({history}) => {
     const classes = useStyles();
-    const parameters = [{shortName: "KH", name: "Water hardness", unit: "°KH"}, {
-        shortName: "MG",
-        name: "Magnesium",
-        unit: "mg/l"
-    }, {shortName: "CA", name: "Calcium", unit: "mg/l"}, {
-        shortName: "MG",
-        name: "Magnesium",
-        unit: "mg/l"
-    }, {shortName: "NO3", name: "Nitrate", unit: "mg/l"}, {
-        shortName: "MG",
-        name: "Magnesium",
-        unit: "mg/l"
-    }, {shortName: "°C", name: "Temperature", unit: "°C"}];
-
+    const {auth} = useContext(authContext);
+    const {setAlert} = useContext(alertContext);
     const [types, setTypes] = useState({loading: true, data: null});
 
     useEffect(() => {
-
+        fetch(process.env.REACT_APP_API_URL + '/measure-types', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + auth.token
+            },
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setTypes({data: result, loading: false});
+                },
+                (error) => {
+                    setTypes({loading: false, data: []});
+                    setAlert({
+                        open: true,
+                        message: `An error occurred`,
+                        severity: 'error'
+                    });
+                }
+            );
     }, []);
+
     return(
     <>
         <Header history={history}>
@@ -71,8 +82,8 @@ export const Home = ({history}) => {
             :
             <div className={classes.root}>
             <Grid container>
-                {parameters.map((value, index) => (
-                    <Measure key={index} name={value.name} shortName={value.shortName} unit={value.unit}/>
+                {!types.loading && types.data.map((value, index) => (
+                    <Measure key={index} name={value.name} shortName={value.shortName} unit={value.unit} type={value.id}/>
                 ))}
             </Grid>
             </div>}
