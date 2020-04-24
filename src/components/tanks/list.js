@@ -7,10 +7,9 @@ import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import {CircularProgress} from "@material-ui/core";
 import {TypographyResponsive} from "../common/typography-responsive";
-import Modal from "@material-ui/core/Modal";
-import {Form} from "./form";
 import {tankContext} from "../../contexts/tank-context";
 import Button from "@material-ui/core/Button";
+import FormModal from "./modal";
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -169,14 +168,8 @@ export const List = ({history, match: {params: {manage}}}) => {
                     )}
                 </div>
                 : <CircularProgress/>}
-            <Modal
-                className={classes.modal}
-                open={open}
-                onClose={handleClose}
-            >
-                <Form handleClose={handleClose} history={history} edit={tankEdit.data}
-                      handleEditSuccess={handleEditSuccess}/>
-            </Modal>
+            <FormModal handleClose={handleClose} history={history} handleEditSuccess={handleEditSuccess}
+                       tankEdit={tankEdit} open={open}/>
         </GridContainerResponsive>
     )
 };

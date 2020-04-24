@@ -10,7 +10,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const MenuItemAvatar = ({data, onClick}) => {
+export const MenuItemAvatarWithRef = React.forwardRef((props, ref) => <MenuItemAvatar innerRef={ref} {...props} />);
+
+const MenuItemAvatar = ({data, onClick}) => {
     const classes = useStyles();
     const [avatar, setAvatar] = useState(null);
     const {auth} = useContext(authContext);

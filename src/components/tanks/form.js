@@ -18,6 +18,7 @@ import defaultAvatar from "../../../asset/images/default_avatar.svg";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
+        backgroundColor: "#FFF",
         overflow: "scroll",
         position: "fixed",
         right: 0,
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => createStyles({
         bottom: 0,
         top: 0,
         height: "inherit",
-        backgroundColor: "#fff"
     },
     form: {
         [theme.breakpoints.up("xs")]: {
@@ -103,7 +103,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
 
     const classes = useStyles();
     useEffect(() => {
-        if (edit) {
+        if (edit && edit.avatar) {
             fetch(`${process.env.REACT_APP_API_URL}/tanks/${edit.id}/avatars`, {
                 method: 'GET',
                 headers: {

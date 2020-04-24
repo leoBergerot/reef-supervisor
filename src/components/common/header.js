@@ -9,7 +9,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Divider from "@material-ui/core/Divider";
 import {alertContext} from "../../contexts/alert-context";
 import {Avatar} from "./avatar";
-import {MenuItemAvatar} from "./menu-item";
+import {MenuItemAvatar, MenuItemAvatarWithRef} from "./menu-item";
 import MenuItem from "@material-ui/core/MenuItem";
 import logo from "../../../asset/images/logo.svg";
 
@@ -147,8 +147,9 @@ export const Header = ({history}) => {
                     >
                         {!tankList.loading && tankList.data.map((value) => (
                             tank.data.id !== value.id && (
-                                <MenuItemAvatar onClick={() => handleChangeTankClick(value)}
-                                                key={value.id} data={value}/>
+                                <MenuItemAvatarWithRef onClick={() => handleChangeTankClick(value)}
+                                                key={value.id} data={value}
+                                />
                             )
                         ))
                         }
