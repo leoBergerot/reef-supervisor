@@ -9,6 +9,8 @@ import {Register} from "./components/auth/register";
 import {List} from "./components/tanks/list";
 import {ThemeProvider} from "@material-ui/styles";
 import {createMuiTheme} from "@material-ui/core";
+import {MuiPickersUtilsProvider} from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 
 const theme = createMuiTheme({
     palette: {
@@ -25,7 +27,8 @@ const theme = createMuiTheme({
 
 function App() {
   return (
-      <ThemeProvider key={3} theme={theme}>
+      <ThemeProvider theme={theme}>
+          <MuiPickersUtilsProvider utils={MomentUtils}>
           <div className="app">
               <BrowserRouter>
                   <Switch>
@@ -38,6 +41,7 @@ function App() {
                   </Switch>
               </BrowserRouter>
           </div>
+          </MuiPickersUtilsProvider>
       </ThemeProvider>
   );
 }

@@ -10,17 +10,23 @@ import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {tankContext} from "../../contexts/tank-context";
+import {AddForm, AddFormWithRef} from "./add-form";
 
 const useStyles = makeStyles(theme => ({
     paper: {
-        [theme.breakpoints.up("xs")]: {
+        [theme.breakpoints.up("sm")]: {
             height: "20vw",
             width: "20vw",
             margin: "1rem auto 1rem auto",
         },
+        [theme.breakpoints.down("sm")]: {
+            height: "30vw",
+            width: "30vw",
+            margin: "1rem auto 1rem auto",
+        },
         [theme.breakpoints.down("xs")]: {
-            height: "40vw",
-            width: "40vw",
+            height: "48vw",
+            width: "48vw",
             margin: "0.5rem auto 0.5rem auto",
         },
     },
@@ -53,6 +59,20 @@ export const Measure = ({name, shortName, unit, type}) => {
     const {setAlert} = useContext(alertContext);
     const classes = useStyles();
     const [measure, setMeasure] = useState({last: null, previous: null, loading: true});
+    const [anchorElAdd, setAnchorElAdd] = React.useState(null);
+    const [size, setSize] = React.useState(null);
+    const measureRef = React.createRef();
+
+    const handleClickAdd = (event) => {
+        setAnchorElAdd(measureRef.current);
+    };
+
+    const handleCloseAdd = () => {
+        setAnchorElAdd(null);
+    };
+
+    const openAdd = Boolean(anchorElAdd);
+    const idAdd = openAdd ? `${name}-add-value` : undefined;
 
     const getMeasureByTypeAndTank = () => {
         setMeasure({last: null, previous: null, loading: true});
@@ -87,14 +107,26 @@ export const Measure = ({name, shortName, unit, type}) => {
         getMeasureByTypeAndTank()
     }, [tank]);
 
+    useEffect(() => {
+        if (measureRef.current !== null) {
+            setSize(measureRef.current.clientHeight);
+            window.addEventListener('resize', () => {
+                if (measureRef.current !== null) {
+                    setSize(measureRef.current.clientHeight);
+                }
+            });
+        }
+    }, [measureRef]);
+
     return (
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} sm={4} lg={3}>
             <Paper className={classes.paper}>
                 {!measure.loading ?
                     <Grid
-                    container
-                    direction="column"
-                    className={classes.container}
+                        container
+                        direction="column"
+                        className={classes.container}
+                        ref={measureRef}
                 >
                         <Grid item>
                             <Typography align="center" variant="subtitle2" className={classes.subtitle2}>
@@ -130,9 +162,14 @@ export const Measure = ({name, shortName, unit, type}) => {
                                     </Typography>
                                 )}
                                 <IconButton color="primary" aria-label={`Add ${name} parameter`}
-                                            className={classes.root}>
+                                            className={classes.root} onClick={handleClickAdd}>
                                     <FontAwesomeIcon icon={faPlus}/>
                                 </IconButton>
+                                <AddFormWithRef unit={unit} name={shortName}
+                                                defaultValue={measure.last ? measure.last.value : 0} open={openAdd}
+                                                handleClose={handleCloseAdd} anchorEl={anchorElAdd} id={idAdd}
+                                                size={size}
+                                />
                             </Grid>
                         </Grid>
                 </Grid>

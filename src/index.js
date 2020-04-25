@@ -9,16 +9,13 @@ import {ContextProviderComposer} from "./contex-provider-composer";
 import TankProvider from "./contexts/tank-context";
 
 ReactDOM.render(
-  <React.StrictMode>
       <ContextProviderComposer contextProviders={[
           <AuthProvider key={0}/>,
           <AlertProvider key={1}/>,
-          <TankProvider key={2}/>,
-
-      ]}>
+          <TankProvider key={2}/>
+          ]}>
           <App/>
-      </ContextProviderComposer>
-  </React.StrictMode>,
+      </ContextProviderComposer>,
   document.getElementById('root')
 );
 
