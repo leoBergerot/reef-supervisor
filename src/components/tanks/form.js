@@ -19,19 +19,8 @@ import defaultAvatar from "../../../asset/images/default_avatar.svg";
 const useStyles = makeStyles((theme) => createStyles({
     root: {
         backgroundColor: "#FFF",
-        overflow: "scroll",
-        position: "fixed",
-        right: 0,
-        left:0,
-        [theme.breakpoints.up("xs")]: {
-            top: "64px",
-        },
-        [theme.breakpoints.down("xs")]: {
-            top: "56px",
-        },
-        bottom: 0,
-        top: 0,
-        height: "inherit",
+        width: "100%",
+        height: "100%"
     },
     form: {
         [theme.breakpoints.up("xs")]: {

@@ -5,16 +5,9 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     modal: {
-        position: "fixed",
-        height: "inherit",
-        [theme.breakpoints.up("xs")]: {
-            top: "64px",
-        },
-        [theme.breakpoints.down("xs")]: {
-            top: "56px",
-        },
-        "& div:first-child ": {
-            backgroundColor: "transparent !important",
+        position: "absolute !important",
+        "& > div": {
+            position: "absolute !important",
         }
     }
 }));
@@ -29,6 +22,7 @@ export default function FormModal({handleClose, handleEditSuccess, tankEdit, ope
     );
     return (
         <Modal
+            disablePortal={true}
             className={classes.modal}
             open={open}
             onClose={handleClose}

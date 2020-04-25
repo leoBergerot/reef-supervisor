@@ -6,7 +6,6 @@ import {HeaderLogo} from "./header-logo";
 const useStyles = makeStyles((theme) => createStyles({
     firstStyle: {
         zIndex:1000,
-        overflow: "scroll",
         position: "absolute",
         alignItems: "center",
         justifyContent: "center",

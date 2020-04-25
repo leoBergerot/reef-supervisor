@@ -9,7 +9,6 @@ import {alertContext} from "../../contexts/alert-context";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        overflow: "scroll",
         position: "absolute",
         [theme.breakpoints.up("xs")]: {
             padding: "1rem"
