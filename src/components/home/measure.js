@@ -10,7 +10,7 @@ import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {tankContext} from "../../contexts/tank-context";
-import {AddForm, AddFormWithRef} from "./add-form";
+import {AddFormWithRef} from "./add-form";
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -64,10 +64,15 @@ export const Measure = ({name, shortName, unit, type}) => {
     const measureRef = React.createRef();
 
     const handleClickAdd = (event) => {
+        window.document.querySelector('.app').style.overflowY = "hidden";
         setAnchorElAdd(measureRef.current);
+        if (measureRef.current.getBoundingClientRect().top - document.querySelector('.app > header').getBoundingClientRect().height < 0) {
+            document.querySelector('.app').scrollTo(0, 0);
+        }
     };
 
     const handleCloseAdd = () => {
+        window.document.querySelector('.app').style.overflowY = "scroll";
         setAnchorElAdd(null);
     };
 

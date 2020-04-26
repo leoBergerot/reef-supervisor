@@ -4,6 +4,10 @@ import TextField from "@material-ui/core/TextField";
 import NumberFormat from 'react-number-format';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {KeyboardDateTimePicker} from '@material-ui/pickers';
+import IconButton from "@material-ui/core/IconButton";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -11,6 +15,12 @@ const useStyles = makeStyles(theme => ({
         width: size => size.size,
     },
     fields: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-around",
+        position: "absolute",
+        top: 0,
+        bottom: 0,
         [theme.breakpoints.up("xs")]: {
             '& div': {
                 fontSize: "1.1em"
@@ -55,12 +65,17 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
         setCreatedAt({value: date, error: false})
     };
 
+    const handleValidate = (event) => {
+        event.preventDefault();
+        console.log("Todo check form values and send")
+    };
+
     return (
         <Popover
             id={id}
             open={open}
             disablePortal={true}
-
+            marginThreshold={0}
             anchorEl={anchorEl}
             onClose={handleClose}
             anchorOrigin={{
@@ -103,6 +118,20 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                             }}
                         />
                     </>
+                    <Grid
+                        container
+                        direction="row"
+                        justify="space-around"
+                    >
+                        <IconButton color="secondary" aria-label={`Cancel measure ${name}`} component="span"
+                                    onClick={handleClose}>
+                            <FontAwesomeIcon icon={faTimes}/>
+                        </IconButton>
+                        <IconButton type="submit" color="primary" aria-label={`Validate measure ${name}`}
+                                    onClick={handleValidate}>
+                            <FontAwesomeIcon icon={faCheck}/>
+                        </IconButton>
+                    </Grid>
                 </div>
             </form>
         </Popover>
