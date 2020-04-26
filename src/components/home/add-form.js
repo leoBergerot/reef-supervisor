@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import NumberFormat from 'react-number-format';
@@ -8,6 +8,11 @@ import IconButton from "@material-ui/core/IconButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import Grid from "@material-ui/core/Grid";
+import {isDate} from "moment";
+import {tankContext} from "../../contexts/tank-context";
+import {authContext} from "../../contexts/auth-context";
+import {alertContext} from "../../contexts/alert-context";
+import isEmpty from "validator/es/lib/isEmpty";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -47,16 +52,28 @@ const useStyles = makeStyles(theme => ({
 
 export const AddFormWithRef = React.forwardRef((props, ref) => <AddForm innerRef={ref} {...props} />);
 
-const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, size}) => {
+const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, size, type, measure, setMeasure}) => {
+
+    const {auth} = useContext(authContext);
+    const {tank} = useContext(tankContext);
+    const {setAlert} = useContext(alertContext);
 
     const [value, setValue] = useState({value: defaultValue, error: false, helperText: null});
     const [createdAt, setCreatedAt] = useState({value: new Date(), error: false});
 
     const classes = useStyles({size});
 
+    useEffect(() => {
+        if (open) {
+            setCreatedAt({value: new Date(), error: false});
+            setValue({value: defaultValue, error: false, helperText: null});
+        }
+
+    }, [open]);
+
     const handleChange = (event) => {
         setValue({
-            ...value,
+            value: value.value, error: false, helperText: null,
             [event.target.name]: event.target.value,
         });
     };
@@ -67,7 +84,60 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
 
     const handleValidate = (event) => {
         event.preventDefault();
-        console.log("Todo check form values and send")
+        let error = false;
+        if (isEmpty(value.value)) {
+            setValue({value: value.value, error: true, helperText: "Please enter a correct value"});
+            error = true;
+        }
+
+        if (!isDate(createdAt.value.toDate())) {
+            setCreatedAt({value: new Date(), error: true});
+            error = true;
+        }
+
+        if (!error) {
+            handleSubmit();
+        }
+    };
+
+    const handleSubmit = () => {
+        handleClose();
+        setMeasure({loading: true, last: measure.last, previous: measure.previous});
+        fetch(process.env.REACT_APP_API_URL + '/measures', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth.token}`
+            },
+            body: JSON.stringify({
+                tank: tank.data.id,
+                type: type,
+                value: value.value,
+                createdAt: createdAt.value.toDate(),
+            })
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    if (result.value.toString()) {
+                        setMeasure({loading: false, last: result, previous: measure.last});
+                    } else {
+                        setMeasure({loading: false, last: measure.last, previous: measure.previous});
+                        setAlert({
+                            open: true,
+                            message: `An error occurred`,
+                            severity: 'error'
+                        });
+                    }
+                },
+                (error) => {
+                    setMeasure({loading: false, last: measure.last, previous: measure.previous});
+                    setAlert({
+                        open: true,
+                        message: `Network error`,
+                        severity: 'error'
+                    });
+                });
     };
 
     return (
@@ -93,6 +163,8 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                         fullWidth
                         label={`${name} value`}
                         value={value.value}
+                        error={value.error}
+                        helperText={value.helperText}
                         placeholder={unit}
                         onChange={handleChange}
                         name="value"

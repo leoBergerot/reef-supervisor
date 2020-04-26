@@ -12,9 +12,18 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import {tankContext} from "../../contexts/tank-context";
 import {AddFormWithRef} from "./add-form";
 
+Number.prototype.round = function (places) {
+    return +(Math.round(this + "e+" + places) + "e-" + places);
+};
+
 const useStyles = makeStyles(theme => ({
     paper: {
-        [theme.breakpoints.up("sm")]: {
+        [theme.breakpoints.up("md")]: {
+            height: "25vw",
+            width: "25vw",
+            margin: "1rem auto 1rem auto",
+        },
+        [theme.breakpoints.up("lg")]: {
             height: "20vw",
             width: "20vw",
             margin: "1rem auto 1rem auto",
@@ -51,6 +60,39 @@ const useStyles = makeStyles(theme => ({
             fontSize: "6vw"
         }
     },
+    increase:{
+        height: "inherit",
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "0.7rem"
+        },
+        [theme.breakpoints.up("sm")]: {
+            fontSize: "0.73rem"
+        },
+        [theme.breakpoints.up("md")]: {
+            fontSize: "1rem"
+        },
+    },
+    percentageIncrease:{
+        height: "min-content",
+        [theme.breakpoints.down("xs")]: {
+            fontSize: "0.5rem",
+            marginLeft: "2px",
+
+        },
+        [theme.breakpoints.up("sm")]: {
+            marginLeft: "2px",
+            fontSize: "0.53rem"
+        },
+        [theme.breakpoints.up("md")]: {
+            fontSize: "0.8rem",
+            marginLeft: "5px",
+
+        },
+        [theme.breakpoints.up("lg")]: {
+            marginLeft: "10px",
+        },
+
+    }
 }));
 
 export const Measure = ({name, shortName, unit, type}) => {
@@ -156,24 +198,36 @@ export const Measure = ({name, shortName, unit, type}) => {
                                     <FontAwesomeIcon icon={faEllipsisV}/>
                                 </IconButton>
                                 {measure.previous && (
-                                    <Typography align="center" variant="subtitle2" style={{
-                                        height: "inherit",
+                                    <div align="center" style={{
                                         position: "absolute",
+                                        alignItems: "center",
+                                        display: "flex",
                                         left: "50%",
                                         transform: "translateX(-50%)",
-                                        color: (measure.last.value >= measure.previous.value ? "green" : "red")
-                                    }} className={classes.subtitle2}>
-                                        {`${measure.last.value >= measure.previous.value ? "+" : ""}${(((measure.last.value - measure.previous.value) / measure.previous.value) * 100).toFixed(0)} %`}
-                                    </Typography>
+                                    }}>
+                                        <Typography variant={"subtitle2"} className={classes.increase} style={{
+                                            color: measure.last.value >= measure.previous.value ? "green" : "red"
+                                        }}>
+                                            {`${measure.last.value >= measure.previous.value ? "+" : ""}${(measure.last.value - measure.previous.value).round(2)} ${unit}`}
+                                        </Typography>
+                                        <Typography variant="caption" className={classes.percentageIncrease}>
+                                            {measure.previous.value > 0 ? `(${measure.last.value >= measure.previous.value ? "+" : ""}${(((measure.last.value - measure.previous.value).round(3) / measure.previous.value).round(3) * 100).round(2)} %)` : ""}
+                                        </Typography>
+                                    </div>
                                 )}
                                 <IconButton color="primary" aria-label={`Add ${name} parameter`}
                                             className={classes.root} onClick={handleClickAdd}>
                                     <FontAwesomeIcon icon={faPlus}/>
                                 </IconButton>
-                                <AddFormWithRef unit={unit} name={shortName}
-                                                defaultValue={measure.last ? measure.last.value : 0} open={openAdd}
+                                <AddFormWithRef unit={unit}
+                                                measure={measure}
+                                                setMeasure={setMeasure}
+                                                name={shortName}
+                                                defaultValue={measure.last ? measure.last.value.toString() : "0"}
+                                                open={openAdd}
                                                 handleClose={handleCloseAdd} anchorEl={anchorElAdd} id={idAdd}
                                                 size={size}
+                                                type={type}
                                 />
                             </Grid>
                         </Grid>
