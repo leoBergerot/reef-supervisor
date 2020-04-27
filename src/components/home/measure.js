@@ -13,7 +13,7 @@ import {tankContext} from "../../contexts/tank-context";
 import {AddFormWithRef} from "./add-form";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import Popover from "@material-ui/core/Popover/Popover";
+import {typeContext} from "../../contexts/type-context";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -101,6 +101,8 @@ const useStyles = makeStyles(theme => ({
 export const Measure = ({name, shortName, unit, type, history}) => {
     const {auth} = useContext(authContext);
     const {tank} = useContext(tankContext);
+    const {setType} = useContext(typeContext);
+
     const {setAlert} = useContext(alertContext);
     const classes = useStyles();
     const [measure, setMeasure] = useState({last: null, previous: null, loading: true});
@@ -131,6 +133,7 @@ export const Measure = ({name, shortName, unit, type, history}) => {
     };
 
     const handleShowList = () => {
+        setType({data: {name, shortName, unit, type}});
         history.push("/measures")
     };
 
