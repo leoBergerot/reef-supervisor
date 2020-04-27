@@ -87,7 +87,7 @@ export const ForgotPassword = ({history}) => {
     };
 
     return (
-        <GridContainerResponsive baseline={true}>
+        <GridContainerResponsive>
             <CardContainerReponsive>
                 <form onSubmit={onSubmit}>
                     <CardContent>

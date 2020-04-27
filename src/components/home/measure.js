@@ -11,6 +11,9 @@ import {alertContext} from "../../contexts/alert-context";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {tankContext} from "../../contexts/tank-context";
 import {AddFormWithRef} from "./add-form";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import Popover from "@material-ui/core/Popover/Popover";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -95,27 +98,40 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export const Measure = ({name, shortName, unit, type}) => {
+export const Measure = ({name, shortName, unit, type, history}) => {
     const {auth} = useContext(authContext);
     const {tank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
     const classes = useStyles();
     const [measure, setMeasure] = useState({last: null, previous: null, loading: true});
     const [anchorElAdd, setAnchorElAdd] = React.useState(null);
+    const [anchorElMenu, setAnchorElMenu] = React.useState(null);
     const [size, setSize] = React.useState(null);
     const measureRef = React.createRef();
 
     const handleClickAdd = (event) => {
-        window.document.querySelector('.app').style.overflowY = "hidden";
+        window.document.querySelector('main').style.overflowY = "hidden";
         setAnchorElAdd(measureRef.current);
-        if (measureRef.current.getBoundingClientRect().top - document.querySelector('.app > header').getBoundingClientRect().height < 0) {
-            document.querySelector('.app').scrollTo(0, 0);
+        if (measureRef.current.getBoundingClientRect().top - document.querySelector('header').getBoundingClientRect().height < 0) {
+            document.querySelector('main').scrollTo(0, 0);
         }
     };
 
     const handleCloseAdd = () => {
-        window.document.querySelector('.app').style.overflowY = "scroll";
+        window.document.querySelector('main').style.overflowY = "scroll";
         setAnchorElAdd(null);
+    };
+
+    const handleClickMenu = (event) => {
+        setAnchorElMenu(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorElMenu(null);
+    };
+
+    const handleShowList = () => {
+        history.push("/measures")
     };
 
     const openAdd = Boolean(anchorElAdd);
@@ -194,9 +210,19 @@ export const Measure = ({name, shortName, unit, type}) => {
                                 style={{position: "relative"}}
                             >
                                 <IconButton color="primary" aria-label={`Menu ${name} parameter`}
-                                            className={classes.root}>
+                                            className={classes.root} onClick={handleClickMenu}>
                                     <FontAwesomeIcon icon={faEllipsisV}/>
                                 </IconButton>
+                                <Menu
+                                    id={`menu-measure-${name}`}
+                                    anchorEl={anchorElMenu}
+                                    keepMounted
+                                    open={Boolean(anchorElMenu)}
+                                    marginThreshold={0}
+                                    onClose={handleCloseMenu}
+                                >
+                                    <MenuItem onClick={handleShowList}>Values list {shortName}</MenuItem>
+                                </Menu>
                                 {measure.previous && (
                                     <div align="center" style={{
                                         position: "absolute",

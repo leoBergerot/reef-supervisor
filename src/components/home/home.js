@@ -38,7 +38,8 @@ export const Home = ({history}) => {
         <Main history={history} loading={types.loading}>
             <Grid container>
                 {!types.loading && types.data.map((value, index) => (
-                    <Measure key={index} name={value.name} shortName={value.shortName} unit={value.unit} type={value.id}/>
+                    <Measure history={history} key={index} name={value.name} shortName={value.shortName}
+                             unit={value.unit} type={value.id}/>
                 ))}
             </Grid>
         </Main>

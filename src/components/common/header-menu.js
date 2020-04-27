@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const Header = ({history}) => {
+export const HeaderMenu = ({history}) => {
     const {auth, setAuthData} = useContext(authContext);
     const {tank, setTank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
@@ -62,7 +62,7 @@ export const Header = ({history}) => {
 
     const handleManageTanks = () => {
         handleClose();
-        history.push("/tanks/manage");
+        history.push('/tanks/manage')
     };
 
     useEffect(() => {

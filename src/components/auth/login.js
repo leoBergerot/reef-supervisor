@@ -111,7 +111,7 @@ export const Login = ({history, match: {params: {enable}}}) => {
         }
     };
     return (
-        <GridContainerResponsive baseline={true}>
+        <GridContainerResponsive>
             <CardContainerReponsive>
                 <form onSubmit={onSubmit}>
                     <CardContent>

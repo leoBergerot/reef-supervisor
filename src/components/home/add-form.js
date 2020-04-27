@@ -90,7 +90,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
             error = true;
         }
 
-        if (!isDate(createdAt.value.toDate())) {
+        if (!isDate(createdAt.value instanceof Date ? createdAt.value : createdAt.value.toDate())) {
             setCreatedAt({value: new Date(), error: true});
             error = true;
         }
@@ -113,7 +113,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                 tank: tank.data.id,
                 type: type,
                 value: value.value,
-                createdAt: createdAt.value.toDate(),
+                createdAt: createdAt.value instanceof Date ? createdAt.value : createdAt.value.toDate(),
             })
         })
             .then(res => res.json())
