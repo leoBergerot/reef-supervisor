@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import {tankContext} from "../../contexts/tank-context";
 import {typeContext} from "../../contexts/type-context";
 import {authContext} from "../../contexts/auth-context";
@@ -8,6 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import {MobileDateRangePicker, MuiPickersContext} from "@material-ui/pickers";
 
 const useStyle = makeStyles((theme) =>
     ({
@@ -21,6 +22,24 @@ const useStyle = makeStyles((theme) =>
         }
     }));
 
+function BasicDateRangePicker() {
+    const {moment} = useContext(MuiPickersContext);
+    const [selectedDate, handleDateChange] = React.useState([moment().subtract(1, 'months'), moment()]);
+
+    return (
+        <MobileDateRangePicker
+            startText="Start date"
+            endText="End date"
+            inputFormat="DD/MM/YY"
+            disableFuture
+            value={selectedDate}
+            onChange={date => {
+                handleDateChange(date)
+            }}
+        />
+    );
+}
+
 export const Graph = () => {
     const {tank} = useContext(tankContext);
     const {type} = useContext(typeContext);
@@ -29,6 +48,11 @@ export const Graph = () => {
 
     const classes = useStyle();
 
+    useEffect(() => {
+        // getMeasures()
+    }, [tank]);
+
+
     return (
         <Loading loading={type.loading}>
             <Paper variant="elevation" className={classes.root}>
@@ -36,6 +60,7 @@ export const Graph = () => {
                     <Typography variant="overline" className={classes.title}>
                         {type.data.name} values graphic
                     </Typography>
+                    <BasicDateRangePicker/>
                 </Toolbar>
             </Paper>
         </Loading>

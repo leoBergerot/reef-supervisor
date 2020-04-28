@@ -3,7 +3,6 @@ import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import NumberFormat from 'react-number-format';
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {KeyboardDateTimePicker} from '@material-ui/pickers';
 import IconButton from "@material-ui/core/IconButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +12,7 @@ import {tankContext} from "../../contexts/tank-context";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import isEmpty from "validator/es/lib/isEmpty";
+import {DesktopDateTimePicker, MuiPickersContext} from "@material-ui/pickers";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -24,6 +24,8 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         justifyContent: "space-around",
         position: "absolute",
+        left: 0,
+        right: 0,
         top: 0,
         bottom: 0,
         [theme.breakpoints.up("xs")]: {
@@ -35,9 +37,6 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down("xs")]: {
             '& div': {
                 fontSize: "1em",
-            },
-            '& button': {
-                padding: "2px"
             },
             padding: "0.3rem",
         },
@@ -54,18 +53,19 @@ export const AddFormWithRef = React.forwardRef((props, ref) => <AddForm innerRef
 
 const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, size, type, measure, setMeasure}) => {
 
+    const {moment} = useContext(MuiPickersContext);
     const {auth} = useContext(authContext);
     const {tank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
 
     const [value, setValue] = useState({value: defaultValue, error: false, helperText: null});
-    const [createdAt, setCreatedAt] = useState({value: new Date(), error: false});
+    const [createdAt, setCreatedAt] = useState({value: moment(), error: false});
 
     const classes = useStyles({size});
 
     useEffect(() => {
         if (open) {
-            setCreatedAt({value: new Date(), error: false});
+            setCreatedAt({value: moment(), error: false});
             setValue({value: defaultValue, error: false, helperText: null});
         }
 
@@ -90,11 +90,6 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
             error = true;
         }
 
-        if (!isDate(createdAt.value instanceof Date ? createdAt.value : createdAt.value.toDate())) {
-            setCreatedAt({value: new Date(), error: true});
-            error = true;
-        }
-
         if (!error) {
             handleSubmit();
         }
@@ -113,7 +108,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                 tank: tank.data.id,
                 type: type,
                 value: value.value,
-                createdAt: createdAt.value instanceof Date ? createdAt.value : createdAt.value.toDate(),
+                createdAt: createdAt.value,
             })
         })
             .then(res => res.json())
@@ -174,19 +169,18 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                         }}
                     />
                     <>
-                        <KeyboardDateTimePicker
-                            variant="inline"
-                            format="DD/MM/YY HH:mm"
-                            margin="normal"
-                            id="date"
+                        <DesktopDateTimePicker
+                            disableFuture
+                            ampm={false}
+                            inputFormat="DD/MM/YY HH:mm"
+                            mask="__/__/__ __:__"
                             label="Date"
+                            okLabel="Ok"
+                            cancelLabel="Cancel"
                             value={createdAt.value}
                             onChange={handleDateChange}
                             onError={() => {
                                 createdAt.error = true
-                            }}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change date',
                             }}
                         />
                     </>

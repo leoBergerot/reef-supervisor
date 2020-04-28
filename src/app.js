@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Route, Router, Switch} from "react-router-dom";
 import {Login} from "./components/auth/login";
 import {Home} from "./components/home/home";
@@ -9,8 +9,9 @@ import {Register} from "./components/auth/register";
 import {List} from "./components/tanks/list";
 import {ThemeProvider} from "@material-ui/styles";
 import {createMuiTheme} from "@material-ui/core";
-import {MuiPickersUtilsProvider} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import {LocalizationProvider} from "@material-ui/pickers";
+import MomentAdapter from "@material-ui/pickers/adapter/moment";
+import moment from "moment";
 import {MeasureList} from "./components/measures/measure-list";
 import {Layout} from "./components/common/layout";
 import history from "./components/common/history";
@@ -31,10 +32,11 @@ const theme = createMuiTheme({
 
 function App() {
     const constHistory = history;
+    const [locale, setLocale] = useState("en");
   return (
       <ThemeProvider theme={theme}>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-          <div className="app">
+          <LocalizationProvider dateLibInstance={moment} dateAdapter={MomentAdapter} locale={locale}>
+              <div className="app">
               <Router history={constHistory}>
                   <Switch>
                       <Layout history={constHistory}>
@@ -50,7 +52,7 @@ function App() {
                   </Switch>
               </Router>
           </div>
-          </MuiPickersUtilsProvider>
+          </LocalizationProvider>
       </ThemeProvider>
   );
 }
