@@ -15,7 +15,7 @@ import moment from "moment";
 import {MeasureList} from "./components/measures/measure-list";
 import {Layout} from "./components/common/layout";
 import history from "./components/common/history";
-import {Graph} from "./components/graph/graph";
+import {Chart} from "./components/chart/chart";
 
 const theme = createMuiTheme({
     palette: {
@@ -47,7 +47,7 @@ function App() {
                           <GuardRoute exact path="/" component={Home}/>
                           <GuardRoute exact path="/tanks/:manage?" component={List}/>
                           <GuardRoute exact path="/measures" component={MeasureList}/>
-                          <GuardRoute exact path="/graph" component={Graph}/>
+                          <GuardRoute exact path="/chart" component={Chart}/>
                       </Layout>
                   </Switch>
               </Router>

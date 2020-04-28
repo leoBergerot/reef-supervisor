@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
             padding: "1rem"
         },
         [theme.breakpoints.down("xs")]: {
-            padding: "1rem 0 1rem 0"
+            padding: "0"
         },
         [theme.breakpoints.down("sm")]: {
             top: "56px"
@@ -36,7 +36,7 @@ export const Layout = ({children, location: {pathname}, history}) => {
     switch (pathname) {
         case "/":
         case "/measures":
-        case "/graph":
+        case "/chart":
             header = <HeaderMenu history={history}/>;
             break;
         default:

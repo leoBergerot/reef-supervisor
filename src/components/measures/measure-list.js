@@ -12,11 +12,10 @@ export const MeasureList = () => {
     const {auth} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
-
     const [measures, setMeasures] = useState({data: [], loading: true});
     const [page, setPage] = useState(0);
     const [totalMeasures, setTotalMeasures] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [order, setOrder] = React.useState('desc');
     const [orderBy, setOrderBy] = React.useState('createdAt');
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import Skeleton from "@material-ui/lab/Skeleton";
 import {HeaderList} from "./header-list";
 import {ToolbarList} from "./toolbar-list";
+import {MuiPickersContext} from "@material-ui/pickers";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy}) {
     const classes = useStyles();
+    const {moment} = useContext(MuiPickersContext);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -77,7 +79,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                                         key={index}
                                     >
                                         <TableCell id={index}>
-                                            {row.createdAt}
+                                            {moment(row.createdAt).format('DD/MM/YY HH:mm')}
                                         </TableCell>
                                         <TableCell>{row.value}</TableCell>
                                     </TableRow>
@@ -99,7 +101,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[10, 25, 50]}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}

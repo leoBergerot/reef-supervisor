@@ -140,8 +140,8 @@ export const Measure = ({name, shortName, unit, type, history}) => {
 
     const handleShowGraphic = () => {
         setType({data: {name, shortName, unit, type}});
-        history.push("/graph")
-    }
+        history.push("/chart")
+    };
 
     const openAdd = Boolean(anchorElAdd);
     const idAdd = openAdd ? `${name}-add-value` : undefined;
@@ -233,7 +233,7 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                     <MenuItem disabled><Typography variant="subtitle2" align="center">{name} values </Typography></MenuItem>
                                     <Divider/>
                                     <MenuItem onClick={handleShowList}>Edit</MenuItem>
-                                    <MenuItem onClick={handleShowGraphic}>Show graphic</MenuItem>
+                                    <MenuItem onClick={handleShowGraphic}>Show chart</MenuItem>
                                 </Menu>
                                 {measure.previous && (
                                     <div align="center" style={{
