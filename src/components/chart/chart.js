@@ -8,16 +8,11 @@ import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import {MobileDateRangePicker, MuiPickersContext} from "@material-ui/pickers";
+import {MuiPickersContext} from "@material-ui/pickers";
 import {ArgumentAxis, Chart as ChartDevExpress, LineSeries, ValueAxis} from '@devexpress/dx-react-chart-material-ui';
 import Skeleton from "@material-ui/lab/Skeleton";
 import {ValueScale} from "@devexpress/dx-react-chart";
-
-const data = [
-    {createdAt: "hola", value: 10},
-    {createdAt: "helo", value: 20},
-    {createdAt: "helo", value: 30},
-];
+import {DateRangePicker} from "../common/date-range-picker";
 
 const useStyle = makeStyles((theme) =>
     ({
@@ -46,33 +41,6 @@ const useStyle = makeStyles((theme) =>
         }
     }));
 
-const pickerStyle = makeStyles((theme) => ({
-    root: {
-        flexDirection: "row",
-        marginLeft: "auto"
-    }
-}));
-
-const BasicDateRangePicker = ({selectedDate, handleDateChange, disabled}) => {
-    const classes = pickerStyle();
-
-    return (
-        <MobileDateRangePicker
-            disabled={disabled}
-            className={classes.root}
-            startText="Start date"
-            endText="End date"
-            inputFormat="DD/MM/YY"
-            mask="__/__/__"
-            disableFuture
-            value={selectedDate}
-            onChange={date => {
-                handleDateChange(date)
-            }}
-        />
-    );
-};
-
 export const Chart = () => {
     const {moment} = useContext(MuiPickersContext);
     const {tank} = useContext(tankContext);
@@ -91,7 +59,7 @@ export const Chart = () => {
 
     const getMeasures = () => {
         setMeasures({data: [], loading: true});
-        fetch(`${process.env.REACT_APP_API_URL}/measures?tank=${tank.data.id}&sort=createdAt,ASC&type=${type.data.type}&filter=createdAt||gte||${selectedDate[0].format("Y-MM-DD")}&filter=createdAt||lte||${moment(selectedDate[1], "Y-MM-DD").add('days', 1).format("Y-MM-DD")}`, {
+        fetch(`${process.env.REACT_APP_API_URL}/measures?tank=${tank.data.id}&sort=createdAt,ASC&type=${type.data.type}&filter=createdAt||gte||${selectedDate[0].format("Y-MM-DD")}&filter=createdAt||lte||${moment(selectedDate[1], "Y-MM-DD").add(1, 'days').format("Y-MM-DD")}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -138,8 +106,8 @@ export const Chart = () => {
                     <Typography variant="overline" className={classes.title} gutterBottom>
                         {type.data.name} values graphic
                     </Typography>
-                    <BasicDateRangePicker selectedDate={selectedDate} handleDateChange={handleDateChange}
-                                          disabled={measures.loading}/>
+                    <DateRangePicker selectedDate={selectedDate} handleDateChange={handleDateChange}
+                                     disabled={measures.loading}/>
                 </Toolbar>
                 <Paper className={classes.paper}>
                     {!measures.loading ?

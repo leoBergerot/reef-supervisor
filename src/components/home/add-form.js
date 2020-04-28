@@ -7,12 +7,12 @@ import IconButton from "@material-ui/core/IconButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import Grid from "@material-ui/core/Grid";
-import {isDate} from "moment";
 import {tankContext} from "../../contexts/tank-context";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import isEmpty from "validator/es/lib/isEmpty";
-import {DesktopDateTimePicker, MuiPickersContext} from "@material-ui/pickers";
+import {MuiPickersContext} from "@material-ui/pickers";
+import {DatePicker} from "../common/date-picker";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -168,22 +168,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                             inputComponent: NumberFormatCustom,
                         }}
                     />
-                    <>
-                        <DesktopDateTimePicker
-                            disableFuture
-                            ampm={false}
-                            inputFormat="DD/MM/YY HH:mm"
-                            mask="__/__/__ __:__"
-                            label="Date"
-                            okLabel="Ok"
-                            cancelLabel="Cancel"
-                            value={createdAt.value}
-                            onChange={handleDateChange}
-                            onError={() => {
-                                createdAt.error = true
-                            }}
-                        />
-                    </>
+                    <DatePicker selectedDate={createdAt.value} handleDateChange={handleDateChange}/>
                     <Grid
                         container
                         direction="row"
