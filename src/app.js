@@ -11,9 +11,10 @@ import {ThemeProvider} from "@material-ui/styles";
 import {createMuiTheme} from "@material-ui/core";
 import {MuiPickersUtilsProvider} from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
-import {Measures} from "./components/list/measures";
+import {MeasureList} from "./components/measures/measure-list";
 import {Layout} from "./components/common/layout";
 import history from "./components/common/history";
+import {Graph} from "./components/graph/graph";
 
 const theme = createMuiTheme({
     palette: {
@@ -43,7 +44,8 @@ function App() {
                           <Route path="/register" component={Register}/>
                           <GuardRoute exact path="/" component={Home}/>
                           <GuardRoute exact path="/tanks/:manage?" component={List}/>
-                          <GuardRoute exact path="/measures" component={Measures}/>
+                          <GuardRoute exact path="/measures" component={MeasureList}/>
+                          <GuardRoute exact path="/graph" component={Graph}/>
                       </Layout>
                   </Switch>
               </Router>

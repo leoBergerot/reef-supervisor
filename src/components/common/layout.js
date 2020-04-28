@@ -36,6 +36,7 @@ export const Layout = ({children, location: {pathname}, history}) => {
     switch (pathname) {
         case "/":
         case "/measures":
+        case "/graph":
             header = <HeaderMenu history={history}/>;
             break;
         default:

@@ -14,6 +14,7 @@ import {AddFormWithRef} from "./add-form";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import {typeContext} from "../../contexts/type-context";
+import Divider from "@material-ui/core/Divider";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -137,6 +138,11 @@ export const Measure = ({name, shortName, unit, type, history}) => {
         history.push("/measures")
     };
 
+    const handleShowGraphic = () => {
+        setType({data: {name, shortName, unit, type}});
+        history.push("/graph")
+    }
+
     const openAdd = Boolean(anchorElAdd);
     const idAdd = openAdd ? `${name}-add-value` : undefined;
 
@@ -224,7 +230,10 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                     marginThreshold={0}
                                     onClose={handleCloseMenu}
                                 >
-                                    <MenuItem onClick={handleShowList}>Values list {shortName}</MenuItem>
+                                    <MenuItem disabled><Typography variant="subtitle2" align="center">{name} values </Typography></MenuItem>
+                                    <Divider/>
+                                    <MenuItem onClick={handleShowList}>Edit</MenuItem>
+                                    <MenuItem onClick={handleShowGraphic}>Show graphic</MenuItem>
                                 </Menu>
                                 {measure.previous && (
                                     <div align="center" style={{

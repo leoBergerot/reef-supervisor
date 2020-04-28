@@ -1,13 +1,12 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Main} from "../common/main";
-import Grid from "@material-ui/core/Grid";
+import {Loading} from "../common/loading";
 import {tankContext} from "../../contexts/tank-context";
 import {typeContext} from "../../contexts/type-context";
-import EnhancedTable from "./table";
+import List from "./list";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 
-export const Measures = () => {
+export const MeasureList = () => {
     const {tank} = useContext(tankContext);
     const {type} = useContext(typeContext);
     const {auth} = useContext(authContext);
@@ -56,14 +55,10 @@ export const Measures = () => {
     };
 
     return (
-        <Main loading={type.loading}>
-            <Grid container style={{height:"100%"}}>
-                <Grid item xs={12} style={{position: "relative", height:"inherit"}}>
-                    <EnhancedTable type={type} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}
-                                   rowsPerPage={rowsPerPage} total={totalMeasures} data={measures} setOrder={setOrder}
-                                   setOrderBy={setOrderBy} order={order} orderBy={orderBy}/>
-                </Grid>
-            </Grid>
-        </Main>
+        <Loading loading={type.loading}>
+            <List type={type} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}
+                  rowsPerPage={rowsPerPage} total={totalMeasures} data={measures} setOrder={setOrder}
+                  setOrderBy={setOrderBy} order={order} orderBy={orderBy}/>
+        </Loading>
     )
 };

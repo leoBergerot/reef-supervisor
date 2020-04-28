@@ -3,7 +3,7 @@ import Grid from "@material-ui/core/Grid";
 import {Measure} from "./measure";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
-import {Main} from "../common/main";
+import {Loading} from "../common/loading";
 
 export const Home = ({history}) => {
     const {auth} = useContext(authContext);
@@ -35,13 +35,13 @@ export const Home = ({history}) => {
     }, []);
 
     return(
-        <Main history={history} loading={types.loading}>
+        <Loading history={history} loading={types.loading}>
             <Grid container>
                 {!types.loading && types.data.map((value, index) => (
                     <Measure history={history} key={index} name={value.name} shortName={value.shortName}
                              unit={value.unit} type={value.id}/>
                 ))}
             </Grid>
-        </Main>
+        </Loading>
     )
 };

@@ -1,100 +1,22 @@
 import React from "react";
-import PropTypes from 'prop-types';
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Skeleton from "@material-ui/lab/Skeleton";
-
-const headCells = [
-    {id: 'createdAt',  label: 'Created at'},
-    {id: 'value', label: 'Value'},
-];
-
-function EnhancedTableHead(props) {
-    const {classes, order, orderBy, onRequestSort} = props;
-    const createSortHandler = (property) => (event) => {
-        onRequestSort(event, property);
-    };
-
-    return (
-        <TableHead>
-            <TableRow>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </span>
-                            ) : null}
-                        </TableSortLabel>
-                    </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
-}
-
-EnhancedTableHead.propTypes = {
-    classes: PropTypes.object.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-};
-
-const useToolbarStyles = makeStyles((theme) => ({
-    root: {
-        // paddingLeft: theme.spacing(2),
-        // paddingRight: theme.spacing(1),
-    },
-    title: {
-        flex: '1 1 100%',
-    }
-}));
-
-const EnhancedTableToolbar = ({type}) => {
-    const classes = useToolbarStyles();
-
-    return (
-        <Toolbar
-            className={classes.root}
-        >
-            <Typography variant="overline" className={classes.title}>
-                {type.data.name} values list
-            </Typography>
-            {/*<Tooltip title="Filter list">*/}
-            {/*    <IconButton aria-label="filter list">*/}
-            {/*        <FilterListIcon/>*/}
-            {/*    </IconButton>*/}
-            {/*</Tooltip>*/}
-        </Toolbar>
-    );
-};
+import {HeaderList} from "./header-list";
+import {ToolbarList} from "./toolbar-list";
 
 const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
+        height: "100%",
         position: "relative",
-        height: "inherit"
     },
-    table: {},
     visuallyHidden: {
         border: 0,
         clip: 'rect(0 0 0 0)',
@@ -111,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function EnhancedTable({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy}) {
+export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy}) {
     const classes = useStyles();
 
     const handleRequestSort = (event, property) => {
@@ -133,15 +55,14 @@ export default function EnhancedTable({type, page, setPage, setRowsPerPage, rows
 
     return (
         <Paper className={classes.root}>
-            <EnhancedTableToolbar type={type}/>
+            <ToolbarList type={type}/>
             <TableContainer className={classes.container}>
                 <Table
                     stickyHeader
-                    className={classes.table}
-                    aria-labelledby="tableTitle"
-                    aria-label="enhanced table"
+                    aria-labelledby={`List ${type.data.name}`}
+                    aria-label={`List ${type.data.name}`}
                 >
-                    <EnhancedTableHead
+                    <HeaderList
                         classes={classes}
                         order={order}
                         orderBy={orderBy}
