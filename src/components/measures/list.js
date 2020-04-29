@@ -1,16 +1,17 @@
-import React, {useContext} from "react";
+import React, {createRef, useContext} from "react";
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
+import {default as TableRowUi} from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Skeleton from "@material-ui/lab/Skeleton";
 import {HeaderList} from "./header-list";
 import {ToolbarList} from "./toolbar-list";
 import {MuiPickersContext} from "@material-ui/pickers";
+import {TableRow} from "./row-table";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,12 +32,14 @@ const useStyles = makeStyles((theme) => ({
     },
     container: {
         maxHeight: "calc(100% - 108px)",
-    }
+    },
 }));
 
 export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy}) {
     const classes = useStyles();
     const {moment} = useContext(MuiPickersContext);
+
+    const refRows = [];
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -53,7 +56,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
         setPage(0);
     };
 
-    const emptyRows = !data.loading ? (rowsPerPage - data.data.length) : 5;
+    const emptyRows = !data.loading ? (rowsPerPage - data.data.length) : 10;
 
     return (
         <Paper className={classes.root}>
@@ -73,28 +76,24 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                     <TableBody>
                         {data.data
                             .map((row, index) => {
+                                refRows[row.id] = createRef();
                                 return (
-                                    <TableRow
-                                        hover
-                                        key={index}
-                                    >
-                                        <TableCell id={index}>
-                                            {moment(row.createdAt).format('DD/MM/YY HH:mm')}
-                                        </TableCell>
-                                        <TableCell>{row.value}</TableCell>
-                                    </TableRow>
+                                    <TableRow row={row} refRows={refRows} index={index} moment={moment} unit={type.data.unit}/>
                                 );
                             })}
                         {emptyRows > 0 && data.loading && (
                             Array.apply(null, Array(emptyRows)).map((value, index) =>
-                                <TableRow key={index} style={{height: 33}}>
+                                <TableRowUi key={index} style={{height: 33}}>
                                     <TableCell>
                                         <Skeleton/>
                                     </TableCell>
                                     <TableCell>
                                         <Skeleton/>
                                     </TableCell>
-                                </TableRow>
+                                    <TableCell>
+                                        <Skeleton/>
+                                    </TableCell>
+                                </TableRowUi>
                             ))
                         }
                     </TableBody>

@@ -45,6 +45,9 @@ export function HeaderList(props) {
                         </TableSortLabel>
                     </TableCell>
                 ))}
+                <TableCell>
+                    Actions
+                </TableCell>
             </TableRow>
         </TableHead>
     );

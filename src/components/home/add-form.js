@@ -1,7 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import Popover from "@material-ui/core/Popover";
-import TextField from "@material-ui/core/TextField";
-import NumberFormat from 'react-number-format';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import IconButton from "@material-ui/core/IconButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,6 +11,7 @@ import {alertContext} from "../../contexts/alert-context";
 import isEmpty from "validator/es/lib/isEmpty";
 import {MuiPickersContext} from "@material-ui/pickers";
 import {DatePicker} from "../common/date-picker";
+import {MeasureField} from "../common/measure-field";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -154,8 +153,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
         >
             <form className={classes.form}>
                 <div className={classes.fields}>
-                    <TextField
-                        fullWidth
+                    <MeasureField
                         label={`${name} value`}
                         value={value.value}
                         error={value.error}
@@ -164,9 +162,6 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                         onChange={handleChange}
                         name="value"
                         id="value"
-                        InputProps={{
-                            inputComponent: NumberFormatCustom,
-                        }}
                     />
                     <DatePicker selectedDate={createdAt.value} handleDateChange={handleDateChange}/>
                     <Grid
@@ -188,26 +183,3 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
         </Popover>
     )
 };
-
-function NumberFormatCustom(props) {
-    const {inputRef, onChange, placeholder, ...other} = props;
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={inputRef}
-            onValueChange={(value) => {
-                onChange({
-                    target: {
-                        name: props.name,
-                        value: value.value,
-                    },
-                });
-            }}
-            isNumericString
-            allowNegative={false}
-            thousandSeparator=" "
-            decimalScale
-            suffix={` ${placeholder}`}
-        />
-    );
-}
