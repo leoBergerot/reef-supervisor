@@ -8,15 +8,8 @@ const useStyle = makeStyles(theme => ({
     small: {
         '& input': {
             fontSize: '0.875rem',
-            width: props => (
-                (props.value.toString().length + props.placeholder.length).toString() + 'ch'
-            )
-            ,
             padding: 0
         },
-        ' & p': {
-            width: props => props.value + 'ch',
-        }
     }
 }));
 export const MeasureField = ({small, ...rest}) => {

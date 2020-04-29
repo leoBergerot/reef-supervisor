@@ -99,23 +99,35 @@ export const TableRow = ({moment, refRows, index, row, unit}) => {
             }
             {!edit ?
                 !loading ?
-                    <TableCell>{`${currentValues.value} ${unit}`}</TableCell>
+                    <TableCell>
+                        <div style={{
+                            minWidth: (6 + unit.length).toString() + 'ch',
+                            width: "min-content",
+                        }}>
+                            {`${currentValues.value} ${unit}`}
+                        </div>
+                    </TableCell>
                     :
                     <TableCell>
                         <Skeleton/>
                     </TableCell>
                 :
                 <TableCell>
-                    <MeasureField
-                        small
-                        value={value.value}
-                        error={value.error}
-                        helperText={value.helperText}
-                        placeholder={unit}
-                        onChange={(event) => setValue({value: event.target.value, error: false})}
-                        name="value"
-                        id="value"
-                    />
+                    <div style={{
+                        minWidth: (currentValues.value.toString().length + unit.length + (currentValues.value > 1000 ? 1 : 0)).toString() + 'ch',
+                        width: "min-content",
+                    }}>
+                        <MeasureField
+                            small
+                            value={value.value}
+                            error={value.error}
+                            helperText={value.helperText}
+                            placeholder={unit}
+                            onChange={(event) => setValue({value: event.target.value, error: false})}
+                            name="value"
+                            id="value"
+                        />
+                    </div>
                 </TableCell>
             }
             <TableCell>
