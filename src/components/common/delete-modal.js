@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const DeleteModal = ({open, name, onDelete, setOpen}) => {
+export const DeleteModal = ({open, name, onDelete, setOpen, unDisplayLinked}) => {
 
         const [isOpen, setIsOpen] = useState(false);
 
@@ -40,9 +40,10 @@ export const DeleteModal = ({open, name, onDelete, setOpen}) => {
                         <Typography variant="h5">
                             You want to remove {name} ?
                         </Typography>
-                        <Typography variant="body2" color="error">
+                        {!unDisplayLinked && (<Typography variant="body2" color="error">
                             This action is irreversible, and removed all linked elements
-                        </Typography>
+                        </Typography>)}
+
                     </CardContent>
                     <CardActions>
                         <Button

@@ -18,7 +18,14 @@ export const MeasureList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [order, setOrder] = React.useState('desc');
     const [orderBy, setOrderBy] = React.useState('createdAt');
+    const [update, setUpdate] = React.useState(false);
 
+    useEffect(() => {
+        if (update) {
+            getMeasures();
+            setUpdate(false);
+        }
+    }, [update]);
 
     useEffect(() => {
         getMeasures()
@@ -57,7 +64,7 @@ export const MeasureList = () => {
         <Loading loading={type.loading}>
             <List type={type} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}
                   rowsPerPage={rowsPerPage} total={totalMeasures} data={measures} setOrder={setOrder}
-                  setOrderBy={setOrderBy} order={order} orderBy={orderBy}/>
+                  setOrderBy={setOrderBy} order={order} orderBy={orderBy} setUpdate={setUpdate}/>
         </Loading>
     )
 };

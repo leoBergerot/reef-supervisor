@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const Actions = ({edit, setEdit, handleSave, disabled}) => {
+export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => {
     const classes = useStyles();
 
     const handleEdit = () => {
@@ -28,7 +28,7 @@ export const Actions = ({edit, setEdit, handleSave, disabled}) => {
                     <FontAwesomeIcon icon={faPen} onClick={handleEdit}/>
                 </IconButton>
                 <IconButton aria-label="delete" color="secondary" size="small" className={classes.margin}
-                            disabled={disabled}>
+                            disabled={disabled} onClick={handleDelete}>
                     <FontAwesomeIcon icon={faTrashAlt}/>
                 </IconButton>
             </>

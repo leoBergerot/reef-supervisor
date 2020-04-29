@@ -1,4 +1,4 @@
-import React, {createRef, useContext} from "react";
+import React, {useContext, useState} from "react";
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,6 +12,9 @@ import {HeaderList} from "./header-list";
 import {ToolbarList} from "./toolbar-list";
 import {MuiPickersContext} from "@material-ui/pickers";
 import {TableRow} from "./row-table";
+import {DeleteModal} from "../common/delete-modal";
+import {authContext} from "../../contexts/auth-context";
+import {alertContext} from "../../contexts/alert-context";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,11 +38,50 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy}) {
+export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy, setUpdate}) {
     const classes = useStyles();
+    const {auth} = useContext(authContext);
+    const {setAlert} = useContext(alertContext);
     const {moment} = useContext(MuiPickersContext);
+    const [open, setOpen] = useState(false);
+    const [measureToDelete, setMeasureToDelete] = useState({id: null, createdAt: null});
 
-    const refRows = [];
+    const handleDelete = (id, createdAt, load) => {
+        setOpen(true);
+        setMeasureToDelete({id, createdAt, load})
+    };
+
+    const onDelete = () => {
+            measureToDelete.load();
+            setOpen(false);
+            fetch(`${process.env.REACT_APP_API_URL}/measures/${measureToDelete.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + auth.token
+                    },
+                    body: JSON.stringify({name: name.value})
+                }
+            ).then(res => {
+                if (res.status === 200) {
+                    setUpdate(true);
+                    setAlert({
+                        open: true,
+                        message: `Measure of ${measureToDelete.createdAt} has been deleted`,
+                        severity: 'success'
+                    });
+
+                } else {
+                    setAlert({
+                        open: true,
+                        message: `An error occurred`,
+                        severity: 'error'
+                    });
+                }
+            });
+        }
+    ;
+
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -76,9 +118,9 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                     <TableBody>
                         {data.data
                             .map((row, index) => {
-                                refRows[row.id] = createRef();
                                 return (
-                                    <TableRow row={row} refRows={refRows} index={index} moment={moment} unit={type.data.unit}/>
+                                    <TableRow row={row} index={index} moment={moment}
+                                              unit={type.data.unit} handleDelete={handleDelete}/>
                                 );
                             })}
                         {emptyRows > 0 && data.loading && (
@@ -109,6 +151,8 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                 onChangeRowsPerPage={handleChangeRowsPerPage}
                 style={{position: "absolute", bottom: 0, right: 0}}
             />
+            <DeleteModal open={open} onDelete={onDelete} name={`value of ${measureToDelete.createdAt}`}
+                         setOpen={setOpen} unDisplayLinked/>
         </Paper>
     );
 }

@@ -10,7 +10,7 @@ import {DatePicker} from "../common/date-picker";
 import isEmpty from "validator/es/lib/isEmpty";
 
 
-export const TableRow = ({moment, refRows, index, row, unit}) => {
+export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     const {auth} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const [edit, setEdit] = useState(false);
@@ -31,6 +31,10 @@ export const TableRow = ({moment, refRows, index, row, unit}) => {
         handleChangeDate(currentValues.createdAt);
         setValue({value: currentValues.value, error: false});
     }, [currentValues]);
+
+    const _handleDelete = () => {
+        handleDelete(row.id, moment(currentValues.createdAt).format("DD/MM/YY HH:mm"), () => (setLoading(true)))
+    };
 
     const handleSave = (event) => {
         event.preventDefault();
@@ -58,6 +62,11 @@ export const TableRow = ({moment, refRows, index, row, unit}) => {
                     (result) => {
                         if (result.id) {
                             setCurrentValues({value: result.value, createdAt: result.createdAt})
+                            setAlert({
+                                open: true,
+                                message: `Updated successful`,
+                                severity: 'success'
+                            });
                         } else {
                             setAlert({
                                 open: true,
@@ -78,11 +87,11 @@ export const TableRow = ({moment, refRows, index, row, unit}) => {
         }
     };
 
+
     return (
         <TableRowUi
             hover
             key={index}
-            ref={ref => (refRows[row.id]) = ref}
         >
             {!edit ?
                 !loading ?
@@ -131,8 +140,9 @@ export const TableRow = ({moment, refRows, index, row, unit}) => {
                 </TableCell>
             }
             <TableCell>
-                <Actions id={row.id} rowsRef={refRows} edit={edit}
-                         setEdit={setEdit} handleSave={handleSave} disabled={loading}/>
+                <Actions edit={edit}
+                         setEdit={setEdit} handleSave={handleSave} disabled={loading}
+                         handleDelete={_handleDelete}/>
             </TableCell>
         </TableRowUi>
     )
