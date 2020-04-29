@@ -24,21 +24,39 @@ export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => 
     return (
         !edit ?
             <>
-                <IconButton aria-label="edit" size="small" className={classes.margin} disabled={disabled}>
-                    <FontAwesomeIcon icon={faPen} onClick={handleEdit}/>
+                <IconButton aria-label="edit"
+                            size="small"
+                            className={classes.margin}
+                            disabled={disabled}
+                            onClick={handleEdit}
+                >
+                    <FontAwesomeIcon icon={faPen}/>
                 </IconButton>
-                <IconButton aria-label="delete" color="secondary" size="small" className={classes.margin}
-                            disabled={disabled} onClick={handleDelete}>
+                <IconButton aria-label="delete"
+                            color="secondary"
+                            size="small"
+                            className={classes.margin}
+                            disabled={disabled}
+                            onClick={handleDelete}
+                >
                     <FontAwesomeIcon icon={faTrashAlt}/>
                 </IconButton>
             </>
             :
             <>
-                <IconButton aria-label="save" size="small" className={classes.margin} onClick={handleSave}>
+                <IconButton aria-label="save"
+                            size="small"
+                            className={classes.margin}
+                            onClick={handleSave}
+                >
                     <FontAwesomeIcon icon={faSave}/>
                 </IconButton>
-                <IconButton aria-label="cancel" color="secondary" size="small" className={classes.margin}
-                            onClick={handleCancel}>
+                <IconButton aria-label="cancel"
+                            color="secondary"
+                            size="small"
+                            className={classes.margin}
+                            onClick={handleCancel}
+                >
                     <FontAwesomeIcon icon={faTimes}/>
                 </IconButton>
             </>

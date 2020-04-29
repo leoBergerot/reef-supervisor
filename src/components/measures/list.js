@@ -119,8 +119,13 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                         {data.data
                             .map((row, index) => {
                                 return (
-                                    <TableRow row={row} index={index} moment={moment}
-                                              unit={type.data.unit} handleDelete={handleDelete}/>
+                                    <TableRow key={row.id}
+                                              row={row}
+                                              index={index}
+                                              moment={moment}
+                                              unit={type.data.unit}
+                                              handleDelete={handleDelete}
+                                    />
                                 );
                             })}
                         {emptyRows > 0 && data.loading && (
@@ -151,8 +156,11 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                 onChangeRowsPerPage={handleChangeRowsPerPage}
                 style={{position: "absolute", bottom: 0, right: 0}}
             />
-            <DeleteModal open={open} onDelete={onDelete} name={`value of ${measureToDelete.createdAt}`}
-                         setOpen={setOpen} unDisplayLinked/>
+            <DeleteModal open={open}
+                         onDelete={onDelete}
+                         name={`value of ${measureToDelete.createdAt}`}
+                         setOpen={setOpen} unDisplayLinked
+            />
         </Paper>
     );
 }

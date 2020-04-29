@@ -62,9 +62,19 @@ export const MeasureList = () => {
 
     return (
         <Loading loading={type.loading}>
-            <List type={type} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}
-                  rowsPerPage={rowsPerPage} total={totalMeasures} data={measures} setOrder={setOrder}
-                  setOrderBy={setOrderBy} order={order} orderBy={orderBy} setUpdate={setUpdate}/>
+            <List
+                type={type}
+                page={page}
+                setPage={setPage}
+                setRowsPerPage={setRowsPerPage}
+                rowsPerPage={rowsPerPage}
+                total={totalMeasures}
+                data={measures}
+                setOrder={setOrder}
+                setOrderBy={setOrderBy}
+                order={order}
+                orderBy={orderBy}
+                setUpdate={setUpdate}/>
         </Loading>
     )
 };

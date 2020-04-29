@@ -9,7 +9,6 @@ import {Skeleton} from "@material-ui/lab";
 import {DatePicker} from "../common/date-picker";
 import isEmpty from "validator/es/lib/isEmpty";
 
-
 export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     const {auth} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
@@ -33,14 +32,22 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     }, [currentValues]);
 
     const _handleDelete = () => {
-        handleDelete(row.id, moment(currentValues.createdAt).format("DD/MM/YY HH:mm"), () => (setLoading(true)))
+        handleDelete(
+            row.id,
+            moment(currentValues.createdAt).format("DD/MM/YY HH:mm"),
+            () => (setLoading(true))
+        )
     };
 
     const handleSave = (event) => {
         event.preventDefault();
         let error = false;
         if (isEmpty(value.value.toString())) {
-            setValue({value: value.value, error: true, helperText: "Please enter a correct value"});
+            setValue({
+                value: value.value,
+                error: true,
+                helperText: "Please enter a correct value"
+            });
             error = true;
         }
         if (!error) {
@@ -87,7 +94,6 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
         }
     };
 
-
     return (
         <TableRowUi
             hover
@@ -103,7 +109,11 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                     </TableCell>
                 :
                 <TableCell>
-                    <DatePicker selectedDate={selectedDate} handleDateChange={handleChangeDate} small/>
+                    <DatePicker
+                        selectedDate={selectedDate}
+                        handleDateChange={handleChangeDate}
+                        small
+                    />
                 </TableCell>
             }
             {!edit ?
@@ -132,7 +142,9 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                             error={value.error}
                             helperText={value.helperText}
                             placeholder={unit}
-                            onChange={(event) => setValue({value: event.target.value, error: false})}
+                            onChange={
+                                (event) => setValue({value: event.target.value, error: false})
+                            }
                             name="value"
                             id="value"
                         />
@@ -141,8 +153,11 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
             }
             <TableCell>
                 <Actions edit={edit}
-                         setEdit={setEdit} handleSave={handleSave} disabled={loading}
-                         handleDelete={_handleDelete}/>
+                         setEdit={setEdit}
+                         handleSave={handleSave}
+                         disabled={loading}
+                         handleDelete={_handleDelete}
+                />
             </TableCell>
         </TableRowUi>
     )
