@@ -63,7 +63,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "interpolate-html-plugin": "^3.0.0"
-  }
+  "devDependencies": {}
 }

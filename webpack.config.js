@@ -48,11 +48,7 @@ module.exports = (env) => {
           new HWP(
               {
                   inject: true,
-                  templateParameters: {
-                      "PUBLIC_URL": process.env.REACT_APP_PUBLIC_URL,
-                  },
                   template: path.resolve(__dirname, 'public/index.html')
-
               }
           ),
             new CopyPlugin([
