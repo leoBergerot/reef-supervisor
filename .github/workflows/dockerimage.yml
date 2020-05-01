@@ -20,7 +20,7 @@ jobs:
           name: reef-supervisor/app-prod
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-          registry: registry.reef-supervisor.fr
+          registry: ${{ secrets.REGISTRY_NAME }}
           dockerfile: dockerfile.prod 
           buildoptions: "--compress --force-rm" 
           buildargs: REACT_APP_PUBLIC_URL,REACT_APP_API_URL,REACT_APP_RECAPTCHA_KEY_SITE
