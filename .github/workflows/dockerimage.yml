@@ -28,4 +28,4 @@ jobs:
           registry: ${{ secrets.REGISTRY_NAME }}
           dockerfile: dockerfile.prod 
           buildoptions: "--compress --force-rm" 
-          buildargs: REACT_APP_PUBLIC_URL,REACT_APP_API_URL,REACT_APP_RECAPTCHA_KEY_SITE
+          buildargs: REACT_APP_PUBLIC_URL, REACT_APP_API_URL, REACT_APP_RECAPTCHA_KEY_SITE
