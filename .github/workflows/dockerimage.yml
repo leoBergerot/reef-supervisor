@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        env:
+          REACT_APP_PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+          REACT_APP_API_URL: ${{ secrets.APP_API_URL }}
+          REACT_APP_RECAPTCHA_KEY_SITE: ${{ secrets.RECAPTCHA_KEY_SITE }} 
+        with:
+          name: reef-supervisor/app-prod
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          registry: registry.reef-supervisor.fr
+          dockerfile: dockerfile.prod 
+          buildoptions: "--compress --force-rm" 
+          buildargs: REACT_APP_PUBLIC_URL,REACT_APP_API_URL,REACT_APP_RECAPTCHA_KEY_SITE
