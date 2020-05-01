@@ -22,11 +22,10 @@ jobs:
           REACT_APP_API_URL: ${{ secrets.APP_API_URL }}
           REACT_APP_RECAPTCHA_KEY_SITE: ${{ secrets.RECAPTCHA_KEY_SITE }} 
         with:
-          name: reef-supervisor/app-prod
+          name: app-prod
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           registry: ${{ secrets.REGISTRY_NAME }}
           dockerfile: dockerfile.prod 
           buildoptions: "--compress --force-rm" 
           buildargs: REACT_APP_PUBLIC_URL,REACT_APP_API_URL,REACT_APP_RECAPTCHA_KEY_SITE
-          tags: "v1"  
