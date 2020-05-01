@@ -13,9 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == github.event.repository.owner.login
     steps:
-      - name: Publish to Registry
-      - uses: actions/checkout@v2
-      - uses: elgohr/Publish-Docker-Github-Action@master
+      - name: Get code
+        uses: actions/checkout@v2
+      - name: Build and publish
+        uses: elgohr/Publish-Docker-Github-Action@master
         env:
           REACT_APP_PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_API_URL: ${{ secrets.APP_API_URL }}
