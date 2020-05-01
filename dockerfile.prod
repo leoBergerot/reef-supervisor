@@ -1,31 +1,35 @@
 # build environment
 FROM node:14-stretch as build
-ARG REACT_APP_PUBLIC_URL #=define_default_here
-ARG REACT_APP_API_URL #=define_default_here
-ARG REACT_APP_RECAPTCHA_KEY_SITE #=define_default_here
+ARG REACT_APP_PUBLIC_URL
+  #=define_default_here
+ARG REACT_APP_API_URL
+  #=define_default_here
+ARG REACT_APP_RECAPTCHA_KEY_SITE
+  #=define_default_here
 WORKDIR /app
 
-###LOCAL###
-#COPY package.json ./
-#COPY yarn.lock ./
-#COPY . ./
-###LOCAL###
+##LOCAL###
+COPY package.json ./
+COPY yarn.lock ./
+COPY . ./
+##LOCAL###
 
 ###FROM GIT###
-RUN git clone https://github.com/leoBergerot/reef-supervisor.git
-RUN cp -r reef-supervisor/. /app
-RUN rm -r reef-supervisor
-RUN ls -a
+#RUN git clone https://github.com/leoBergerot/reef-supervisor.git
+#RUN cp -r reef-supervisor/. /app
+#RUN rm -r reef-supervisor
+#RUN ls -a
+###FROM GIT###~
+
 RUN mv .env-dist .env.prod
 RUN sed -i "s~http://localhost:9000~$REACT_APP_PUBLIC_URL~g" .env.prod
 RUN sed -i "s~http://localhost:7000~$REACT_APP_API_URL~g" .env.prod
 RUN sed -i "s~xxx~$REACT_APP_RECAPTCHA_KEY_SITE~g" .env.prod
-###FROM GIT###~
 
 RUN yarn install --pure-lockfile --production[true] --silent --non-interactive
 RUN yarn build
 
-# production environment
+  # production environment
 FROM nginx:stable-alpine
 COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build /usr/share/nginx/html
