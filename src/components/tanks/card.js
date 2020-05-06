@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 }));
 export const Card = ({data, edit, handleClick}) => {
 
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
     const classes = useStyles();
@@ -56,7 +56,7 @@ export const Card = ({data, edit, handleClick}) => {
                 GET,
                 `tanks/${data.id}/avatars`,
                 null,
-                auth.token,
+                getAuthToken(),
                 (blob) => (
                     setAvatar({loading: false, blob: URL.createObjectURL(blob)})
                 ),

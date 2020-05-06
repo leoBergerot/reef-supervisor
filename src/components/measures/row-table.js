@@ -11,7 +11,7 @@ import isEmpty from "validator/es/lib/isEmpty";
 import {appFetch, PATCH} from "../../utils/app-fetch";
 
 export const TableRow = ({moment, index, row, unit, handleDelete}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const [edit, setEdit] = useState(false);
     const [selectedDate, handleChangeDate] = useState(moment(row.createdAt));
@@ -61,7 +61,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                     value: value.value,
                     createdAt: selectedDate,
                 },
-                auth.token,
+                getAuthToken(),
                 (result) => {
                     setCurrentValues({value: result.value, createdAt: result.createdAt})
                     setAlert({

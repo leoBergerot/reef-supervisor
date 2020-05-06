@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy, setUpdate}) {
     const classes = useStyles();
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const {moment} = useContext(MuiPickersContext);
     const [open, setOpen] = useState(false);
@@ -59,7 +59,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
             DELETE,
             `measures/${measureToDelete.id}`,
             null,
-            auth.token,
+            getAuthToken(),
             () => {
                     setUpdate(true);
                     setAlert({

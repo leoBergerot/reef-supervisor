@@ -28,21 +28,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Layout = ({children, location: {pathname}, history}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken, auth} = useContext(authContext);
     const {loading} = auth;
     const classes = useStyles();
     let header = null;
 
-    switch (pathname) {
-        case "/":
-        case "/measures":
-        case "/chart":
-            if (auth.token) {
-                header = <HeaderMenu history={history}/>;
-            }
-            break;
-        default:
-            header = <HeaderLogo/>
+    if (!loading) {
+        switch (pathname) {
+            case "/":
+            case "/measures":
+            case "/chart":
+                if (getAuthToken()) {
+                    header = <HeaderMenu history={history}/>;
+                }
+                break;
+            default:
+                header = <HeaderLogo/>
+        }
     }
     return (
         <>

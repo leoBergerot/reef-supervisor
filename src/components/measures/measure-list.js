@@ -10,7 +10,7 @@ import {appFetch, GET} from "../../utils/app-fetch";
 export const MeasureList = () => {
     const {tank} = useContext(tankContext);
     const {type} = useContext(typeContext);
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
     const [measures, setMeasures] = useState({data: [], loading: true});
@@ -38,7 +38,7 @@ export const MeasureList = () => {
             GET,
             `measures?tank=${tank.data.id}&limit=${rowsPerPage}&page=${page + 1}&sort=${orderBy},${order === "desc" ? "DESC" : "ASC"}&type=${type.data.type}`,
             null,
-            auth.token,
+            getAuthToken(),
             (result) => {
                 setMeasures({
                     data: result.data,

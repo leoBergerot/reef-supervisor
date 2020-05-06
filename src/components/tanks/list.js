@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const List = ({history, match: {params: {manage}}}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const {setTankData} = useContext(tankContext);
 
@@ -54,14 +54,14 @@ export const List = ({history, match: {params: {manage}}}) => {
 
     const [tankEdit, setTankEdit] = useState({data: null});
     const [updateList, setUpdateList] = useState(true);
- 
+
     useEffect(() => {
         if (updateList) {
             appFetch(
                 GET,
                 'tanks',
                 null,
-                auth.token,
+                getAuthToken(),
                 (result) => (
                     setTankList({data: result, loading: false})
                 ),
