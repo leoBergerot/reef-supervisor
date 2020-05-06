@@ -13,6 +13,7 @@ import {ArgumentAxis, Chart as ChartDevExpress, LineSeries, ValueAxis} from '@de
 import Skeleton from "@material-ui/lab/Skeleton";
 import {ValueScale} from "@devexpress/dx-react-chart";
 import {DateRangePicker} from "../common/date-range-picker";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 const useStyle = makeStyles((theme) =>
     ({
@@ -59,15 +60,11 @@ export const Chart = () => {
 
     const getMeasures = () => {
         setMeasures({data: [], loading: true});
-        fetch(`${process.env.REACT_APP_API_URL}/measures?tank=${tank.data.id}&sort=createdAt,ASC&type=${type.data.type}&filter=createdAt||gte||${selectedDate[0].format("Y-MM-DD")}&filter=createdAt||lte||${moment(selectedDate[1], "Y-MM-DD").add(1, 'days').format("Y-MM-DD")}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
-            },
-        })
-            .then(res => res.json())
-            .then(
+        appFetch(
+            GET,
+            `measures?tank=${tank.data.id}&sort=createdAt,ASC&type=${type.data.type}&filter=createdAt||gte||${selectedDate[0].format("Y-MM-DD")}&filter=createdAt||lte||${moment(selectedDate[1], "Y-MM-DD").add(1, 'days').format("Y-MM-DD")}`,
+            null,
+            auth.token,
                 (result) => {
                     setMeasures({
                         data: result.map((value) => ({
@@ -77,15 +74,11 @@ export const Chart = () => {
                         loading: false
                     });
                 },
-                (error) => {
+            () => {
                     setMeasures({data: [], loading: true});
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            );
+            },
+            setAlert
+        )
     };
     const getDomain = (domain) => {
         if (domain[0] / 10 < 1) {

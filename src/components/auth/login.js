@@ -12,6 +12,7 @@ import isEmpty from 'validator/lib/isEmpty';
 import Typography from "@material-ui/core/Typography";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
 import {alertContext} from "../../contexts/alert-context";
+import {appFetch, POST} from "../../utils/app-fetch";
 
 export const Login = ({history, match: {params: {enable}}}) => {
     const {setAuthData} = useContext(authContext);
@@ -28,41 +29,27 @@ export const Login = ({history, match: {params: {enable}}}) => {
     useEffect(() => {
         if (formCanSubmit.value) {
             setLoading(true);
-            fetch(process.env.REACT_APP_API_URL + '/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({password: password.value, username: email.value, recaptchaToken: formCanSubmit.recaptchaToken})
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setLoading(false);
-                        if (result.access_token) {
-                            setAuthData(result.access_token);
-                            history.replace('/tanks');
-                            return null;
-                        } else if (result.statusCode === 403) {
-                            setPassword({value: password.value, error: true, helperText: result.message})
-                        } else if (result.statusCode === 404) {
-                            setEmail({value: email.value, error: true, helperText: result.message});
-                            setPassword({value: null, error: false, helperText: null});
-                        } else if (result.statusCode === 401) {
-                            setAlert({
-                                open: true,
-                                message: result.message,
-                                severity: 'warning'
-                            });
-                        }
-                        setLoading(false);
-                    },
-
-                    (error) => {
-                        setLoading(false);
-                        console.log(error)
-                    }
-                );
+            appFetch(POST, 'login', {
+                password: password.value,
+                username: email.value,
+                recaptchaToken: formCanSubmit.recaptchaToken
+            }, null, (result) => {
+                setLoading(false);
+                if (result.access_token) {
+                    setAuthData(result.access_token);
+                    history.replace('/tanks');
+                    return null;
+                }
+            }, (error) => {
+                setLoading(false);
+                if (error && error.statusCode === 403) {
+                    setPassword({value: password.value, error: true, helperText: error.message})
+                } else if (error && error.statusCode === 404) {
+                    setEmail({value: email.value, error: true, helperText: error.message});
+                    setPassword({value: null, error: false, helperText: null});
+                }
+                return null;
+            }, setAlert);
             setFormCanSubmit({value: false, recaptchaToken: null});
             setSubmit(false);
         }

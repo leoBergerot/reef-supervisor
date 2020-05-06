@@ -8,6 +8,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPen} from "@fortawesome/free-solid-svg-icons";
 import {authContext} from "../../contexts/auth-context";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
+import {appFetch, GET} from "../../utils/app-fetch";
+import {alertContext} from "../../contexts/alert-context";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -44,27 +46,24 @@ const useStyles = makeStyles(theme => ({
 export const Card = ({data, edit, handleClick}) => {
 
     const {auth} = useContext(authContext);
+    const {setAlert} = useContext(alertContext);
 
     const classes = useStyles();
     const [avatar, setAvatar] = useState({loading: true, blob: null});
     useEffect(() => {
         if (data.avatar) {
-            fetch(`${process.env.REACT_APP_API_URL}/tanks/${data.id}/avatars`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + auth.token
-                },
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        res.blob().then(blob => {
-                            setAvatar({loading: false, blob: URL.createObjectURL(blob)})
-                        })
-                    } else {
-                        setAvatar({loading: false, blob: null});
-                    }
-                });
+            appFetch(
+                GET,
+                `tanks/${data.id}/avatars`,
+                null,
+                auth.token,
+                (blob) => (
+                    setAvatar({loading: false, blob: URL.createObjectURL(blob)})
+                ),
+                () => (setAvatar({loading: false, blob: null})),
+                setAlert,
+                true
+            );
         } else {
             setAvatar({loading: false, blob: null});
         }

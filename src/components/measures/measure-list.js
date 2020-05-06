@@ -5,6 +5,7 @@ import {typeContext} from "../../contexts/type-context";
 import List from "./list";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 export const MeasureList = () => {
     const {tank} = useContext(tankContext);
@@ -33,31 +34,20 @@ export const MeasureList = () => {
 
     const getMeasures = () => {
         setMeasures({data: [], loading: true});
-        fetch(`${process.env.REACT_APP_API_URL}/measures?tank=${tank.data.id}&limit=${rowsPerPage}&page=${page + 1}&sort=${orderBy},${order === "desc" ? "DESC" : "ASC"}&type=${type.data.type}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
+        appFetch(
+            GET,
+            `measures?tank=${tank.data.id}&limit=${rowsPerPage}&page=${page + 1}&sort=${orderBy},${order === "desc" ? "DESC" : "ASC"}&type=${type.data.type}`,
+            null,
+            auth.token,
+            (result) => {
+                setMeasures({
+                    data: result.data,
+                    loading: false
+                });
+                setTotalMeasures(result.total)
             },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setMeasures({
-                        data: result.data,
-                        loading: false
-                    });
-                    setTotalMeasures(result.total)
-                },
-                (error) => {
-                    setMeasures({data: [], loading: true});
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            );
+            () => (setMeasures({data: [], loading: true}))
+        );
     };
 
     return (

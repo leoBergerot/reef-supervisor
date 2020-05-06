@@ -10,6 +10,7 @@ import {CardContainerReponsive} from "../common/card-container-responsive";
 import Typography from "@material-ui/core/Typography";
 import isEmpty from "validator/lib/isEmpty";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
+import {appFetch, POST} from "../../utils/app-fetch";
 
 export const ForgotPassword = ({history}) => {
     const [email, setEmail] = useState({value: "", error: false, helperText: null});
@@ -22,46 +23,31 @@ export const ForgotPassword = ({history}) => {
 
     useEffect(() => {
         if (formCanSubmit.value) {
-            fetch(process.env.REACT_APP_API_URL + '/forgot-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({email: email.value, recaptchaToken: formCanSubmit.recaptchaToken})
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setLoading(false);
-                        if (result.email) {
-                            setAlert({
-                                open: true,
-                                message: `An email has been sended to ${email.value}, (check also your junk box)`,
-                                severity: 'success'
-                            });
-                            history.replace('/');
-                            return null;
-                        } else if (result.statusCode === 400) {
-                            setEmail({value: email.value, error: true, helperText: result.message})
-                        } else {
-                            setAlert({
-                                open: true,
-                                message: `An error occured: ${result.message}`,
-                                severity: 'error'
-                            });
-                        }
-                        setLoading(false);
-                    },
-                    (error) => {
-                        setLoading(false);
+            appFetch(
+                POST,
+                'forgot-password',
+                {email: email.value, recaptchaToken: formCanSubmit.recaptchaToken},
+                null,
+                (result) => {
+                    setLoading(false);
+                    if (result.email) {
                         setAlert({
                             open: true,
-                            message: `${error.message}`,
-                            severity: 'error'
+                            message: `An email has been sended to ${email.value}, (check also your junk box)`,
+                            severity: 'success'
                         });
+                        history.replace('/');
+                        return null;
                     }
-                );
-
+                },
+                (error) => {
+                    setLoading(false);
+                    if (error.statusCode === 400) {
+                        setEmail({value: email.value, error: true, helperText: error.message})
+                    }
+                },
+                setAlert
+            );
             setFormCanSubmit({value: false, recaptchaToken: null});
             setSubmit(false);
         }

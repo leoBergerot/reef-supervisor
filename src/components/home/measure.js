@@ -15,6 +15,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import {typeContext} from "../../contexts/type-context";
 import Divider from "@material-ui/core/Divider";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -148,31 +149,23 @@ export const Measure = ({name, shortName, unit, type, history}) => {
 
     const getMeasureByTypeAndTank = () => {
         setMeasure({last: null, previous: null, loading: true});
-        fetch(`${process.env.REACT_APP_API_URL}/measures?tank=${tank.data.id}&limit=2&sort=createdAt,DESC&type=${type}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
+        appFetch(
+            GET,
+            `measures?tank=${tank.data.id}&limit=2&sort=createdAt,DESC&type=${type}`,
+            null,
+            auth.token,
+            (result) => {
+                setMeasure({
+                    last: (result.length >= 0 ? result[0] : null),
+                    previous: (result.length >= 1 ? result[1] : null),
+                    loading: false
+                });
             },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setMeasure({
-                        last: (result.length >= 0 ? result[0] : null),
-                        previous: (result.length >= 1 ? result[1] : null),
-                        loading: false
-                    });
-                },
-                (error) => {
-                    setMeasure({last: null, previous: null, loading: true});
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            );
+            () => {
+                setMeasure({last: null, previous: null, loading: true});
+            },
+            setAlert
+        );
     };
 
     useEffect(() => {

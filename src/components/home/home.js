@@ -4,6 +4,7 @@ import {Measure} from "./measure";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import {Loading} from "../common/loading";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 export const Home = ({history}) => {
     const {auth} = useContext(authContext);
@@ -11,27 +12,19 @@ export const Home = ({history}) => {
     const [types, setTypes] = useState({loading: true, data: null});
 
     useEffect(() => {
-        fetch(process.env.REACT_APP_API_URL + '/measure-types', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
+        appFetch(
+            GET,
+            'measure-types',
+            null,
+            auth.token,
+            (result) => {
+                setTypes({data: result, loading: false});
             },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setTypes({data: result, loading: false});
-                },
-                (error) => {
-                    setTypes({loading: false, data: []});
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            );
+            () => {
+                setTypes({data: null, loading: false});
+            },
+            setAlert
+        );
     }, []);
 
     return(

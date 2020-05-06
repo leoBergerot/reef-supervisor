@@ -12,6 +12,7 @@ import isEmpty from "validator/es/lib/isEmpty";
 import {MuiPickersContext} from "@material-ui/pickers";
 import {DatePicker} from "../common/date-picker";
 import {MeasureField} from "../common/measure-field";
+import {appFetch, POST} from "../../utils/app-fetch";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -97,41 +98,21 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
     const handleSubmit = () => {
         handleClose();
         setMeasure({loading: true, last: measure.last, previous: measure.previous});
-        fetch(process.env.REACT_APP_API_URL + '/measures', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${auth.token}`
-            },
-            body: JSON.stringify({
+
+        appFetch(
+            POST,
+            'measures',
+            {
                 tank: tank.data.id,
                 type: type,
                 value: value.value,
                 createdAt: createdAt.value,
-            })
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    if (result.value.toString()) {
-                        setMeasure({loading: false, last: result, previous: measure.last});
-                    } else {
-                        setMeasure({loading: false, last: measure.last, previous: measure.previous});
-                        setAlert({
-                            open: true,
-                            message: `An error occurred`,
-                            severity: 'error'
-                        });
-                    }
-                },
-                (error) => {
-                    setMeasure({loading: false, last: measure.last, previous: measure.previous});
-                    setAlert({
-                        open: true,
-                        message: `Network error`,
-                        severity: 'error'
-                    });
-                });
+            },
+            auth.token,
+            (result) => (setMeasure({loading: false, last: result, previous: measure.last})),
+            () => (setMeasure({loading: false, last: measure.last, previous: measure.previous})),
+            setAlert
+        );
     };
 
     return (

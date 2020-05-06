@@ -15,6 +15,7 @@ import {TableRow} from "./row-table";
 import {DeleteModal} from "../common/delete-modal";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
+import {appFetch, DELETE} from "../../utils/app-fetch";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,31 +55,21 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
     const onDelete = () => {
             measureToDelete.load();
             setOpen(false);
-            fetch(`${process.env.REACT_APP_API_URL}/measures/${measureToDelete.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + auth.token
-                    },
-                    body: JSON.stringify({name: name.value})
-                }
-            ).then(res => {
-                if (res.status === 200) {
+        appFetch(
+            DELETE,
+            `measures/${measureToDelete.id}`,
+            null,
+            auth.token,
+            () => {
                     setUpdate(true);
                     setAlert({
                         open: true,
                         message: `Measure of ${measureToDelete.createdAt} has been deleted`,
                         severity: 'success'
                     });
-
-                } else {
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            });
+            },
+            null,
+        );
         }
     ;
 

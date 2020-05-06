@@ -12,6 +12,7 @@ import {Avatar} from "./avatar";
 import {MenuItemAvatar, MenuItemAvatarWithRef} from "./menu-item";
 import MenuItem from "@material-ui/core/MenuItem";
 import logo from "../../../asset/images/logo.svg";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -66,45 +67,35 @@ export const HeaderMenu = ({history}) => {
     };
 
     useEffect(() => {
-        fetch(process.env.REACT_APP_API_URL + '/tanks', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
+        appFetch(
+            GET,
+            'tanks',
+            null,
+            auth.token,
+            (result) => {
+                setTankList({data: result, loading: false});
             },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setTankList({data: result, loading: false});
-                },
-                (error) => {
-                    setTankList({loading: false, data: []});
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-            );
+            () => {
+                setTankList({loading: false, data: []});
+            },
+            setAlert
+        )
     }, []);
 
     useEffect(() => {
         if (tank.data && tank.data.avatar) {
-            fetch(`${process.env.REACT_APP_API_URL}/tanks/${tank.data.id}/avatars`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + auth.token
-                },
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        res.blob().then(blob => {
-                            setAvatar(URL.createObjectURL(blob))
-                        })
-                    }
-                });
+            appFetch(
+                GET,
+                `tanks/${tank.data.id}/avatars`,
+                null,
+                auth.token,
+                blob => (
+                    setAvatar(URL.createObjectURL(blob))
+                ),
+                null,
+                setAlert,
+                true
+            );
         }else {
             setAvatar(null)
         }

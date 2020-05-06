@@ -8,6 +8,7 @@ import {alertContext} from "../../contexts/alert-context";
 import {Skeleton} from "@material-ui/lab";
 import {DatePicker} from "../common/date-picker";
 import isEmpty from "validator/es/lib/isEmpty";
+import {appFetch, PATCH} from "../../utils/app-fetch";
 
 export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     const {auth} = useContext(authContext);
@@ -53,46 +54,28 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
         if (!error) {
             setEdit(false);
             setLoading(true);
-            fetch(`${process.env.REACT_APP_API_URL}/measures/${row.id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${auth.token}`
-                },
-                body: JSON.stringify({
+            appFetch(
+                PATCH,
+                `measures/${row.id}`,
+                {
                     value: value.value,
                     createdAt: selectedDate,
-                })
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        if (result.id) {
-                            setCurrentValues({value: result.value, createdAt: result.createdAt})
-                            setAlert({
-                                open: true,
-                                message: `Updated successful`,
-                                severity: 'success'
-                            });
-                        } else {
-                            setAlert({
-                                open: true,
-                                message: `An error occurred`,
-                                severity: 'error'
-                            });
-                        }
-                        setLoading(false);
-                    },
-                    (error) => {
-                        setLoading(false);
-                        setAlert({
-                            open: true,
-                            message: `Network error`,
-                            severity: 'error'
-                        });
+                },
+                auth.token,
+                (result) => {
+                    setCurrentValues({value: result.value, createdAt: result.createdAt})
+                    setAlert({
+                        open: true,
+                        message: `Updated successful`,
+                        severity: 'success'
                     });
+                    setLoading(false);
+                },
+                () => (setLoading(false)),
+                setAlert
+            );
         }
-    };
+    }
 
     return (
         <TableRowUi

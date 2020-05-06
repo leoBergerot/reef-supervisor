@@ -10,6 +10,7 @@ import {TypographyResponsive} from "../common/typography-responsive";
 import {tankContext} from "../../contexts/tank-context";
 import Button from "@material-ui/core/Button";
 import FormModal from "./modal";
+import {appFetch, GET} from "../../utils/app-fetch";
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -56,27 +57,19 @@ export const List = ({history, match: {params: {manage}}}) => {
 
     useEffect(() => {
         if (updateList) {
-            fetch(process.env.REACT_APP_API_URL + '/tanks', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + auth.token
+            appFetch(
+                GET,
+                'tanks',
+                null,
+                auth.token,
+                (result) => (
+                    setTankList({data: result, loading: false})
+                ),
+                () => {
+                    setTankList({loading: false, data: []});
                 },
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setTankList({data: result, loading: false});
-                    },
-                    (error) => {
-                        setTankList({loading: false, data: []});
-                        setAlert({
-                            open: true,
-                            message: `An error occurred`,
-                            severity: 'error'
-                        });
-                    }
-                );
+                setAlert
+            );
             setUpdateList(false)
         }
     }, [updateList]);
@@ -135,7 +128,7 @@ export const List = ({history, match: {params: {manage}}}) => {
             {!tankList.loading ?
                 <div className={classes.list}>
                     <TypographyResponsive overrideClasses={{root: classes.typography}}>
-                        {manage ? "Manage tanks :" : "Choice your tank :"}
+                        {manage ? "Manage tanks :" : (tankList.data.length === 0 ? "Create your first tank to continue :" : "Choose your tank :")}
                     </TypographyResponsive>
                     <div className={classes.listTank}>
                         {tankList.data.map((tank) => (
