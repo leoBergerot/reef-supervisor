@@ -3,6 +3,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {HeaderMenu} from "./header-menu";
 import {HeaderLogo} from "./header-logo";
 import {authContext} from "../../contexts/auth-context";
+import {tankContext} from "../../contexts/tank-context";
 
 const useStyles = makeStyles((theme) => ({
     main: {
@@ -29,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const Layout = ({children, location: {pathname}, history}) => {
     const {getAuthToken, auth} = useContext(authContext);
+    const {tank} = useContext(tankContext);
+
     const {loading} = auth;
     const classes = useStyles();
     let header = null;
@@ -38,7 +41,7 @@ export const Layout = ({children, location: {pathname}, history}) => {
             case "/":
             case "/measures":
             case "/chart":
-                if (getAuthToken()) {
+                if (getAuthToken() && tank.data) {
                     header = <HeaderMenu history={history}/>;
                 }
                 break;
