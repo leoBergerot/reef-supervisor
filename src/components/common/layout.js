@@ -37,7 +37,9 @@ export const Layout = ({children, location: {pathname}, history}) => {
         case "/":
         case "/measures":
         case "/chart":
-            header = <HeaderMenu history={history}/>;
+            if (auth.token) {
+                header = <HeaderMenu history={history}/>;
+            }
             break;
         default:
             header = <HeaderLogo/>

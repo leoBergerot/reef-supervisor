@@ -5,6 +5,9 @@ export const typeContext = createContext({});
 const TypeProvider = ({children}) => {
     const [type, setType] = useState({data: null, loading: true});
 
+    const setTypeData = (data) => {
+        setType({data: data})
+    };
 
     useEffect(() => {
         setType({
@@ -19,7 +22,7 @@ const TypeProvider = ({children}) => {
 
     return (
         <typeContext.Provider
-            value={{setType, type}}
+            value={{setTypeData, type}}
         >
             {children}
         </typeContext.Provider>

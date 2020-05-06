@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 export const List = ({history, match: {params: {manage}}}) => {
     const {auth} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
-    const {setTank} = useContext(tankContext);
+    const {setTankData} = useContext(tankContext);
 
     const classes = useStyles();
 
@@ -54,7 +54,7 @@ export const List = ({history, match: {params: {manage}}}) => {
 
     const [tankEdit, setTankEdit] = useState({data: null});
     const [updateList, setUpdateList] = useState(true);
-
+ 
     useEffect(() => {
         if (updateList) {
             appFetch(
@@ -87,7 +87,7 @@ export const List = ({history, match: {params: {manage}}}) => {
 
     const handleClick = (data) => {
         if (!manage) {
-            setTank({data: data});
+            setTankData(data);
             history.push('/')
         } else {
             handleOpen();

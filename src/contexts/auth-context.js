@@ -1,4 +1,6 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import {tankContext} from "./tank-context";
+import {typeContext} from "./type-context";
 
 export const authContext = createContext({});
 

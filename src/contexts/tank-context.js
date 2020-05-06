@@ -6,6 +6,9 @@ const TankProvider = ({children}) => {
 
     const [tank, setTank] = useState({loading: true, data: null});
 
+    const setTankData = (data) => {
+        setTank({data: data});
+    };
 
     useEffect(() => {
         setTank({
@@ -20,7 +23,7 @@ const TankProvider = ({children}) => {
 
     return (
         <tankContext.Provider
-            value={{setTank, tank}}
+            value={{setTankData, tank}}
         >
             {children}
         </tankContext.Provider>
