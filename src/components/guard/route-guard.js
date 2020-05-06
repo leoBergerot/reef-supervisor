@@ -23,9 +23,9 @@ export const GuardRoute = ({ component: Component, ...rest }) => {
         <Route
             {...rest}
             render={(routeProps) => (
-                auth.token && jwt_decode(auth.token).exp > Date.now().valueOf() / 1000 ? (!tank.data ?
-                    <List {...routeProps} /> :
-                    <Component {...routeProps} />) : <Redirect to="/login"/>
-            )}
+                !!auth.token && !!(jwt_decode(auth.token).exp > Date.now().valueOf() / 1000) ? (!tank.data ?
+                    <List {...routeProps} /> : <Component {...routeProps} />) : <Redirect to="/login"/>
+            )
+            }
         />)
 };

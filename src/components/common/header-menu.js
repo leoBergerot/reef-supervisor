@@ -13,6 +13,7 @@ import {MenuItemAvatar, MenuItemAvatarWithRef} from "./menu-item";
 import MenuItem from "@material-ui/core/MenuItem";
 import logo from "../../../asset/images/logo.svg";
 import {appFetch, GET} from "../../utils/app-fetch";
+import {typeContext} from "../../contexts/type-context";
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -31,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const HeaderMenu = ({history}) => {
     const {auth, setAuthData} = useContext(authContext);
-    const {tank, setTank} = useContext(tankContext);
+    const {tank, setTankData} = useContext(tankContext);
+    const {setTypeData} = useContext(typeContext);
     const {setAlert} = useContext(alertContext);
 
     const [tankList, setTankList] = useState({loading: true, data: []});
@@ -53,12 +55,15 @@ export const HeaderMenu = ({history}) => {
 
     const onLogout = () => {
         handleClose();
-        setAuthData(null)
+        setAuthData(null);
+        setTankData(null);
+        setTypeData(null);
+        history.push('/login')
     };
 
     const handleChangeTankClick = (data) => {
         handleClose();
-        setTank({data: data});
+        setTankData(data);
     };
 
     const handleManageTanks = () => {

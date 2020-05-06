@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => createStyles({
 }));
 export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     const {auth} = useContext(authContext);
-    const {setTank} = useContext(tankContext);
+    const {setTankData} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
 
     const [name, setName] = useState({value: (!!edit ? edit.name : ""), error: false, helperText: null});
@@ -144,7 +144,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                                     severity: 'success'
                                 });
                                 if (!edit) {
-                                    setTank({data: result});
+                                    setTankData(result);
                                     history.push('/');
                                 } else {
                                     result.avatar = avatar.blob;
@@ -161,7 +161,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                             severity: 'success'
                         });
                         if (!edit) {
-                            setTank({data: result});
+                            setTankData(result);
                             history.push('/');
                             return null;
                         } else {

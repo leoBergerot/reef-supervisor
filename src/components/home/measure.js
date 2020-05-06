@@ -103,7 +103,7 @@ const useStyles = makeStyles(theme => ({
 export const Measure = ({name, shortName, unit, type, history}) => {
     const {auth} = useContext(authContext);
     const {tank} = useContext(tankContext);
-    const {setType} = useContext(typeContext);
+    const {setTypeData} = useContext(typeContext);
 
     const {setAlert} = useContext(alertContext);
     const classes = useStyles();
@@ -135,12 +135,12 @@ export const Measure = ({name, shortName, unit, type, history}) => {
     };
 
     const handleShowList = () => {
-        setType({data: {name, shortName, unit, type}});
+        setTypeData({name, shortName, unit, type});
         history.push("/measures")
     };
 
     const handleShowGraphic = () => {
-        setType({data: {name, shortName, unit, type}});
+        setTypeData({name, shortName, unit, type});
         history.push("/chart")
     };
 
