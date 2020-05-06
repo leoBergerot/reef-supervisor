@@ -15,17 +15,19 @@ const AuthProvider = ({children, history}) => {
     };
 
     const getAuthToken = () => {
-        if (auth.token && jwt_decode(auth.token).exp > Date.now().valueOf() / 1000) {
-            return auth.token
-        } else {
-            setAuthData(null);
-            history.replace('/login');
-            setAlert({
-                open: true,
-                message: `Your session is expired, sign in`,
-                severity: 'warning'
-            });
-            return EXPIRED;
+        if (auth.token) {
+            if (jwt_decode(auth.token).exp > Date.now().valueOf() / 1000) {
+                return auth.token
+            } else {
+                setAuthData(null);
+                history.replace('/login');
+                setAlert({
+                    open: true,
+                    message: `Your session is expired, sign in`,
+                    severity: 'warning'
+                });
+                return EXPIRED;
+            }
         }
         return false;
     };
