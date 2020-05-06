@@ -7,7 +7,7 @@ import {Loading} from "../common/loading";
 import {appFetch, GET} from "../../utils/app-fetch";
 
 export const Home = ({history}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const [types, setTypes] = useState({loading: true, data: null});
 
@@ -16,7 +16,7 @@ export const Home = ({history}) => {
             GET,
             'measure-types',
             null,
-            auth.token,
+            getAuthToken(),
             (result) => {
                 setTypes({data: result, loading: false});
             },

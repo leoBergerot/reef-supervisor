@@ -46,7 +46,7 @@ export const Chart = () => {
     const {moment} = useContext(MuiPickersContext);
     const {tank} = useContext(tankContext);
     const {type} = useContext(typeContext);
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
     const [selectedDate, handleDateChange] = React.useState([moment().subtract(1, 'months'), moment()]);
@@ -64,7 +64,7 @@ export const Chart = () => {
             GET,
             `measures?tank=${tank.data.id}&sort=createdAt,ASC&type=${type.data.type}&filter=createdAt||gte||${selectedDate[0].format("Y-MM-DD")}&filter=createdAt||lte||${moment(selectedDate[1], "Y-MM-DD").add(1, 'days').format("Y-MM-DD")}`,
             null,
-            auth.token,
+            getAuthToken(),
                 (result) => {
                     setMeasures({
                         data: result.map((value) => ({

@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => createStyles({
     }
 }));
 export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setTankData} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
 
@@ -98,7 +98,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                 GET,
                 `tanks/${edit.id}/avatars`,
                 null,
-                auth.token,
+                getAuthToken(),
                 blob => {
                     setAvatar({update: false, url: URL.createObjectURL(blob), blob: null})
                 },
@@ -124,7 +124,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
             !!edit ? PATCH : POST,
             `tanks${!!edit ? `/${edit.id}` : ''}`,
             {name: name.value},
-            auth.token,
+            getAuthToken(),
             (result) => {
                 setLoading(false);
                 if (result.name) {
@@ -136,7 +136,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                             PATCH,
                             `tanks/${result.id}/avatars`,
                             formData,
-                            auth.token,
+                            getAuthToken(),
                             (result) => {
                                 setAlert({
                                     open: true,
@@ -186,7 +186,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
             DELETE,
             `tanks/${edit.id}`,
             null,
-            auth.token,
+            getAuthToken(),
             () => {
                 setLoading(false);
                 handleEditSuccess(edit, true);

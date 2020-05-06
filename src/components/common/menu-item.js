@@ -17,7 +17,7 @@ export const MenuItemAvatarWithRef = React.forwardRef((props, ref) => <MenuItemA
 const MenuItemAvatar = ({data, onClick}) => {
     const classes = useStyles();
     const [avatar, setAvatar] = useState(null);
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
     useEffect(() => {
@@ -26,7 +26,7 @@ const MenuItemAvatar = ({data, onClick}) => {
                 GET,
                 `tanks/${data.id}/avatars`,
                 null,
-                auth.token,
+                getAuthToken(),
                 (blob) => {
                     setAvatar(URL.createObjectURL(blob))
                 },

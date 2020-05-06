@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const HeaderMenu = ({history}) => {
-    const {auth, setAuthData} = useContext(authContext);
+    const {getAuthToken, setAuthData} = useContext(authContext);
     const {tank, setTankData} = useContext(tankContext);
     const {setTypeData} = useContext(typeContext);
     const {setAlert} = useContext(alertContext);
@@ -76,7 +76,7 @@ export const HeaderMenu = ({history}) => {
             GET,
             'tanks',
             null,
-            auth.token,
+            getAuthToken(),
             (result) => {
                 setTankList({data: result, loading: false});
             },
@@ -93,7 +93,7 @@ export const HeaderMenu = ({history}) => {
                 GET,
                 `tanks/${tank.data.id}/avatars`,
                 null,
-                auth.token,
+                getAuthToken(),
                 blob => (
                     setAvatar(URL.createObjectURL(blob))
                 ),

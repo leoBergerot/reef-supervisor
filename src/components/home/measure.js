@@ -101,7 +101,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const Measure = ({name, shortName, unit, type, history}) => {
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {tank} = useContext(tankContext);
     const {setTypeData} = useContext(typeContext);
 
@@ -153,7 +153,7 @@ export const Measure = ({name, shortName, unit, type, history}) => {
             GET,
             `measures?tank=${tank.data.id}&limit=2&sort=createdAt,DESC&type=${type}`,
             null,
-            auth.token,
+            getAuthToken(),
             (result) => {
                 setMeasure({
                     last: (result.length >= 0 ? result[0] : null),

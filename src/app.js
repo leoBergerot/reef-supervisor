@@ -16,6 +16,11 @@ import {MeasureList} from "./components/measures/measure-list";
 import {Layout} from "./components/common/layout";
 import history from "./components/common/history";
 import {Chart} from "./components/chart/chart";
+import AuthProvider from "./contexts/auth-context";
+import AlertProvider from "./contexts/alert-context";
+import TankProvider from "./contexts/tank-context";
+import TypeProvider from "./contexts/type-context";
+import {ContextProviderComposer} from "./contex-provider-composer";
 
 const theme = createMuiTheme({
     palette: {
@@ -38,18 +43,25 @@ function App() {
           <LocalizationProvider dateLibInstance={moment} dateAdapter={MomentAdapter} locale={locale}>
               <div className="app">
               <Router history={constHistory}>
-                  <Switch>
-                      <Layout history={constHistory}>
-                          <Route path="/login/:enable?" component={Login}/>
-                          <Route path="/forgot-password" component={ForgotPassword}/>
-                          <Route path="/recover-password/:id/:token" component={RecoverPassword}/>
-                          <Route path="/register" component={Register}/>
-                          <GuardRoute exact path="/" component={Home}/>
-                          <GuardRoute exact path="/tanks/:manage?" component={List}/>
-                          <GuardRoute exact path="/measures" component={MeasureList}/>
-                          <GuardRoute exact path="/chart" component={Chart}/>
-                      </Layout>
-                  </Switch>
+                  <ContextProviderComposer contextProviders={[
+                      <AlertProvider key={0}/>,
+                      <AuthProvider key={1} history={constHistory}/>,
+                      <TankProvider key={2}/>,
+                      <TypeProvider key={3}/>
+                  ]}>
+                      <Switch>
+                          <Layout history={constHistory}>
+                              <Route path="/login/:enable?" component={Login}/>
+                              <Route path="/forgot-password" component={ForgotPassword}/>
+                              <Route path="/recover-password/:id/:token" component={RecoverPassword}/>
+                              <Route path="/register" component={Register}/>
+                              <GuardRoute exact path="/" component={Home}/>
+                              <GuardRoute exact path="/tanks/:manage?" component={List}/>
+                              <GuardRoute exact path="/measures" component={MeasureList}/>
+                              <GuardRoute exact path="/chart" component={Chart}/>
+                          </Layout>
+                      </Switch>
+                  </ContextProviderComposer>
               </Router>
           </div>
           </LocalizationProvider>

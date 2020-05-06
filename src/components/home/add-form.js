@@ -54,7 +54,7 @@ export const AddFormWithRef = React.forwardRef((props, ref) => <AddForm innerRef
 const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, size, type, measure, setMeasure}) => {
 
     const {moment} = useContext(MuiPickersContext);
-    const {auth} = useContext(authContext);
+    const {getAuthToken} = useContext(authContext);
     const {tank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
 
@@ -108,7 +108,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                 value: value.value,
                 createdAt: createdAt.value,
             },
-            auth.token,
+            getAuthToken(),
             (result) => (setMeasure({loading: false, last: result, previous: measure.last})),
             () => (setMeasure({loading: false, last: measure.last, previous: measure.previous})),
             setAlert
