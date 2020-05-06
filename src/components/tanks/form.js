@@ -15,6 +15,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPen} from "@fortawesome/free-solid-svg-icons";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
+import {appFetch, DELETE, GET, PATCH, POST} from "../../utils/app-fetch";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
@@ -93,20 +94,18 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     const classes = useStyles();
     useEffect(() => {
         if (edit && edit.avatar) {
-            fetch(`${process.env.REACT_APP_API_URL}/tanks/${edit.id}/avatars`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + auth.token
+            appFetch(
+                GET,
+                `tanks/${edit.id}/avatars`,
+                null,
+                auth.token,
+                blob => {
+                    setAvatar({update: false, url: URL.createObjectURL(blob), blob: null})
                 },
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        res.blob().then(blob => {
-                            setAvatar({update: false, url: URL.createObjectURL(blob), blob: null})
-                        })
-                    }
-                });
+                null,
+                setAlert,
+                true
+            );
         }
     }, [edit]);
 
@@ -121,114 +120,87 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
         if (error) {
             return;
         }
-
-        fetch(process.env.REACT_APP_API_URL + '/tanks' + (!!edit ? `/${edit.id}` : ""), {
-            method: !!edit ? 'PATCH' : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
-            },
-            body: JSON.stringify({name: name.value})
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setLoading(false);
-                    if (result.name) {
-                        //update avatar
-                        if (avatar.blob && avatar.update) {
-                            const formData = new FormData();
-                            formData.append("file", avatar.blob);
-                            fetch(`${process.env.REACT_APP_API_URL}/tanks/${result.id}/avatars`, {
-                                method: 'PATCH',
-                                headers: {
-                                    'Authorization': 'Bearer ' + auth.token
-                                },
-                                body: formData
-                            }).then(
-                                res => {
-                                    if (res.status === 200) {
-                                        setAlert({
-                                            open: true,
-                                            message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
-                                            severity: 'success'
-                                        });
-                                        if (!edit) {
-                                            setTank({data: result});
-                                            history.push('/');
-                                        } else {
-                                            result.avatar = avatar.blob;
-                                            handleEditSuccess(result);
-                                        }
-                                    }
+        appFetch(
+            !!edit ? PATCH : POST,
+            `tanks${!!edit ? `/${edit.id}` : ''}`,
+            {name: name.value},
+            auth.token,
+            (result) => {
+                setLoading(false);
+                if (result.name) {
+                    //update avatar
+                    if (avatar.blob && avatar.update) {
+                        const formData = new FormData();
+                        formData.append("file", avatar.blob);
+                        appFetch(
+                            PATCH,
+                            `tanks/${result.id}/avatars`,
+                            formData,
+                            auth.token,
+                            (result) => {
+                                setAlert({
+                                    open: true,
+                                    message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                                    severity: 'success'
+                                });
+                                if (!edit) {
+                                    setTank({data: result});
+                                    history.push('/');
+                                } else {
+                                    result.avatar = avatar.blob;
+                                    handleEditSuccess(result);
                                 }
-                            )
-                        } else {
-                            setAlert({
-                                open: true,
-                                message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
-                                severity: 'success'
-                            });
-                            if (!edit) {
-                                setTank({data: result});
-                                history.push('/');
-                            } else {
-                                handleEditSuccess(result);
-                            }
-                        }
-                        return null;
-                    } else if (result.statusCode === 400) {
-                        setName({value: name.value, error: true, helperText: result.message})
+                            },
+                            null,
+                            setAlert
+                        )
                     } else {
                         setAlert({
                             open: true,
-                            message: `An error occurred: ${result.message}`,
-                            severity: 'error'
+                            message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                            severity: 'success'
                         });
+                        if (!edit) {
+                            setTank({data: result});
+                            history.push('/');
+                            return null;
+                        } else {
+                            handleEditSuccess(result);
+                        }
                     }
-                    setLoading(false);
-                },
-                (error) => {
-                    setLoading(false);
-                    setAlert({
-                        open: true,
-                        message: `${error.message}`,
-                        severity: 'error'
-                    });
+                    return null;
                 }
-            );
+            },
+            error => {
+                if (error && error.statusCode === 400) {
+                    setName({value: name.value, error: true, helperText: error.message})
+                }
+            }
+        );
     };
 
     const handleOnDelete = () => {
         setLoading(true);
-        fetch(process.env.REACT_APP_API_URL + '/tanks' + (!!edit ? `/${edit.id}` : ""), {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + auth.token
-            },
-            body: JSON.stringify({name: name.value})
-        })
-            .then(res => {
-                if (res.status === 200) {
-                    handleEditSuccess(edit, true);
-                    setAlert({
-                        open: true,
-                        message: `Tank ${edit.name} has been deleted`,
-                        severity: 'success'
-                    });
-
-                } else {
-                    setAlert({
-                        open: true,
-                        message: `An error occurred`,
-                        severity: 'error'
-                    });
-                }
-
-                setIsOpenDeleteModal(false);
+        setIsOpenDeleteModal(false);
+        appFetch(
+            DELETE,
+            `tanks/${edit.id}`,
+            null,
+            auth.token,
+            () => {
                 setLoading(false);
-            });
+                handleEditSuccess(edit, true);
+                setAlert({
+                    open: true,
+                    message: `Tank ${edit.name} has been deleted`,
+                    severity: 'success'
+                })
+            },
+            () => {
+                setLoading(false);
+            },
+            setAlert
+        )
     };
 
     const handleClickAvatar = () => {
@@ -291,7 +263,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         color="primary"
                         type="submit"
                     >
-                        {!!edit ? "Save" : "Create"} {loading && (<CircularProgress size={25}/>)}
+                        {!!edit ? "Save" : "Create"}
                     </Button>
                     <Button
                         onClick={handleClose}
@@ -308,6 +280,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     >
                         Remove {loading && (<CircularProgress size={25}/>)}
                     </Button>)}
+                    {loading && (<CircularProgress size={25}/>)}
                 </div>
                 {!!edit && (<DeleteModal
                     open={openDeleteModal}

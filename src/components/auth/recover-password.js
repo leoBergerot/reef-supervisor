@@ -12,6 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
 import isAlphanumeric from "validator/es/lib/isAlphanumeric";
 import isLength from "validator/es/lib/isLength";
+import {appFetch, POST} from "../../utils/app-fetch";
 
 export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
     const [newPassword, setNewPassword] = useState({value: "", error: false, helperText: null});
@@ -24,56 +25,42 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
     useEffect(() => {
         if (formCanSubmit.value) {
             setLoading(true);
-            fetch(process.env.REACT_APP_API_URL + '/recover-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            appFetch(
+                POST,
+                'recover-password',
+                {
                     newPassword: newPassword.value,
                     token,
                     id,
                     recaptchaToken: formCanSubmit.recaptchaToken
-                })
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setLoading(false);
-                        if (result.username) {
-                            setAlert({
-                                open: true,
-                                message: `${result.firstName} ${result.lastName}, your password was change`,
-                                severity: 'success'
-                            });
-                            history.replace('/');
-                            return null;
-                        } else if (result.statusCode === 400) {
-                            setNewPassword({value: newPassword.value, error: true, helperText: result.message})
-                        } else if (result.statusCode === 403) {
-                            setAlert({
-                                open: true,
-                                message: `This link are expired`,
-                                severity: 'error'
-                            });
-                        } else {
-                            setAlert({
-                                open: true,
-                                message: `An error occurred in server`,
-                                severity: 'error'
-                            });
-                        }
-                        setLoading(false);
-                    },
-                    (error) => {
-                        setLoading(false);
+                },
+                null,
+                (result) => {
+                    setLoading(false);
+                    if (result.username) {
                         setAlert({
                             open: true,
-                            message: `Network error`,
+                            message: `${result.firstName} ${result.lastName}, your password was change`,
+                            severity: 'success'
+                        });
+                        history.replace('/');
+                        return null;
+                    }
+                },
+                (error) => {
+                    setLoading(false);
+                    if (error && error.statusCode === 400) {
+                        setNewPassword({value: newPassword.value, error: true, helperText: error.message})
+                    } else if (error && error.statusCode === 403) {
+                        setAlert({
+                            open: true,
+                            message: `This link are expired`,
                             severity: 'error'
                         });
                     }
-                );
+                },
+                setAlert
+            );
             setFormCanSubmit({value: false, recaptchaToken: null});
             setSubmit(false);
         }

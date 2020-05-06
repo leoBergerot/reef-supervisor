@@ -3,6 +3,8 @@ import {default as MenuItemUi} from "@material-ui/core/MenuItem";
 import {Avatar} from "./avatar";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {authContext} from "../../contexts/auth-context";
+import {appFetch, GET} from "../../utils/app-fetch";
+import {alertContext} from "../../contexts/alert-context";
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -16,22 +18,22 @@ const MenuItemAvatar = ({data, onClick}) => {
     const classes = useStyles();
     const [avatar, setAvatar] = useState(null);
     const {auth} = useContext(authContext);
+    const {setAlert} = useContext(alertContext);
+
     useEffect(() => {
         if (data.avatar) {
-            fetch(`${process.env.REACT_APP_API_URL}/tanks/${data.id}/avatars`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + auth.token
+            appFetch(
+                GET,
+                `tanks/${data.id}/avatars`,
+                null,
+                auth.token,
+                (blob) => {
+                    setAvatar(URL.createObjectURL(blob))
                 },
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        res.blob().then(blob => {
-                            setAvatar(URL.createObjectURL(blob))
-                        })
-                    }
-                });
+                null,
+                setAlert,
+                true
+            );
         } else {
             setAvatar(null)
         }

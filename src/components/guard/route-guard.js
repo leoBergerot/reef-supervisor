@@ -4,19 +4,18 @@ import {authContext} from "../../contexts/auth-context";
 import jwt_decode from 'jwt-decode'
 import {tankContext} from "../../contexts/tank-context";
 import {List} from "../tanks/list";
+import {Loading} from "../common/loading";
 
 export const GuardRoute = ({ component: Component, ...rest }) => {
     const {auth} = useContext(authContext);
     const {tank} = useContext(tankContext);
-    const { loading } = auth;
-
-    if (loading) {
+    if (auth.loading || tank.loading) {
         return (
             <Route
                 {...rest}
-                render={() => {
-                    return <p>Loading...</p>;
-                }}
+                render={() => (
+                    <Loading loading={auth.loading || tank.loading}/>
+                )}
             />
         );
     }
