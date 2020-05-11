@@ -14,6 +14,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import logo from "../../../asset/images/logo.svg";
 import {appFetch, GET} from "../../utils/app-fetch";
 import {typeContext} from "../../contexts/type-context";
+import {LanguageSelect} from "./language-select";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -43,6 +45,7 @@ export const HeaderMenu = ({history}) => {
     const open = Boolean(anchorEl);
 
     const classes = useStyles();
+    const {t} = useTranslation();
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -149,10 +152,15 @@ export const HeaderMenu = ({history}) => {
                             )
                         ))
                         }
-                        <MenuItem onClick={handleManageTanks} color="inherit">Manage tanks</MenuItem>
+                        <MenuItem onClick={handleManageTanks} color="inherit">{t('menu.manage')}</MenuItem>
+                        {/*<Divider variant="middle"/>*/}
+                        {/*<MenuItem onClick={handleClose} color="inherit">Account</MenuItem>*/}
                         <Divider variant="middle"/>
-                        <MenuItem onClick={handleClose} color="inherit">Account</MenuItem>
-                        <MenuItem onClick={onLogout} color="inherit">Logout</MenuItem>
+                        <MenuItem disableRipple>
+                            <LanguageSelect fullWidth/>
+                        </MenuItem>
+                        <Divider variant="middle"/>
+                        <MenuItem onClick={onLogout} color="inherit">{t('menu.logout')}</MenuItem>
                     </Menu>
                 </div>
             </Toolbar>

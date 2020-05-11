@@ -2,6 +2,7 @@ import React, {createContext, useState} from 'react';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from "@material-ui/core/Snackbar";
 import {makeStyles} from "@material-ui/core/styles";
+import {useTranslation} from "react-i18next";
 
 export const alertContext = createContext({});
 
@@ -13,9 +14,10 @@ const useStyle = makeStyles((theme) => (
             backgroundColor: theme.palette.success.main + '!important'
         },
     }
-))
+));
 const AlertProvider = ({children}) => {
     const [alert, setAlert] = useState({open: false, message: null, severity: null});
+    const {t} = useTranslation();
 
     const classes = useStyle();
 
@@ -37,7 +39,7 @@ const AlertProvider = ({children}) => {
                            severity={alert.severity}
                            onClose={handleClose}
                     >
-                        {alert.message}
+                        {t(alert.message)}
                     </Alert>
                 </Snackbar>
             )}

@@ -16,6 +16,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {typeContext} from "../../contexts/type-context";
 import Divider from "@material-ui/core/Divider";
 import {appFetch, GET} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -104,9 +105,10 @@ export const Measure = ({name, shortName, unit, type, history}) => {
     const {getAuthToken} = useContext(authContext);
     const {tank} = useContext(tankContext);
     const {setTypeData} = useContext(typeContext);
-
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
     const classes = useStyles();
+
     const [measure, setMeasure] = useState({last: null, previous: null, loading: true});
     const [anchorElAdd, setAnchorElAdd] = React.useState(null);
     const [anchorElMenu, setAnchorElMenu] = React.useState(null);
@@ -195,7 +197,7 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                 >
                         <Grid item>
                             <Typography align="center" variant="subtitle2" className={classes.subtitle2}>
-                                {name} {shortName && `(${shortName})`}
+                                {t(`measure.parameter.${name}`)} {shortName && `(${shortName})`}
                             </Typography>
                         </Grid>
                         <Grid item style={{margin: "auto"}}>
@@ -211,7 +213,8 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                 alignItems="center"
                                 style={{position: "relative"}}
                             >
-                                <IconButton color="primary" aria-label={`Menu ${name} parameter`}
+                                <IconButton color="primary"
+                                            aria-label={t('measure.menu.aria', {name: t(`measure.parameter.${name}`)})}
                                             className={classes.root} onClick={handleClickMenu}>
                                     <FontAwesomeIcon icon={faEllipsisV}/>
                                 </IconButton>
@@ -223,10 +226,11 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                     marginThreshold={0}
                                     onClose={handleCloseMenu}
                                 >
-                                    <MenuItem disabled><Typography variant="subtitle2" align="center">{name} values </Typography></MenuItem>
+                                    <MenuItem disabled><Typography variant="subtitle2"
+                                                                   align="center">{t('measure.menu.title', {name: t(`measure.parameter.${name}`)})}</Typography></MenuItem>
                                     <Divider/>
-                                    <MenuItem onClick={handleShowList}>Edit</MenuItem>
-                                    <MenuItem onClick={handleShowGraphic}>Show chart</MenuItem>
+                                    <MenuItem onClick={handleShowList}>{t('measure.menu.edit')}</MenuItem>
+                                    <MenuItem onClick={handleShowGraphic}>{t('measure.menu.show_chart')}</MenuItem>
                                 </Menu>
                                 {measure.previous && (
                                     <div align="center" style={{
@@ -246,7 +250,8 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                         </Typography>
                                     </div>
                                 )}
-                                <IconButton color="primary" aria-label={`Add ${name} parameter`}
+                                <IconButton color="primary"
+                                            aria-label={t('measure.add', {name: t(`measure.parameter.${name}`)})}
                                             className={classes.root} onClick={handleClickAdd}>
                                     <FontAwesomeIcon icon={faPlus}/>
                                 </IconButton>

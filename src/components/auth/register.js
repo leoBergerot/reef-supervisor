@@ -14,6 +14,7 @@ import {Recaptcha} from "../common/recaptcha";
 import isEmail from "validator/es/lib/isEmail";
 import {alertContext} from "../../contexts/alert-context";
 import {appFetch, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 export const Register = ({history}) => {
     const [password, setPassword] = useState({value: "", error: false, helperText: null});
@@ -28,6 +29,7 @@ export const Register = ({history}) => {
     const [formCanSubmit, setFormCanSubmit] = useState({value: false, recaptchaToken: null});
 
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (formCanSubmit.value) {
@@ -46,7 +48,11 @@ export const Register = ({history}) => {
                 (result) => {
                     setAlert({
                         open: true,
-                        message: `${result.firstName} ${result.lastName}, an email was send to validate your account at ${result.email}, (check also your junk box)`,
+                        message: t('register.success', {
+                            first_name: result.firstName,
+                            last_name: result.lastName,
+                            email: result.email
+                        }),
                         severity: 'success'
                     });
                     history.replace('/');
@@ -59,7 +65,7 @@ export const Register = ({history}) => {
                             eval(`set${field}`)({
                                 value: "",
                                 error: true,
-                                helperText: value.substring(field.length, value.length)
+                                helperText: t(`register.error.${value.substring(field.length+1, value.length)}`)
                             })
                         })
                     }
@@ -76,37 +82,37 @@ export const Register = ({history}) => {
         let helperText = {password: "", email: "", lastName: "", firstName: ""};
 
         if (isEmpty(password.value)) {
-            helperText.password = "Please enter password";
+            helperText.password = t('register.error.password.no');
             error.password = true;
         }
 
         if (!error.password && !isLength(password.value, 6)) {
-            helperText.password = "Must be at least 6 characters long";
+            helperText.password = t('register.error.password.short');
             error.password = true;
         }
 
         if (isAlphanumeric(password.value)) {
-            helperText.password = (!error.password ? "Please enter alphanumeric password" : helperText.password + " and alphanumeric");
+            helperText.password = (!error.password ? t('register.error.password.alphanumeric_only') : helperText.password + t('register.error.password.alphanumeric'));
             error.password = true;
         }
 
         if (isEmpty(firstName.value)) {
-            helperText.firstName = "Please enter your first name";
+            helperText.firstName = t('register.error.first_name');
             error.firstName = true;
         }
 
         if (isEmpty(lastName.value)) {
-            helperText.lastName = "Please enter your last name";
+            helperText.lastName = t('register.error.last_name');
             error.lastName = true;
         }
 
         if (isEmpty(email.value)) {
-            helperText.email = "Please enter your email";
+            helperText.email = t('register.error.email.no');
             error.email = true;
         }
 
         if (!error.email && !isEmail(email.value)) {
-            helperText.email = "Please enter a valid email";
+            helperText.email = t('register.error.email.valid');
             error.email = true;
         }
 
@@ -156,11 +162,11 @@ export const Register = ({history}) => {
                 <form onSubmit={onSubmit}>
                     <CardContent>
                         <Typography variant="h4" component="h4" gutterBottom>
-                            Register
+                            {t('register.title')}
                         </Typography>
                         <TextField
                             margin="dense"
-                            label="First name"
+                            label={t('register.first_name')}
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -172,7 +178,7 @@ export const Register = ({history}) => {
                         />
                         <TextField
                             margin="dense"
-                            label="Last name"
+                            label={t('register.last_name')}
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -184,7 +190,7 @@ export const Register = ({history}) => {
                         />
                         <TextField
                             margin="dense"
-                            label="Email"
+                            label={t('register.email')}
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -196,7 +202,7 @@ export const Register = ({history}) => {
                         />
                         <TextField
                             margin="dense"
-                            label="Password"
+                            label={t('register.password')}
                             type="password"
                             disabled={!captchaReady}
                             fullWidth
@@ -220,7 +226,7 @@ export const Register = ({history}) => {
                             color="primary"
                             type="submit"
                         >
-                            Register {loading && (<CircularProgress size={25}/>)}
+                            {t('register.button')} {loading && (<CircularProgress size={25}/>)}
                         </Button>
                     </CardContent>
                     <CardContent>

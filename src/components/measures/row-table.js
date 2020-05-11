@@ -9,10 +9,13 @@ import {Skeleton} from "@material-ui/lab";
 import {DatePicker} from "../common/date-picker";
 import isEmpty from "validator/es/lib/isEmpty";
 import {appFetch, PATCH} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
+
     const [edit, setEdit] = useState(false);
     const [selectedDate, handleChangeDate] = useState(moment(row.createdAt));
     const [value, setValue] = useState({value: row.value, error: false});
@@ -47,7 +50,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
             setValue({
                 value: value.value,
                 error: true,
-                helperText: "Please enter a correct value"
+                helperText: t('measure.list.form.error.value')
             });
             error = true;
         }
@@ -66,7 +69,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                     setCurrentValues({value: result.value, createdAt: result.createdAt})
                     setAlert({
                         open: true,
-                        message: `Updated successful`,
+                        message: t('measure.list.form.success'),
                         severity: 'success'
                     });
                     setLoading(false);

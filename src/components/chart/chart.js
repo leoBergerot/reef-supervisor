@@ -14,6 +14,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import {ValueScale} from "@devexpress/dx-react-chart";
 import {DateRangePicker} from "../common/date-range-picker";
 import {appFetch, GET} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 const useStyle = makeStyles((theme) =>
     ({
@@ -48,6 +49,7 @@ export const Chart = () => {
     const {type} = useContext(typeContext);
     const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
 
     const [selectedDate, handleDateChange] = React.useState([moment().subtract(1, 'months'), moment()]);
     const [measures, setMeasures] = useState({data: [], loading: true});
@@ -97,7 +99,7 @@ export const Chart = () => {
             <Paper variant="elevation" className={classes.root}>
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="overline" className={classes.title} gutterBottom>
-                        {type.data.name} values graphic
+                        {t('chart.title', {name: t(`measure.parameter.${type.data.name}`)})}
                     </Typography>
                     <DateRangePicker selectedDate={selectedDate} handleDateChange={handleDateChange}
                                      disabled={measures.loading}/>

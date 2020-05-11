@@ -1,0 +1,192 @@
+{
+  "language": {
+    "en": "Anglais",
+    "fr": "Français"
+  },
+  "login": {
+    "sign_in": "Se connecter",
+    "email": "Email",
+    "password": "Mot de passe",
+    "sign_in_button": "Se connecter",
+    "first_visit": "Première visite sur Reef Supervisor ?",
+    "sign_up": "S'enregistrer dès maintenant.",
+    "forgotten_password": "Mot de passe oublié",
+    "reset_password": "Rénitialiser le mot de passe.",
+    "enable": "Votre compte a été activé avec succès",
+    "error": {
+      "no_email": "Merci d'entrer une adresse email",
+      "no_password": "Merci d'entrer votre mot de passe",
+      "404": "Aucun compte relié a cette adresse email.",
+      "403": "Votre mot de passe est incorecte."
+    }
+  },
+  "recaptcha": {
+    "terms": {
+      "first": "Cette page est protégé par Google reCAPTCHA pour déterminer si vous n'êtes pas un robot.",
+      "link": "Termes et conditions d'utilisation",
+      "second": "de Google"
+    }
+  },
+  "register": {
+    "error": {
+      "password": {
+        "no": "Merci d'entrer un mot de passe",
+        "short": "Doit être supérieure ou équal à 6 charactères de long",
+        "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
+        "alphanumeric": " et alphanumérique"
+      },
+      "first_name": "Merci d'entrer votre prénom",
+      "last_name": "Merci d'entrer votre nom",
+      "email": {
+        "no": "Merci d'entrer votre email",
+        "valid": "Merci d'entrer une adresse email valide"
+      },
+      "email_already_register": "Email déjà enregistré. Choisissez en un autre, ou rénitialiser votre mot de passe"
+    },
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Email",
+    "password": "Mot de passe",
+    "title": "S'enregistrer",
+    "button": "S'enregistrer",
+    "success": "{{first_name}} {{last_name}}, un email a été envoyé pour valider votre compte sur votre adresse {{email}}, (Vérifier aussi vos courriers indésirables)"
+  },
+  "forgot_password": {
+    "title": "Mot de passe oublié",
+    "subtitle": "Nous vous enverrons par e-mail les instructions pour réinitialiser votre mot de passe",
+    "success": "Un email a été envoyé {{email}}, (Vérifier aussi vos courriers indésirables)",
+    "error": {
+      "email_unlink": "Cet email {{email}} n'est pas lié à un compte",
+      "no_email": "Merci d'entrer une adresse"
+    },
+    "email": "Email",
+    "button": "Envoyer moi un email"
+  },
+  "recover": {
+    "success": "{{first_name}} {{last_name}}, votre mot de passe a été mise à jours",
+    "title": "Rénitialiser votre mot de passe",
+    "password": "Mot de passe",
+    "button": "Mettre à jours",
+    "error": {
+      "password": {
+        "no": "Merci d'entrer un mot de passe",
+        "short": "Doit être supérieure ou équal à 6 charactères de long",
+        "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
+        "alphanumeric": " et alphanumérique"
+      },
+      "403": "Ce lien a expiré"
+    }
+  },
+  "tanks": {
+    "choice": "Choix de l'aquarium :",
+    "create": "Créer votre premier aquarium pour continuer :",
+    "manage": "Gérer vos aquarium :",
+    "add": "Ajouter un aquarium",
+    "finish": "Terminer",
+    "form": {
+      "cancel": "Annuler",
+      "inputs": {
+        "name": "Nom"
+      },
+      "edit": {
+        "title": "Mettre à jour l'aquarium",
+        "button": "Sauvegarder",
+        "success": "L'aquarium : {{name}} a été mise à jours avec succès"
+      },
+      "create": {
+        "success": "L'aquarium : {{name}} a été créé avec succès",
+        "title": "Ajouter l'aquarium",
+        "button": "Créer"
+      },
+      "error": {
+        "name": {
+          "no": "Merci d'entrer un nom"
+        }
+      },
+      "deleted": "L'aquarium {{name}} a été supprimé",
+      "delete": "Supprimer",
+      "deleted_name": "l'aquarium {{name}}"
+    }
+  },
+  "delete_modal": {
+    "title": "Vous voulez supprimer {{name}} ?",
+    "warning": "Cette action est irreversible et supprime tous les éléments qui lui sont liés.",
+    "delete": "Oui",
+    "cancel": "Non"
+  },
+  "menu": {
+    "manage": "Gérer les aquariums",
+    "logout": "Déconnexion"
+  },
+  "measure": {
+    "add": "Ajouter une valeur pour le paramètre {{name}}",
+    "menu": {
+      "aria": "Menu du paramètre {{name}}",
+      "title": "Valeurs : {{name}}",
+      "edit": "Editer",
+      "show_chart": "Voir le graphique"
+    },
+    "error": {
+      "value": "Merci d'entrer un valeur correcte"
+    },
+    "inputs": {
+      "value": "{{name}} valeur",
+      "date": "Date"
+    },
+    "cancel": "Annuler l'enregistrement du paramètre {{name}}",
+    "validate": "Validate de la valeur du paramètre {{name}}",
+    "parameter": {
+      "Calcium": "Calcium",
+      "Water hardness": "Alcalinité",
+      "Magnesium": "Magnésium",
+      "Temperature": "Température",
+      "Power of hydrogen": "Dureté",
+      "Phosphate": "Phosphate",
+      "Nitrate": "Nitrate",
+      "Nitrite": "Nitrite",
+      "Water change": "Changement d'eau",
+      "Density": "Densité",
+      "Silicate": "Silicate"
+    },
+    "list": {
+      "header": {
+        "created_at": "Crée le",
+        "value": "Valeur",
+        "actions": "Actions"
+      },
+      "action": {
+        "edit": "Editer",
+        "remove": "Supprimer",
+        "save": "Sauvegarder",
+        "cancel": "Annuler"
+      },
+      "form": {
+        "error": {
+          "value": "Merci d'entrer une valeur correcte"
+        },
+        "success": "Mise à jours avec succés"
+      },
+      "toolbar": {
+        "title": "Liste des valeurs : {{name}}"
+      },
+      "delete":{
+        "success": "La mesure du {{createdAt}} a été supprimée",
+        "name": "la valeur du {{createdAt}}"
+      },
+      "row_per_page": "Valeurs/page"
+    }
+  },
+  "chart": {
+    "title": "Graphique des valeurs : {{name}}"
+  },
+  "date_picker_range": {
+    "start_date": "Date début",
+    "end_date": "Date de fin"
+  },
+  "error": {
+    "no_network": "Pas de connexion à internet",
+    "500": "Une erreur sur le serveur est survenue",
+    "unauthorized": "Veuillez vous reconnecter",
+    "expired_session": "Session expiré, merci de vous reconnecter"
+  }
+}

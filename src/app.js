@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Route, Router, Switch} from "react-router-dom";
 import {Login} from "./components/auth/login";
 import {Home} from "./components/home/home";
@@ -7,11 +7,7 @@ import {ForgotPassword} from "./components/auth/forgot-password";
 import {RecoverPassword} from "./components/auth/recover-password";
 import {Register} from "./components/auth/register";
 import {List} from "./components/tanks/list";
-import {ThemeProvider} from "@material-ui/styles";
 import {createMuiTheme} from "@material-ui/core";
-import {LocalizationProvider} from "@material-ui/pickers";
-import MomentAdapter from "@material-ui/pickers/adapter/moment";
-import moment from "moment";
 import {MeasureList} from "./components/measures/measure-list";
 import {Layout} from "./components/common/layout";
 import history from "./components/common/history";
@@ -21,6 +17,11 @@ import AlertProvider from "./contexts/alert-context";
 import TankProvider from "./contexts/tank-context";
 import TypeProvider from "./contexts/type-context";
 import {ContextProviderComposer} from "./contex-provider-composer";
+import {I18nContext} from "react-i18next";
+import MomentAdapter from "@material-ui/pickers/adapter/moment";
+import moment from "moment";
+import {ThemeProvider} from "./contexts/theme-context";
+import {LocalizationProvider} from "./contexts/localization-context";
 
 const theme = createMuiTheme({
     palette: {
@@ -37,18 +38,24 @@ const theme = createMuiTheme({
 
 function App() {
     const constHistory = history;
-    const [locale, setLocale] = useState("en");
+    const [local, setLocal] = useState('en');
+    const {i18n} = useContext(I18nContext);
+
+    useEffect(() => {
+        setLocal(i18n.language)
+    }, [i18n.language]);
+
   return (
-      <ThemeProvider theme={theme}>
-          <LocalizationProvider dateLibInstance={moment} dateAdapter={MomentAdapter} locale={locale}>
+      <ContextProviderComposer contextProviders={[
+          <ThemeProvider theme={theme}/>,
+          <LocalizationProvider dateLibInstance={moment} dateAdapter={MomentAdapter} locale={local}/>,
+          <AlertProvider/>,
+          <AuthProvider history={constHistory}/>,
+          <TankProvider/>,
+          <TypeProvider/>
+      ]}>
               <div className="app">
               <Router history={constHistory}>
-                  <ContextProviderComposer contextProviders={[
-                      <AlertProvider key={0}/>,
-                      <AuthProvider key={1} history={constHistory}/>,
-                      <TankProvider key={2}/>,
-                      <TypeProvider key={3}/>
-                  ]}>
                       <Switch>
                           <Layout history={constHistory}>
                               <Route path="/login/:enable?" component={Login}/>
@@ -61,11 +68,9 @@ function App() {
                               <GuardRoute exact path="/chart" component={Chart}/>
                           </Layout>
                       </Switch>
-                  </ContextProviderComposer>
               </Router>
           </div>
-          </LocalizationProvider>
-      </ThemeProvider>
+      </ContextProviderComposer>
   );
 }
 

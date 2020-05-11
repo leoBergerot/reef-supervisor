@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import jwt_decode from "jwt-decode";
 import {alertContext} from "./alert-context";
+import {useTranslation} from "react-i18next";
 
 export const EXPIRED = "expired";
 
@@ -9,6 +10,7 @@ export const authContext = createContext({});
 const AuthProvider = ({children, history}) => {
     const {setAlert} = useContext(alertContext);
     const [auth, setAuth] = useState({loading: true, token: null});
+    const {t} = useTranslation();
 
     const setAuthData = (token) => {
         setAuth({token: token});
@@ -23,7 +25,7 @@ const AuthProvider = ({children, history}) => {
                 history.replace('/login');
                 setAlert({
                     open: true,
-                    message: `Your session is expired, sign in`,
+                    message: t('error.expired_session'),
                     severity: 'warning'
                 });
                 return EXPIRED;

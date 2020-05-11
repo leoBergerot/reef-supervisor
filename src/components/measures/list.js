@@ -16,6 +16,7 @@ import {DeleteModal} from "../common/delete-modal";
 import {authContext} from "../../contexts/auth-context";
 import {alertContext} from "../../contexts/alert-context";
 import {appFetch, DELETE} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, total, data, setOrder, setOrderBy, order, orderBy, setUpdate}) {
     const classes = useStyles();
+    const {t} = useTranslation();
     const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const {moment} = useContext(MuiPickersContext);
@@ -64,7 +66,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
                     setUpdate(true);
                     setAlert({
                         open: true,
-                        message: `Measure of ${measureToDelete.createdAt} has been deleted`,
+                        message: t('measure.list.delete.success', {createdAt: measureToDelete.createdAt}),
                         severity: 'success'
                     });
             },
@@ -139,6 +141,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
             </TableContainer>
             <TablePagination
                 rowsPerPageOptions={[10, 25, 50]}
+                labelRowsPerPage={t('measure.list.row_per_page')}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}
@@ -149,7 +152,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
             />
             <DeleteModal open={open}
                          onDelete={onDelete}
-                         name={`value of ${measureToDelete.createdAt}`}
+                         name={t('measure.list.delete.name', {createdAt: measureToDelete.createdAt})}
                          setOpen={setOpen} unDisplayLinked
             />
         </Paper>

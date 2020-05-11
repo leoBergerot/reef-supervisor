@@ -6,6 +6,7 @@ export const PATCH = 'PATCH';
 export const DELETE = 'DELETE';
 
 export const appFetch = (method, endpoint, body, token, onSuccess, onError, setAlert, blob = false) => {
+
     let status = null;
     if (token !== EXPIRED) {
         fetch(`${process.env.REACT_APP_API_URL}/${endpoint}`, {
@@ -36,7 +37,7 @@ export const appFetch = (method, endpoint, body, token, onSuccess, onError, setA
                         //no network
                         setAlert({
                             open: true,
-                            message: error.message,
+                            message: "error.no_network",
                             severity: 'error'
                         });
                     } else {
@@ -46,14 +47,14 @@ export const appFetch = (method, endpoint, body, token, onSuccess, onError, setA
                             case 500:
                                 setAlert({
                                     open: true,
-                                    message: error.statusText,
+                                    message: "error.500",
                                     severity: 'error'
                                 });
                                 break;
                             case 401:
                                 setAlert({
                                     open: true,
-                                    message: error.statusText,
+                                    message: "error.unauthorized",
                                     severity: 'warning'
                                 });
                                 break

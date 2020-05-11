@@ -13,10 +13,12 @@ import Typography from "@material-ui/core/Typography";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
 import {alertContext} from "../../contexts/alert-context";
 import {appFetch, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 export const Login = ({history, match: {params: {enable}}}) => {
     const {setAuthData} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
 
     const [email, setEmail] = useState({value: "", error: false, helperText: null});
     const [password, setPassword] = useState({value: "", error: false, helperText: null});
@@ -43,9 +45,9 @@ export const Login = ({history, match: {params: {enable}}}) => {
             }, (error) => {
                 setLoading(false);
                 if (error && error.statusCode === 403) {
-                    setPassword({value: password.value, error: true, helperText: error.message})
+                    setPassword({value: password.value, error: true, helperText: t("login.error.403")})
                 } else if (error && error.statusCode === 404) {
-                    setEmail({value: email.value, error: true, helperText: error.message});
+                    setEmail({value: email.value, error: true, helperText: t("login.error.404")});
                     setPassword({value: null, error: false, helperText: null});
                 }
                 return null;
@@ -59,7 +61,7 @@ export const Login = ({history, match: {params: {enable}}}) => {
         if (enable) {
             setAlert({
                 open: true,
-                message: "Your account are successfully enabled",
+                message: t('login.enable'),
                 severity: "success"
             })
         }
@@ -83,12 +85,12 @@ export const Login = ({history, match: {params: {enable}}}) => {
         event.preventDefault();
         let error = false;
         if (isEmpty(email.value)) {
-            setEmail({value: "", error: true, helperText: "Please enter an email address"});
+            setEmail({value: "", error: true, helperText: t("login.error.no_email")});
             error = true;
         }
 
         if (isEmpty(password.value)) {
-            setPassword({value: "", error: true, helperText: "Please enter your password"});
+            setPassword({value: "", error: true, helperText: t("login.error.no_password")});
             error = true;
         }
 
@@ -103,11 +105,11 @@ export const Login = ({history, match: {params: {enable}}}) => {
                 <form onSubmit={onSubmit}>
                     <CardContent>
                         <Typography variant="h4" component="h4" gutterBottom>
-                            Sign in
+                            {t(`login.sign_in`)}
                         </Typography>
                         <TextField
                             margin="dense"
-                            label="Email"
+                            label={t(`login.email`)}
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -119,7 +121,7 @@ export const Login = ({history, match: {params: {enable}}}) => {
                         />
                         <TextField
                             margin="dense"
-                            label="Password"
+                            label={t(`login.password`)}
                             disabled={!captchaReady}
                             fullWidth
                             type="password"
@@ -141,19 +143,21 @@ export const Login = ({history, match: {params: {enable}}}) => {
                             color="primary"
                             type="submit"
                         >
-                            Sign in {loading && (<CircularProgress size={25}/>)}
+                            {t(`login.sign_in_button`)} {loading && (<CircularProgress size={25}/>)}
                         </Button>
                     </CardContent>
                     <CardContent>
                         <Typography display="block" variant="subtitle1" gutterBottom>
-                            First visit to Reef Supervisor ? {<Link href="#" onClick={handleRegister}
+
+                            {t(`login.first_visit`)} {<Link href="#" onClick={handleRegister}
                                                                     variant="body2">
-                            Sign up now.
+                            {t(`login.sign_up`)}
                         </Link>}
                         </Typography>
                         <Typography display="block" variant="subtitle1" gutterBottom>
-                            Password forgotten ? {<Link href="#" onClick={handleRecoverPassword} variant="body2">
-                            Reset password.
+                            {t(`login.forgotten_password`)} {<Link href="#" onClick={handleRecoverPassword}
+                                                                   variant="body2">
+                            {t(`login.reset_password`)}
                         </Link>}
                         </Typography>
                         <ConditionRecaptcha/>
