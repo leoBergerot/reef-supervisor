@@ -119,7 +119,7 @@ export const Measure = ({name, shortName, unit, type, history}) => {
         window.document.querySelector('main').style.overflowY = "hidden";
         setAnchorElAdd(measureRef.current);
         if (measureRef.current.getBoundingClientRect().top - document.querySelector('header').getBoundingClientRect().height < 0) {
-            document.querySelector('main').scrollTo(0, 0);
+            document.querySelector('main').scrollTo(0, (window.document.querySelector('main').scrollTop + measureRef.current.getBoundingClientRect().top) - document.querySelector('header').getBoundingClientRect().height);
         }
     };
 
