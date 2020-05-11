@@ -39,10 +39,11 @@ function NumberFormatCustom(props) {
                     },
                 });
             }}
-            isNumericString
             allowNegative={false}
             thousandSeparator=" "
-            decimalScale
+            decimalScale={4}
+            inputMode="decimal"
+            allowedDecimalSeparators={[',', '.']}
             suffix={` ${placeholder}`}
         />
     );
