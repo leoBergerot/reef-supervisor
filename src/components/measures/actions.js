@@ -3,6 +3,7 @@ import IconButton from "@material-ui/core/IconButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPen, faSave, faTimes, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {makeStyles} from "@material-ui/core/styles";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     margin: {
@@ -12,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => {
     const classes = useStyles();
+    const {t} = useTranslation();
 
     const handleEdit = () => {
         setEdit(true)
@@ -24,7 +26,7 @@ export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => 
     return (
         !edit ?
             <>
-                <IconButton aria-label="edit"
+                <IconButton aria-label={t("measure.list.action.edit")}
                             size="small"
                             className={classes.margin}
                             disabled={disabled}
@@ -32,7 +34,7 @@ export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => 
                 >
                     <FontAwesomeIcon icon={faPen}/>
                 </IconButton>
-                <IconButton aria-label="delete"
+                <IconButton aria-label={t("measure.list.action.remove")}
                             color="secondary"
                             size="small"
                             className={classes.margin}
@@ -44,14 +46,14 @@ export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => 
             </>
             :
             <>
-                <IconButton aria-label="save"
+                <IconButton aria-label={t("measure.list.action.save")}
                             size="small"
                             className={classes.margin}
                             onClick={handleSave}
                 >
                     <FontAwesomeIcon icon={faSave}/>
                 </IconButton>
-                <IconButton aria-label="cancel"
+                <IconButton aria-label={t("measure.list.action.cancel")}
                             color="secondary"
                             size="small"
                             className={classes.margin}

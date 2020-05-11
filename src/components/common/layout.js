@@ -45,8 +45,12 @@ export const Layout = ({children, location: {pathname}, history}) => {
                     header = <HeaderMenu history={history}/>;
                 }
                 break;
+            case "/tanks/manage":
+            case "/tanks":
+                header = <HeaderLogo displayLanguage={false}/>
+                break;
             default:
-                header = <HeaderLogo/>
+                header = <HeaderLogo displayLanguage={true}/>
         }
     }
     return (

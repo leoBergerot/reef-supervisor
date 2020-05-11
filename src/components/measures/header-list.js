@@ -4,10 +4,11 @@ import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import React from "react";
 import PropTypes from "prop-types";
+import {useTranslation} from "react-i18next";
 
 const headCells = [
-    {id: 'createdAt', label: 'Created at'},
-    {id: 'value', label: 'Value'},
+    {id: 'createdAt', label: 'measure.list.header.created_at'},
+    {id: 'value', label: 'measure.list.header.value'},
 ];
 
 HeaderList.propTypes = {
@@ -19,6 +20,7 @@ HeaderList.propTypes = {
 
 export function HeaderList(props) {
     const {classes, order, orderBy, onRequestSort} = props;
+    const {t} = useTranslation();
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
@@ -36,7 +38,7 @@ export function HeaderList(props) {
                             direction={orderBy === headCell.id ? order : 'asc'}
                             onClick={createSortHandler(headCell.id)}
                         >
-                            {headCell.label}
+                            {t(headCell.label)}
                             {orderBy === headCell.id ? (
                                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
@@ -46,7 +48,7 @@ export function HeaderList(props) {
                     </TableCell>
                 ))}
                 <TableCell>
-                    Actions
+                    {t('measure.list.header.actions')}
                 </TableCell>
             </TableRow>
         </TableHead>

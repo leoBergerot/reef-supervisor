@@ -11,6 +11,7 @@ import {tankContext} from "../../contexts/tank-context";
 import Button from "@material-ui/core/Button";
 import FormModal from "./modal";
 import {appFetch, GET} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -46,6 +47,7 @@ export const List = ({history, match: {params: {manage}}}) => {
     const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
     const {setTankData} = useContext(tankContext);
+    const {t} = useTranslation();
 
     const classes = useStyles();
 
@@ -128,7 +130,7 @@ export const List = ({history, match: {params: {manage}}}) => {
             {!tankList.loading ?
                 <div className={classes.list}>
                     <TypographyResponsive overrideClasses={{root: classes.typography}}>
-                        {manage ? "Manage tanks :" : (tankList.data.length === 0 ? "Create your first tank to continue :" : "Choose your tank :")}
+                        {manage ? t('tanks.manage') : (tankList.data.length === 0 ? t('tanks.create') : t('tanks.choice'))}
                     </TypographyResponsive>
                     <div className={classes.listTank}>
                         {tankList.data.map((tank) => (
@@ -143,7 +145,7 @@ export const List = ({history, match: {params: {manage}}}) => {
                             onClick={handleManageFinish}
                             variant="contained"
                         >
-                            Finish
+                            {t('tanks.finish')}
                         </Button>
                     )}
                 </div>

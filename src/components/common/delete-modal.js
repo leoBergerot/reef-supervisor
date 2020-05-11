@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -21,6 +22,7 @@ export const DeleteModal = ({open, name, onDelete, setOpen, unDisplayLinked}) =>
         const [isOpen, setIsOpen] = useState(false);
 
         const classes = useStyles();
+    const {t} = useTranslation();
 
         useEffect(() => {
             setIsOpen(open);
@@ -38,30 +40,30 @@ export const DeleteModal = ({open, name, onDelete, setOpen, unDisplayLinked}) =>
                 <Card>
                     <CardContent>
                         <Typography variant="h5">
-                            You want to remove {name} ?
+                            {t('delete_modal.title', {name})}
                         </Typography>
                         {!unDisplayLinked && (<Typography variant="body2" color="error">
-                            This action is irreversible, and removed all linked elements
+                            {t('delete_modal.warning')}
                         </Typography>)}
-
                     </CardContent>
                     <CardActions>
                         <Button
+                            size="small"
                             color="primary"
                             variant="contained"
                             onClick={onDelete}
                         >
-                            Delete
+                            {t('delete_modal.delete')}
                         </Button>
                         <Button
+                            size="small"
                             color="secondary"
                             variant="contained"
                             onClick={() => setIsOpen(!open)}
                         >
-                            Cancel
+                            {t('delete_modal.cancel')}
                         </Button>
                     </CardActions>
-
                 </Card>
             </Modal>
         )

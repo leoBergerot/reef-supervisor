@@ -1,0 +1,192 @@
+{
+  "language": {
+    "en": "English",
+    "fr": "French"
+  },
+  "login": {
+    "sign_in": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "sign_in_button": "Sign in",
+    "first_visit": "First visit to Reef Supervisor ?",
+    "sign_up": "Sign up now.",
+    "forgotten_password": "Password forgotten ?",
+    "reset_password": "Reset password.",
+    "enable": "Your account are successfully enabled",
+    "error": {
+      "no_email": "Please enter an email address",
+      "no_password": "Please enter your password",
+      "404": "Can't to find an account corresponding to this e-mail address.",
+      "403": "Your password is incorrect."
+    }
+  },
+  "recaptcha": {
+    "terms": {
+      "first": "This page is protected by Google reCAPTCHA to ensure that you are not a robot.",
+      "link": "Terms and conditions of use",
+      "second": "of Google"
+    }
+  },
+  "register": {
+    "error": {
+      "password": {
+        "no": "Please enter password",
+        "short": "Must be at least 6 characters long",
+        "alphanumeric_only": "Please enter alphanumeric password",
+        "alphanumeric": " and alphanumeric"
+      },
+      "first_name": "Please enter your first name",
+      "last_name": "Please enter your last name",
+      "email": {
+        "no": "Please enter your email",
+        "valid": "Please enter a valid email"
+      },
+      "email_already_register": "Email already register. Choose another, or recover your password"
+    },
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email",
+    "password": "password",
+    "title": "Register",
+    "button": "Register",
+    "success": "{{first_name}} {{last_name}}, an email was send to validate your account at {{email}}, (check also your junk box)"
+  },
+  "forgot_password": {
+    "title": "Forgot password",
+    "subtitle": "We will send you instructions on how to reset your password by e-mail.",
+    "success": "An email has been sended to {{email}}, (check also your junk box)",
+    "error": {
+      "email_unlink": "This email {{email}} doesn't link to account",
+      "no_email": "Please enter an email address"
+    },
+    "email": "Email",
+    "button": "Send me an email"
+  },
+  "recover": {
+    "success": "{{first_name}} {{last_name}}, your password was change",
+    "title": "Reset your password",
+    "password": "Password",
+    "button": "Update",
+    "error": {
+      "password": {
+        "no": "Please enter your password",
+        "short": "Must be at least 6 characters long",
+        "alphanumeric_only": "Please enter alphanumeric password",
+        "alphanumeric": " and alphanumeric"
+      },
+      "403": "This link are expired"
+    }
+  },
+  "tanks": {
+    "choice": "Choose your tank :",
+    "create": "Create your first tank to continue :",
+    "manage": "Manage tanks :",
+    "add": "Add tank",
+    "finish": "Finish",
+    "form": {
+      "cancel": "Cancel",
+      "inputs": {
+        "name": "Name"
+      },
+      "edit": {
+        "success": "Tank : {{name}} have successfully updated",
+        "title": "Update tank",
+        "button": "Save"
+      },
+      "create": {
+        "success": "Tank : {{name}} have successfully created",
+        "title": "Add tank",
+        "button": "Create"
+      },
+      "error": {
+        "name": {
+          "no": "Please enter a name"
+        }
+      },
+      "deleted": "Tank {{name}} has been deleted",
+      "delete": "Remove",
+      "deleted_name": "tank {{name}}"
+    }
+  },
+  "delete_modal": {
+    "title": "You want to remove tank {{name}} ?",
+    "warning": "This action is irreversible and removed all linked elements.",
+    "delete": "Yes",
+    "cancel": "No"
+  },
+  "menu": {
+    "manage": "Manage tanks",
+    "logout": "Logout"
+  },
+  "measure": {
+    "add": "Add {{name}} parameter value",
+    "menu": {
+      "aria": "Menu {{name}} parameter",
+      "title": "Values : {{name}}",
+      "edit": "Edit",
+      "show_chart": "Show chart"
+    },
+    "error": {
+      "value": "Please enter a correct value"
+    },
+    "inputs": {
+      "value": "{{name}} value",
+      "date": "Date"
+    },
+    "cancel": "Cancel saved {{name}} parameter",
+    "validate": "Validate {{name}} parameter value",
+    "parameter": {
+      "Calcium": "Calcium",
+      "Water hardness": "Water hardness",
+      "Magnesium": "Magnesium",
+      "Temperature": "Temperature",
+      "Power of hydrogen": "Power of hydrogen",
+      "Phosphate": "Phosphate",
+      "Nitrate": "Nitrate",
+      "Nitrite": "Nitrite",
+      "Water change": "Water change",
+      "Density": "Density",
+      "Silicate": "Silicate"
+    },
+    "list": {
+      "header": {
+        "created_at": "Created at",
+        "value": "Value",
+        "actions": "Actions"
+      },
+      "action": {
+        "edit": "Edit",
+        "remove": "Delete",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "form": {
+        "error": {
+          "value": "Please enter correct value"
+        },
+        "success": "Updated successful"
+      },
+      "toolbar": {
+        "title": "List {{name}} values"
+      },
+      "delete": {
+        "success": "Measure of {{createdAt}} has been deleted",
+        "name": "value of {{createdAt}}"
+      },
+      "row_per_page": "Values/page"
+    }
+  },
+  "chart": {
+    "title": "Chart values : {{name}}"
+  },
+  "date_picker_range": {
+    "start_date": "Start Date",
+    "end_date": "End date"
+  },
+  "error": {
+    "no_network": "You doesn't have connexion",
+    "500": "An error in server was happen",
+    "unauthorized": "Pleaze, sign in",
+    "expired_session": "Your session is expired, pleaze sign in"
+  }
+}

@@ -13,6 +13,7 @@ import {MuiPickersContext} from "@material-ui/pickers";
 import {DatePicker} from "../common/date-picker";
 import {MeasureField} from "../common/measure-field";
 import {appFetch, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -62,6 +63,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
     const [createdAt, setCreatedAt] = useState({value: moment(), error: false});
 
     const classes = useStyles({size});
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (open) {
@@ -86,7 +88,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
         event.preventDefault();
         let error = false;
         if (isEmpty(value.value)) {
-            setValue({value: value.value, error: true, helperText: "Please enter a correct value"});
+            setValue({value: value.value, error: true, helperText: t('measure.error.value')});
             error = true;
         }
 
@@ -135,7 +137,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
             <form className={classes.form}>
                 <div className={classes.fields}>
                     <MeasureField
-                        label={`${name} value`}
+                        label={t("measure.inputs.value", {name})}
                         value={value.value}
                         error={value.error}
                         helperText={value.helperText}
@@ -150,11 +152,11 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                         direction="row"
                         justify="space-around"
                     >
-                        <IconButton color="secondary" aria-label={`Cancel measure ${name}`} component="span"
+                        <IconButton color="secondary" aria-label={t('measure.cancel', {name})} component="span"
                                     onClick={handleClose}>
                             <FontAwesomeIcon icon={faTimes}/>
                         </IconButton>
-                        <IconButton type="submit" color="primary" aria-label={`Validate measure ${name}`}
+                        <IconButton type="submit" color="primary" aria-label={t('measure.validate', {name})}
                                     onClick={handleValidate}>
                             <FontAwesomeIcon icon={faCheck}/>
                         </IconButton>

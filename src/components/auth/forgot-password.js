@@ -11,6 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import isEmpty from "validator/lib/isEmpty";
 import {ConditionRecaptcha} from "../common/condition-recaptcha";
 import {appFetch, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 export const ForgotPassword = ({history}) => {
     const [email, setEmail] = useState({value: "", error: false, helperText: null});
@@ -19,7 +20,7 @@ export const ForgotPassword = ({history}) => {
     const [submit, setSubmit] = useState(false);
     const [formCanSubmit, setFormCanSubmit] = useState({value: false, recaptchaToken: null});
     const {setAlert} = useContext(alertContext);
-
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (formCanSubmit.value) {
@@ -33,7 +34,7 @@ export const ForgotPassword = ({history}) => {
                     if (result.email) {
                         setAlert({
                             open: true,
-                            message: `An email has been sended to ${email.value}, (check also your junk box)`,
+                            message: t('forgot_password.success', {email: email.value}),
                             severity: 'success'
                         });
                         history.replace('/');
@@ -43,7 +44,11 @@ export const ForgotPassword = ({history}) => {
                 (error) => {
                     setLoading(false);
                     if (error.statusCode === 400) {
-                        setEmail({value: email.value, error: true, helperText: error.message})
+                        setEmail({
+                            value: email.value,
+                            error: true,
+                            helperText: t(`forgot_password.error.${error.message}`, {email: email.value})
+                        })
                     }
                 },
                 setAlert
@@ -62,7 +67,7 @@ export const ForgotPassword = ({history}) => {
         event.preventDefault();
         let error = false;
         if (isEmpty(email.value)) {
-            setEmail({value: "", error: true, helperText: "Please enter an email address"});
+            setEmail({value: "", error: true, helperText: t("forgot_password.error.no_email")});
             error = true;
         }
 
@@ -78,14 +83,14 @@ export const ForgotPassword = ({history}) => {
                 <form onSubmit={onSubmit}>
                     <CardContent>
                         <Typography variant="h4" component="h4" gutterBottom>
-                            Forgot password
+                            {t("forgot_password.title")}
                         </Typography>
                         <Typography variant="subtitle1" gutterBottom>
-                            We will send you instructions on how to reset your password by e-mail.
+                            {t("forgot_password.subtitle")}
                         </Typography>
                         <TextField
                             margin="dense"
-                            label="Email"
+                            label={t("forgot_password.email")}
                             disabled={!captchaReady}
                             fullWidth
                             autoFocus
@@ -106,7 +111,7 @@ export const ForgotPassword = ({history}) => {
                             color="primary"
                             type="submit"
                         >
-                            Send me an email {loading && (<CircularProgress size={25}/>)}
+                            {t("forgot_password.button")} {loading && (<CircularProgress size={25}/>)}
                         </Button>
                     </CardContent>
                     <CardContent>

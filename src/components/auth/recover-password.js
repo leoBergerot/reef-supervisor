@@ -13,6 +13,7 @@ import {ConditionRecaptcha} from "../common/condition-recaptcha";
 import isAlphanumeric from "validator/es/lib/isAlphanumeric";
 import isLength from "validator/es/lib/isLength";
 import {appFetch, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
     const [newPassword, setNewPassword] = useState({value: "", error: false, helperText: null});
@@ -21,6 +22,8 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
     const [captchaReady, setCaptchaReady] = useState(false);
     const [submit, setSubmit] = useState(false);
     const [formCanSubmit, setFormCanSubmit] = useState({value: false, recaptchaToken: null});
+
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (formCanSubmit.value) {
@@ -40,7 +43,7 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                     if (result.username) {
                         setAlert({
                             open: true,
-                            message: `${result.firstName} ${result.lastName}, your password was change`,
+                            message: t('recover.success', {first_name: result.firstName, last_name: result.lastName}),
                             severity: 'success'
                         });
                         history.replace('/');
@@ -49,12 +52,10 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                 },
                 (error) => {
                     setLoading(false);
-                    if (error && error.statusCode === 400) {
-                        setNewPassword({value: newPassword.value, error: true, helperText: error.message})
-                    } else if (error && error.statusCode === 403) {
+                    if (error && error.statusCode === 403) {
                         setAlert({
                             open: true,
-                            message: `This link are expired`,
+                            message: t('recover.error.403'),
                             severity: 'error'
                         });
                     }
@@ -77,17 +78,17 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
         let helperText = "";
 
         if (isEmpty(newPassword.value)) {
-            helperText = "Please enter your password";
+            helperText = t('recover.error.password.no');
             error = true;
         }
 
         if (!error && !isLength(newPassword.value, 6)) {
-            helperText = "Must be at least 6 characters long";
+            helperText = t('recover.error.password.short');
             error = true;
         }
 
         if (isAlphanumeric(newPassword.value)) {
-            helperText = (!error ? "Please enter alphanumeric password" : helperText + " and alphanumeric");
+            helperText = (!error ? t('recover.error.password.alphanumeric_only') : helperText + t('recover.error.password.alphanumeric'));
             error = true;
         }
 
@@ -109,11 +110,11 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                 <form onSubmit={onSubmit}>
                     <CardContent>
                         <Typography variant="h4" component="h4" gutterBottom>
-                            Reset your password
+                            {t('recover.title')}
                         </Typography>
                         <TextField
                             margin="dense"
-                            label="Password"
+                            label={t('recover.password')}
                             type="password"
                             disabled={!captchaReady}
                             fullWidth
@@ -135,7 +136,7 @@ export const RecoverPassword = ({match: {params: {id, token}}, history}) => {
                             color="primary"
                             type="submit"
                         >
-                            Update {loading && (<CircularProgress size={25}/>)}
+                            {t('recover.button')} {loading && (<CircularProgress size={25}/>)}
                         </Button>
                     </CardContent>
                     <CardContent>

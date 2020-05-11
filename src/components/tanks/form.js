@@ -16,6 +16,7 @@ import {faPen} from "@fortawesome/free-solid-svg-icons";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
 import {appFetch, DELETE, GET, PATCH, POST} from "../../utils/app-fetch";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
@@ -82,6 +83,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     const {getAuthToken} = useContext(authContext);
     const {setTankData} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
+    const {t} = useTranslation();
 
     const [name, setName] = useState({value: (!!edit ? edit.name : ""), error: false, helperText: null});
     const [loading, setLoading] = useState(false);
@@ -113,7 +115,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
         event.preventDefault();
         let error = false;
         if (isEmpty(name.value)) {
-            setName({value: "", error: true, helperText: "Please enter a name"});
+            setName({value: "", error: true, helperText: t('tanks.form.error.name.no')});
             error = true;
         }
 
@@ -140,7 +142,11 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                             (result) => {
                                 setAlert({
                                     open: true,
-                                    message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                                    message: !!edit ? t('tanks.form.edit.success', {
+                                        name: result.name,
+                                    }) : t('tanks.form.create.success', {
+                                        name: result.name,
+                                    }),
                                     severity: 'success'
                                 });
                                 if (!edit) {
@@ -157,7 +163,11 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     } else {
                         setAlert({
                             open: true,
-                            message: `Tank : ${result.name} have successfully ${!!edit ? "updated" : "created"}`,
+                            message: !!edit ? t('tanks.form.edit.success', {
+                                name: result.name,
+                            }) : t('tanks.form.create.success', {
+                                name: result.name,
+                            }),
                             severity: 'success'
                         });
                         if (!edit) {
@@ -192,7 +202,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                 handleEditSuccess(edit, true);
                 setAlert({
                     open: true,
-                    message: `Tank ${edit.name} has been deleted`,
+                    message: t('tanks.form.deleted', {name: edit.name}),
                     severity: 'success'
                 })
             },
@@ -211,7 +221,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
         <div className={classes.root}>
             <form onSubmit={onSubmit} className={classes.form}>
                 <TypographyResponsive overrideClasses={{root: classes.typography}}>
-                    {!!edit ? "Update tank" : "Add Tank"}
+                    {!!edit ? t('tanks.form.edit.title') : t('tanks.form.create.title')}
                 </TypographyResponsive>
                 <Divider/>
                 <div className={classes.fields}>
@@ -244,7 +254,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     </div>
                     <TextField
                         margin="dense"
-                        label="Name"
+                        label={t('tanks.form.inputs.name')}
                         fullWidth
                         autoFocus
                         value={name.value}
@@ -260,32 +270,35 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     <Button
                         disabled={name.error || loading}
                         variant="contained"
+                        size="small"
                         color="primary"
                         type="submit"
                     >
-                        {!!edit ? "Save" : "Create"}
+                        {!!edit ? t('tanks.form.edit.button') : t('tanks.form.edit.create')}
                     </Button>
                     <Button
+                        size="small"
                         onClick={handleClose}
                         disabled={loading}
                         variant="contained"
                     >
-                        Cancel {loading && (<CircularProgress size={25}/>)}
+                        {t('tanks.form.cancel')} {loading && (<CircularProgress size={25}/>)}
                     </Button>
                     {!!edit && (<Button
+                        size="small"
                         color="secondary"
                         onClick={() => setIsOpenDeleteModal(true)}
                         disabled={loading}
                         variant="contained"
                     >
-                        Remove {loading && (<CircularProgress size={25}/>)}
+                        {t('tanks.form.delete')} {loading && (<CircularProgress size={25}/>)}
                     </Button>)}
                     {loading && (<CircularProgress size={25}/>)}
                 </div>
                 {!!edit && (<DeleteModal
                     open={openDeleteModal}
                     setOpen={setIsOpenDeleteModal}
-                    name={edit.name}
+                    name={t('tanks.form.deleted_name', {name: edit.name})}
                     onDelete={handleOnDelete}
                 />)}
             </form>

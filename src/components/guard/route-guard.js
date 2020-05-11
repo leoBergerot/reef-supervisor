@@ -18,7 +18,6 @@ export const GuardRoute = ({ component: Component, ...rest }) => {
             />
         );
     }
-    console.log(!tank.data);
     return (
         <Route
             {...rest}

@@ -4,6 +4,7 @@ import {TypographyResponsive} from "../common/typography-responsive";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortawesome/free-solid-svg-icons'
 import ButtonBase from "@material-ui/core/ButtonBase";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => (
     {
@@ -56,7 +57,7 @@ const useStyles = makeStyles((theme) => (
 export const AddButton = ({onClick}) => {
 
     const classes = useStyles();
-
+    const {t} = useTranslation();
 
     return (
         <ButtonBase
@@ -71,7 +72,7 @@ export const AddButton = ({onClick}) => {
                 <FontAwesomeIcon icon={faPlus} className={classes.icon}/>
             </div>
             <TypographyResponsive overrideClasses={{root: classes.typography}}>
-                Add tank
+                {t('tanks.add')}
             </TypographyResponsive>
         </ButtonBase>
     )
