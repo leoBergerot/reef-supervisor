@@ -245,11 +245,19 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                             <input
                                 style={{display: "none"}}
                                 onChange={(event => {
-                                        setAvatar({
-                                            url: URL.createObjectURL(event.target.files[0]),
-                                            blob: event.target.files[0],
-                                            update: true
-                                        })
+                                        if(event.target.files[0].type.match('image.*') !== null) {
+                                            setAvatar({
+                                                url: URL.createObjectURL(event.target.files[0]),
+                                                blob: event.target.files[0],
+                                                update: true
+                                            })
+                                        }else {
+                                            setAlert({
+                                                open: true,
+                                                message: ('tanks.form.error.image.extension'),
+                                                severity: 'warning'
+                                            })
+                                        }
                                     }
                                 )}
                                 type="file"
@@ -263,7 +271,11 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         autoFocus
                         value={name.value}
                         onChange={e => {
-                            setName({value: e.target.value, error: false, helperText: false});
+                            setName({
+                                value: e.target.value,
+                                error: e.target.value.length <= 0,
+                                helperText: e.target.value.length <= 0 ? t('tanks.form.error.name.no') : false
+                            });
                         }}
                         error={name.error}
                         helperText={name.helperText}

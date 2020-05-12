@@ -101,6 +101,9 @@
       "error": {
         "name": {
           "no": "Please enter a name"
+        },
+        "image": {
+          "extension": "Pleaze select image whith one of this extension : (png, gif, svg, jpeg, jpg)"
         }
       },
       "deleted": "Tank {{name}} has been deleted",

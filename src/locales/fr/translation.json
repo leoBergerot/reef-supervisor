@@ -101,6 +101,9 @@
       "error": {
         "name": {
           "no": "Merci d'entrer un nom"
+        },
+        "image": {
+          "extension": "Merci de sélectionner une image avec l'une des extensions suivante : (png, gif, svg, jpeg, jpg)"
         }
       },
       "deleted": "L'aquarium {{name}} a été supprimé",
