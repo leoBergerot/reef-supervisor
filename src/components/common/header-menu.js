@@ -3,7 +3,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import {authContext} from "../../contexts/auth-context";
 import {tankContext} from "../../contexts/tank-context";
-import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Divider from "@material-ui/core/Divider";
@@ -16,6 +15,10 @@ import {appFetch, GET} from "../../utils/app-fetch";
 import {typeContext} from "../../contexts/type-context";
 import {LanguageSelect} from "./language-select";
 import {useTranslation} from "react-i18next";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCaretDown, faCaretUp} from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles((theme) => ({
     logo: {
@@ -54,7 +57,6 @@ export const HeaderMenu = ({history}) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
 
     const onLogout = () => {
         handleClose();
@@ -117,18 +119,28 @@ export const HeaderMenu = ({history}) => {
                     </img>
                 </div>
                 <div>
-                    <IconButton
+                    <Typography variant="overline" style={{margin: " 0 0.5rem 0 0.5rem"}}>
+                        {tank.data.name}
+                    </Typography>
+                    <Button
+                        disableTouchRipple
+                        disableRipple
+                        disableFocusRipple
+                        disableElevation
                         size="small"
                         aria-label="account of current user"
                         aria-controls="menu-appbar"
                         aria-haspopup="true"
                         onClick={handleMenu}
                         color="inherit"
+                        style={{position: "relative"}}
                     >
                         {avatar ? <Avatar src={avatar}/> :
                             <Avatar/>
                         }
-                    </IconButton>
+                        <FontAwesomeIcon icon={open ? faCaretUp : faCaretDown}
+                                         style={{position: "absolute", right: "-5px"}} size="md"/>
+                    </Button>
                     <Menu
                         id="menu-appbar"
                         anchorEl={anchorEl}
