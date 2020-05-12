@@ -130,7 +130,6 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
             {name: name.value},
             getAuthToken(),
             (result) => {
-                setLoading(false);
                 if (result.name) {
                     //update avatar
                     if (avatar.blob && avatar.update) {
@@ -151,6 +150,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                                     }),
                                     severity: 'success'
                                 });
+                                setLoading(false);
                                 if (!edit) {
                                     setTankData(result);
                                     history.push('/');
@@ -163,6 +163,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                             setAlert
                         )
                     } else {
+                        setLoading(false);
                         setAlert({
                             open: true,
                             message: !!edit ? t('tanks.form.edit.success', {
