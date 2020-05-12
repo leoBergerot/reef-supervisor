@@ -17,6 +17,7 @@ import {typeContext} from "../../contexts/type-context";
 import Divider from "@material-ui/core/Divider";
 import {appFetch, GET} from "../../utils/app-fetch";
 import {useTranslation} from "react-i18next";
+import {MuiPickersContext} from "@material-ui/pickers";
 
 Number.prototype.round = function (places) {
     return +(Math.round(this + "e+" + places) + "e-" + places);
@@ -106,6 +107,8 @@ export const Measure = ({name, shortName, unit, type, history}) => {
     const {tank} = useContext(tankContext);
     const {setTypeData} = useContext(typeContext);
     const {setAlert} = useContext(alertContext);
+    const {moment} = useContext(MuiPickersContext);
+
     const {t} = useTranslation();
     const classes = useStyles();
 
@@ -200,9 +203,12 @@ export const Measure = ({name, shortName, unit, type, history}) => {
                                 {t(`measure.parameter.${name}`)} {shortName && `(${shortName})`}
                             </Typography>
                         </Grid>
-                        <Grid item style={{margin: "auto"}}>
+                        <Grid item style={{margin: "auto", textAlign: "center"}}>
                             <Typography align="center" variant="subtitle1" className={classes.subtitle1}>
                                 {measure.last ? measure.last.value : "- -"} {unit}
+                            </Typography>
+                            <Typography align="center" variant="caption">
+                                {measure.last ? moment(measure.last.createdAt).format("DD/MM/YY HH:mm") : ""}
                             </Typography>
                         </Grid>
                         <Grid item>
