@@ -293,7 +293,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         color="primary"
                         type="submit"
                     >
-                        {!!edit ? t('tanks.form.edit.button') : t('tanks.form.create.button')} {loading && (<CircularProgress size={25}/>)}
+                        {!!edit ? t('tanks.form.edit.button') : t('tanks.form.create.button')}
                     </Button>
                     <Button
                         size="small"
