@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => createStyles({
 }));
 export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
     const {getAuthToken} = useContext(authContext);
-    const {setTankData} = useContext(tankContext);
+    const {setTankData, tank} = useContext(tankContext);
     const {setAlert} = useContext(alertContext);
     const {t} = useTranslation();
 
@@ -189,7 +189,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
         );
     };
 
-    const handleOnDelete = () => {
+    const handleDelete = () => {
         setLoading(true);
         setIsOpenDeleteModal(false);
         appFetch(
@@ -204,7 +204,11 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     open: true,
                     message: t('tanks.form.deleted', {name: edit.name}),
                     severity: 'success'
-                })
+                });
+                
+                if(tank.data.id === edit.id){
+                    setTankData(null);
+                }
             },
             () => {
                 setLoading(false);
@@ -299,7 +303,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     open={openDeleteModal}
                     setOpen={setIsOpenDeleteModal}
                     name={t('tanks.form.deleted_name', {name: edit.name})}
-                    onDelete={handleOnDelete}
+                    onDelete={handleDelete}
                 />)}
             </form>
         </div>
