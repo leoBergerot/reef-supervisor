@@ -60,7 +60,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
     const {setAlert} = useContext(alertContext);
 
     const [value, setValue] = useState({value: defaultValue, error: false, helperText: null});
-    const [createdAt, setCreatedAt] = useState({value: moment(), error: false});
+    const [createdAt, setCreatedAt] = useState({value: moment(), error: false, helperText: null});
 
     const classes = useStyles({size});
     const {t} = useTranslation();
@@ -75,7 +75,9 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
 
     const handleChange = (event) => {
         setValue({
-            value: value.value, error: false, helperText: null,
+            value: value.value,
+            error: event.target.value.toString().length <= 0,
+            helperText: event.target.value.toString().length <= 0 ? t('measure.error.value') : null,
             [event.target.name]: event.target.value,
         });
     };
@@ -92,7 +94,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
             error = true;
         }
 
-        if (!error) {
+        if (!error && !createdAt.error) {
             handleSubmit();
         }
     };
@@ -146,7 +148,18 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                         name="value"
                         id="value"
                     />
-                    <DatePicker selectedDate={createdAt.value} handleDateChange={handleDateChange}/>
+                    <DatePicker selectedDate={createdAt.value} handleDateChange={handleDateChange}
+                                error={createdAt.error}
+                                helperText={createdAt.helperText}
+                                onError={(error) => {
+                                    if (!createdAt.error && error) {
+                                        setCreatedAt({
+                                            value: createdAt.value,
+                                            error: true,
+                                            helperText: t('measure.error.date')
+                                        })
+                                    }
+                                }}/>
                     <Grid
                         container
                         direction="row"
@@ -157,6 +170,7 @@ const AddForm = ({open, handleClose, anchorEl, id, defaultValue, name, unit, siz
                             <FontAwesomeIcon icon={faTimes}/>
                         </IconButton>
                         <IconButton type="submit" color="primary" aria-label={t('measure.validate', {name})}
+                                    disabled={createdAt.error || value.error}
                                     onClick={handleValidate}>
                             <FontAwesomeIcon icon={faCheck}/>
                         </IconButton>
