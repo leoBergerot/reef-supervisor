@@ -17,6 +17,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import defaultAvatar from "../../../asset/images/default_avatar.svg";
 import {appFetch, DELETE, GET, PATCH, POST} from "../../utils/app-fetch";
 import {useTranslation} from "react-i18next";
+import {resizeImage} from "../../utils/image";
 
 const useStyles = makeStyles((theme) => createStyles({
     root: {
@@ -133,7 +134,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                     //update avatar
                     if (avatar.blob && avatar.update) {
                         const formData = new FormData();
-                        formData.append("file", avatar.blob);
+                        formData.append("file", avatar.blob, avatar.blob.name);
                         appFetch(
                             PATCH,
                             `tanks/${result.id}/avatars`,
@@ -246,11 +247,11 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                                 style={{display: "none"}}
                                 onChange={(event => {
                                         if(event.target.files[0].type.match('image.*') !== null) {
-                                            setAvatar({
-                                                url: URL.createObjectURL(event.target.files[0]),
-                                                blob: event.target.files[0],
+                                            resizeImage(event.target.files[0], (result) => (setAvatar({
+                                                url: URL.createObjectURL(result),
+                                                blob: result,
                                                 update: true
-                                            })
+                                            })))
                                         }else {
                                             setAlert({
                                                 open: true,
