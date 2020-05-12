@@ -2,7 +2,6 @@ import {DesktopDateTimePicker} from "@material-ui/pickers";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {useTranslation} from "react-i18next";
-import {MeasureField} from "./measure-field";
 
 const useStyle = makeStyles(() => ({
     small: {
@@ -34,7 +33,7 @@ const useStyle = makeStyles(() => ({
         }
     }
 }));
-export const DatePicker = ({selectedDate, handleDateChange, small}) => {
+export const DatePicker = ({selectedDate, handleDateChange, small, onError, error, helperText}) => {
 
     const classes = useStyle();
     const {t} = useTranslation();
@@ -49,6 +48,9 @@ export const DatePicker = ({selectedDate, handleDateChange, small}) => {
             label={t("measure.inputs.date")}
             okLabel="Ok"
             cancelLabel="Cancel"
+            onError={onError}
+            error={error}
+            helperText={helperText}
             value={selectedDate}
             onChange={handleDateChange}
         />

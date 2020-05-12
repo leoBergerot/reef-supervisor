@@ -127,7 +127,8 @@
       "show_chart": "Show chart"
     },
     "error": {
-      "value": "Please enter a correct value"
+      "value": "Please enter a correct value",
+      "date": "Please enter a correct date"
     },
     "inputs": {
       "value": "{{name}} value",

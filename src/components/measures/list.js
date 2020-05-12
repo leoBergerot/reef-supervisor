@@ -72,9 +72,7 @@ export default function List({type, page, setPage, setRowsPerPage, rowsPerPage, 
             },
             null,
         );
-        }
-    ;
-
+    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';

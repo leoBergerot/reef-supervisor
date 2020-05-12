@@ -127,7 +127,8 @@
       "show_chart": "Voir le graphique"
     },
     "error": {
-      "value": "Merci d'entrer une valeur correcte"
+      "value": "Merci d'entrer une valeur correcte",
+      "date": "Merci d'entrer une date correcte"
     },
     "inputs": {
       "value": "{{name}} valeur",

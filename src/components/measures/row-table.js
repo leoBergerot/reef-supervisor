@@ -17,21 +17,21 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
     const {t} = useTranslation();
 
     const [edit, setEdit] = useState(false);
-    const [selectedDate, handleChangeDate] = useState(moment(row.createdAt));
+    const [selectedDate, handleChangeDate] = useState({value: moment(row.createdAt), error: false, helperText: null});
     const [value, setValue] = useState({value: row.value, error: false});
     const [loading, setLoading] = useState(false);
     const [currentValues, setCurrentValues] = useState({createdAt: moment(row.createdAt), value: row.value});
 
     useEffect(() => {
         if (!edit) {
-            handleChangeDate(currentValues.createdAt);
+            handleChangeDate({value: currentValues.createdAt, error: false, helperText: null});
             setValue({value: currentValues.value, error: false});
         }
 
     }, [edit]);
 
     useEffect(() => {
-        handleChangeDate(currentValues.createdAt);
+        handleChangeDate({value: currentValues.createdAt, error: false, helperText: null});
         setValue({value: currentValues.value, error: false});
     }, [currentValues]);
 
@@ -54,7 +54,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
             });
             error = true;
         }
-        if (!error) {
+        if (!error && !selectedDate.error) {
             setEdit(false);
             setLoading(true);
             appFetch(
@@ -62,7 +62,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                 `measures/${row.id}`,
                 {
                     value: value.value,
-                    createdAt: selectedDate,
+                    createdAt: selectedDate.value,
                 },
                 getAuthToken(),
                 (result) => {
@@ -78,7 +78,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                 setAlert
             );
         }
-    }
+    };
 
     return (
         <TableRowUi
@@ -96,8 +96,19 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                 :
                 <TableCell>
                     <DatePicker
-                        selectedDate={selectedDate}
-                        handleDateChange={handleChangeDate}
+                        selectedDate={selectedDate.value}
+                        handleDateChange={(date) => handleChangeDate({value: date, error: false, helperText: null})}
+                        error={selectedDate.error}
+                        helperText={selectedDate.helperText}
+                        onError={(error) => {
+                            if (!selectedDate.error && error) {
+                                handleChangeDate({
+                                    value: selectedDate.value,
+                                    error: true,
+                                    helperText: t('measure.error.date')
+                                })
+                            }
+                        }}
                         small
                     />
                 </TableCell>
@@ -129,7 +140,12 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                             helperText={value.helperText}
                             placeholder={unit}
                             onChange={
-                                (event) => setValue({value: event.target.value, error: false})
+                                (event) => setValue({
+                                    value: value.value,
+                                    error: event.target.value.toString().length <= 0,
+                                    helperText: event.target.value.toString().length <= 0 ? t('measure.error.value') : null,
+                                    [event.target.name]: event.target.value,
+                                })
                             }
                             name="value"
                             id="value"
@@ -141,7 +157,7 @@ export const TableRow = ({moment, index, row, unit, handleDelete}) => {
                 <Actions edit={edit}
                          setEdit={setEdit}
                          handleSave={handleSave}
-                         disabled={loading}
+                         disabled={loading || value.error || selectedDate.error}
                          handleDelete={_handleDelete}
                 />
             </TableCell>

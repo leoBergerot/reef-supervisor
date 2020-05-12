@@ -50,6 +50,7 @@ export const Actions = ({edit, setEdit, handleSave, handleDelete, disabled}) => 
                             size="small"
                             className={classes.margin}
                             onClick={handleSave}
+                            disabled={disabled}
                 >
                     <FontAwesomeIcon icon={faSave}/>
                 </IconButton>
