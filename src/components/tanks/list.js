@@ -78,10 +78,13 @@ export const List = ({history, match: {params: {manage}}}) => {
 
     const handleOpen = () => {
         setOpen(true);
+        window.document.querySelector('main').style.overflowY = "hidden";
+        window.document.querySelector('main').scrollTo(0,0)
     };
 
     const handleClose = () => {
         setOpen(false);
+        window.document.querySelector('main').style.overflowY = "scroll";
         if (!!manage) {
             setTankEdit({data: null})
         }
