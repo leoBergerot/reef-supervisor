@@ -12,7 +12,7 @@ i18n
     .use(initReactI18next) // bind react-i18next to the instance
     .init({
         fallbackLng: ["en", "fr"],
-        debug: true,
+        debug: false,
         ns: ["translations"],
         defaultNS: "translations",
         interpolation: {
