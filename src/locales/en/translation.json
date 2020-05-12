@@ -33,7 +33,7 @@
         "no": "Please enter a password",
         "short": "Must be at least 6 characters long",
         "alphanumeric_only": "The password must contain at least a lowercase character, an uppercase one a number and a special character",
-        "alphanumeric": " and alphanumeric /** @TODO: trouver une meilleure façon de le dire **/"
+        "alphanumeric": " and must contain at least a lowercase character, an uppercase one a number and a special character"
       },
       "first_name": "Please enter your first name",
       "last_name": "Please enter your last name",

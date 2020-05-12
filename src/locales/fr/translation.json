@@ -16,7 +16,7 @@
     "error": {
       "no_email": "Merci d'entrer votre adresse email",
       "no_password": "Merci d'entrer votre mot de passe",
-      "404": "Aucun compte relié à cette adresse email. /** @TODO: Vu sur discord, risque de sécurité **/",
+      "404": "Aucun compte relié à cette adresse email.",
       "403": "Votre mot de passe est incorrect."
     }
   },
@@ -71,8 +71,8 @@
       "password": {
         "no": "Merci d'entrer un mot de passe",
         "short": "Doit contenir au minimum 6 caractères",
-        "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
-        "alphanumeric": " et alphanumérique"
+        "alphanumeric_only": "Le mot de passe doit contenir au moins un caractère minuscule, un chiffre en majuscule et un caractère spécial",
+        "alphanumeric": " et doit contenir au moins un caractère minuscule, une majuscule un chiffre et un caractère spécial"
       },
       "403": "Ce lien a expiré"
     }
