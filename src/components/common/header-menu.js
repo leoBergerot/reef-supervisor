@@ -139,7 +139,7 @@ export const HeaderMenu = ({history}) => {
                             <Avatar/>
                         }
                         <FontAwesomeIcon icon={open ? faCaretUp : faCaretDown}
-                                         style={{position: "absolute", right: "-5px"}} size="md"/>
+                                         style={{position: "absolute", right: "-5px"}} size="sm"/>
                     </Button>
                     <Menu
                         id="menu-appbar"
