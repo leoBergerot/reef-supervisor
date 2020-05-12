@@ -11,7 +11,7 @@ import defaultAvatar from "../../../asset/images/default_avatar.svg";
 import {appFetch, GET} from "../../utils/app-fetch";
 import {alertContext} from "../../contexts/alert-context";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         width: "10vw",
         maxWidth: "200px",
@@ -26,7 +26,8 @@ const useStyles = makeStyles(theme => ({
         minHeight: "84px",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        filter: edit => `brightness(${edit ? 80 : 100}%)`
     },
     edit: {
         color: "#FFF",
@@ -48,7 +49,7 @@ export const Card = ({data, edit, handleClick}) => {
     const {getAuthToken} = useContext(authContext);
     const {setAlert} = useContext(alertContext);
 
-    const classes = useStyles();
+    const classes = useStyles(edit);
     const [avatar, setAvatar] = useState({loading: true, blob: null});
     useEffect(() => {
         if (data.avatar) {
