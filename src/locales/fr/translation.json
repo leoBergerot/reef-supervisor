@@ -12,17 +12,17 @@
     "sign_up": "S'enregistrer dès maintenant.",
     "forgotten_password": "Mot de passe oublié",
     "reset_password": "Rénitialiser le mot de passe.",
-    "enable": "Votre compte a été activé avec succès",
+    "enable": "Votre compte à été activé avec succès",
     "error": {
-      "no_email": "Merci d'entrer une adresse email",
+      "no_email": "Merci d'entrer votre adresse email",
       "no_password": "Merci d'entrer votre mot de passe",
-      "404": "Aucun compte relié a cette adresse email.",
-      "403": "Votre mot de passe est incorecte."
+      "404": "Aucun compte relié à cette adresse email. /** @TODO: Vu sur discord, risque de sécurité **/",
+      "403": "Votre mot de passe est incorrect."
     }
   },
   "recaptcha": {
     "terms": {
-      "first": "Cette page est protégé par Google reCAPTCHA pour déterminer si vous n'êtes pas un robot.",
+      "first": "Cette page est protégée par Google reCAPTCHA pour déterminer si vous n'êtes pas un robot.",
       "link": "Termes et conditions d'utilisation",
       "second": "de Google"
     }
@@ -31,17 +31,17 @@
     "error": {
       "password": {
         "no": "Merci d'entrer un mot de passe",
-        "short": "Doit être supérieure ou équal à 6 charactères de long",
+        "short": "Doit contenir au minimum 6 caractères",
         "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
         "alphanumeric": " et alphanumérique"
       },
       "first_name": "Merci d'entrer votre prénom",
-      "last_name": "Merci d'entrer votre nom",
+      "last_name": "Merci d'entrer votre nom de famille",
       "email": {
         "no": "Merci d'entrer votre email",
         "valid": "Merci d'entrer une adresse email valide"
       },
-      "email_already_register": "Email déjà enregistré. Choisissez en un autre, ou rénitialiser votre mot de passe"
+      "email_already_register": "Cette adresse email est déjà utilisée"
     },
     "first_name": "Prénom",
     "last_name": "Nom",
@@ -49,7 +49,7 @@
     "password": "Mot de passe",
     "title": "S'enregistrer",
     "button": "S'enregistrer",
-    "success": "{{first_name}} {{last_name}}, un email a été envoyé pour valider votre compte sur votre adresse {{email}}, (Vérifier aussi vos courriers indésirables)"
+    "success": "{{first_name}} {{last_name}}, un email a été envoyé pour valider votre compte sur votre adresse {{email}}, (Vérifiez aussi vos courriers indésirables)"
   },
   "forgot_password": {
     "title": "Mot de passe oublié",
@@ -57,20 +57,20 @@
     "success": "Un email a été envoyé {{email}}, (Vérifier aussi vos courriers indésirables)",
     "error": {
       "email_unlink": "Cet email {{email}} n'est pas lié à un compte",
-      "no_email": "Merci d'entrer une adresse"
+      "no_email": "Merci d'entrer une adresse email"
     },
     "email": "Email",
-    "button": "Envoyer moi un email"
+    "button": "Réinitialiser mon mot de passe"
   },
   "recover": {
-    "success": "{{first_name}} {{last_name}}, votre mot de passe a été mise à jours",
-    "title": "Rénitialiser votre mot de passe",
+    "success": "{{first_name}} {{last_name}}, votre mot de passe a été mise à jour",
+    "title": "Réinitialiser votre mot de passe",
     "password": "Mot de passe",
-    "button": "Mettre à jours",
+    "button": "Mettre à jour",
     "error": {
       "password": {
         "no": "Merci d'entrer un mot de passe",
-        "short": "Doit être supérieure ou équal à 6 charactères de long",
+        "short": "Doit contenir au minimum 6 caractères",
         "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
         "alphanumeric": " et alphanumérique"
       },
@@ -80,7 +80,7 @@
   "tanks": {
     "choice": "Choix de l'aquarium :",
     "create": "Créer votre premier aquarium pour continuer :",
-    "manage": "Gérer vos aquarium :",
+    "manage": "Gérer vos aquariums :",
     "add": "Ajouter un aquarium",
     "finish": "Terminer",
     "form": {
@@ -91,7 +91,7 @@
       "edit": {
         "title": "Mettre à jour l'aquarium",
         "button": "Sauvegarder",
-        "success": "L'aquarium : {{name}} a été mise à jours avec succès"
+        "success": "L'aquarium : {{name}} a été mise à jour avec succès"
       },
       "create": {
         "success": "L'aquarium : {{name}} a été créé avec succès",
@@ -110,7 +110,7 @@
   },
   "delete_modal": {
     "title": "Vous voulez supprimer {{name}} ?",
-    "warning": "Cette action est irreversible et supprime tous les éléments qui lui sont liés.",
+    "warning": "Cette action est irréversible et supprime tous les éléments qui lui sont liés.",
     "delete": "Oui",
     "cancel": "Non"
   },
@@ -127,14 +127,14 @@
       "show_chart": "Voir le graphique"
     },
     "error": {
-      "value": "Merci d'entrer un valeur correcte"
+      "value": "Merci d'entrer une valeur correcte"
     },
     "inputs": {
       "value": "{{name}} valeur",
       "date": "Date"
     },
     "cancel": "Annuler l'enregistrement du paramètre {{name}}",
-    "validate": "Validate de la valeur du paramètre {{name}}",
+    "validate": "Valider le paramètre {{name}}",
     "parameter": {
       "Calcium": "Calcium",
       "Water hardness": "Alcalinité",
@@ -164,7 +164,7 @@
         "error": {
           "value": "Merci d'entrer une valeur correcte"
         },
-        "success": "Mise à jours avec succés"
+        "success": "Mise à jours avec succès"
       },
       "toolbar": {
         "title": "Liste des valeurs : {{name}}"
@@ -173,20 +173,20 @@
         "success": "La mesure du {{createdAt}} a été supprimée",
         "name": "la valeur du {{createdAt}}"
       },
-      "row_per_page": "Valeurs/page"
+      "row_per_page": "Valeurs par pages"
     }
   },
   "chart": {
     "title": "Graphique des valeurs : {{name}}"
   },
   "date_picker_range": {
-    "start_date": "Date début",
+    "start_date": "Date de début",
     "end_date": "Date de fin"
   },
   "error": {
-    "no_network": "Pas de connexion à internet",
-    "500": "Une erreur sur le serveur est survenue",
+    "no_network": "Perte connexion internet",
+    "500": "Une erreur est survenue",
     "unauthorized": "Veuillez vous reconnecter",
-    "expired_session": "Session expiré, merci de vous reconnecter"
+    "expired_session": "Session expirée. Merci de vous reconnecter"
   }
 }

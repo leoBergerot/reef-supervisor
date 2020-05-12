@@ -8,32 +8,32 @@
     "email": "Email",
     "password": "Password",
     "sign_in_button": "Sign in",
-    "first_visit": "First visit to Reef Supervisor ?",
-    "sign_up": "Sign up now.",
-    "forgotten_password": "Password forgotten ?",
+    "first_visit": "First time on Reef Supervisor ?",
+    "sign_up": "Sign up",
+    "forgotten_password": "Forgotten password ?",
     "reset_password": "Reset password.",
-    "enable": "Your account are successfully enabled",
+    "enable": "Your account was successfully enabled",
     "error": {
       "no_email": "Please enter an email address",
       "no_password": "Please enter your password",
-      "404": "Can't to find an account corresponding to this e-mail address.",
+      "404": "There is no account for this email",
       "403": "Your password is incorrect."
     }
   },
   "recaptcha": {
     "terms": {
       "first": "This page is protected by Google reCAPTCHA to ensure that you are not a robot.",
-      "link": "Terms and conditions of use",
+      "link": "Terms of usage",
       "second": "of Google"
     }
   },
   "register": {
     "error": {
       "password": {
-        "no": "Please enter password",
+        "no": "Please enter a password",
         "short": "Must be at least 6 characters long",
-        "alphanumeric_only": "Please enter alphanumeric password",
-        "alphanumeric": " and alphanumeric"
+        "alphanumeric_only": "The password must contain at least a lowercase character, an uppercase one a number and a special character",
+        "alphanumeric": " and alphanumeric /** @TODO: trouver une meilleure façon de le dire **/"
       },
       "first_name": "Please enter your first name",
       "last_name": "Please enter your last name",
@@ -41,29 +41,29 @@
         "no": "Please enter your email",
         "valid": "Please enter a valid email"
       },
-      "email_already_register": "Email already register. Choose another, or recover your password"
+      "email_already_register": "Email is already used. Choose another, or use the forgotten password link"
     },
     "first_name": "First name",
     "last_name": "Last name",
     "email": "Email",
-    "password": "password",
+    "password": "Password",
     "title": "Register",
     "button": "Register",
-    "success": "{{first_name}} {{last_name}}, an email was send to validate your account at {{email}}, (check also your junk box)"
+    "success": "{{first_name}} {{last_name}}, an email was sent to {{email}} to validate your account, (check also your junk box)"
   },
   "forgot_password": {
     "title": "Forgot password",
-    "subtitle": "We will send you instructions on how to reset your password by e-mail.",
-    "success": "An email has been sended to {{email}}, (check also your junk box)",
+    "subtitle": "We will send you instructions on how to reset your password by email.",
+    "success": "An email has been sent to {{email}}, (check also your junk box)",
     "error": {
-      "email_unlink": "This email {{email}} doesn't link to account",
+      "email_unlink": "This email {{email}} is not linked to any account",
       "no_email": "Please enter an email address"
     },
     "email": "Email",
     "button": "Send me an email"
   },
   "recover": {
-    "success": "{{first_name}} {{last_name}}, your password was change",
+    "success": "{{first_name}} {{last_name}}, your password was changed",
     "title": "Reset your password",
     "password": "Password",
     "button": "Update",
@@ -71,14 +71,14 @@
       "password": {
         "no": "Please enter your password",
         "short": "Must be at least 6 characters long",
-        "alphanumeric_only": "Please enter alphanumeric password",
-        "alphanumeric": " and alphanumeric"
+        "alphanumeric_only": "The password must contain at least a lowercase character, an uppercase one a number and a special character",
+        "alphanumeric": " and alphanumeric /** @TODO same as login **/"
       },
-      "403": "This link are expired"
+      "403": "This link is expired"
     }
   },
   "tanks": {
-    "choice": "Choose your tank :",
+    "choice": "Choose a tank :",
     "create": "Create your first tank to continue :",
     "manage": "Manage tanks :",
     "add": "Add tank",
@@ -89,12 +89,12 @@
         "name": "Name"
       },
       "edit": {
-        "success": "Tank : {{name}} have successfully updated",
+        "success": "Tank : {{name}} was successfully updated",
         "title": "Update tank",
         "button": "Save"
       },
       "create": {
-        "success": "Tank : {{name}} have successfully created",
+        "success": "Tank : {{name}} was successfully created",
         "title": "Add tank",
         "button": "Create"
       },
@@ -109,8 +109,8 @@
     }
   },
   "delete_modal": {
-    "title": "You want to remove tank {{name}} ?",
-    "warning": "This action is irreversible and removed all linked elements.",
+    "title": "Do you want to remove tank {{name}} ?",
+    "warning": "This action is not reversible and removed all linked elements.",
     "delete": "Yes",
     "cancel": "No"
   },
@@ -162,7 +162,7 @@
       },
       "form": {
         "error": {
-          "value": "Please enter correct value"
+          "value": "Please enter a correct value"
         },
         "success": "Updated successful"
       },
@@ -170,10 +170,10 @@
         "title": "List {{name}} values"
       },
       "delete": {
-        "success": "Measure of {{createdAt}} has been deleted",
-        "name": "value of {{createdAt}}"
+        "success": "Measure at {{createdAt}} has been deleted",
+        "name": "value at {{createdAt}}"
       },
-      "row_per_page": "Values/page"
+      "row_per_page": "Values per page"
     }
   },
   "chart": {
@@ -184,9 +184,9 @@
     "end_date": "End date"
   },
   "error": {
-    "no_network": "You doesn't have connexion",
-    "500": "An error in server was happen",
-    "unauthorized": "Pleaze, sign in",
-    "expired_session": "Your session is expired, pleaze sign in"
+    "no_network": "No internet",
+    "500": "An error has happened",
+    "unauthorized": "Please, sign in",
+    "expired_session": "Your session has expired. Please sign-in again"
   }
 }
