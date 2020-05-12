@@ -144,6 +144,7 @@ export const List = ({history, match: {params: {manage}}}) => {
                             style={{margin: "0 2vw 2vh 0"}}
                             onClick={handleManageFinish}
                             variant="contained"
+                            size="small"
                         >
                             {t('tanks.finish')}
                         </Button>
