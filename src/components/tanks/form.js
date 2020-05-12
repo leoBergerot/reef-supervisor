@@ -123,6 +123,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
         if (error) {
             return;
         }
+        setLoading(true);
         appFetch(
             !!edit ? PATCH : POST,
             `tanks${!!edit ? `/${edit.id}` : ''}`,
@@ -291,7 +292,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         color="primary"
                         type="submit"
                     >
-                        {!!edit ? t('tanks.form.edit.button') : t('tanks.form.create.button')}
+                        {!!edit ? t('tanks.form.edit.button') : t('tanks.form.create.button')} {loading && (<CircularProgress size={25}/>)}
                     </Button>
                     <Button
                         size="small"
@@ -299,7 +300,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         disabled={loading}
                         variant="contained"
                     >
-                        {t('tanks.form.cancel')} {loading && (<CircularProgress size={25}/>)}
+                        {t('tanks.form.cancel')}
                     </Button>
                     {!!edit && (<Button
                         size="small"
@@ -308,7 +309,7 @@ export const Form = ({history, handleClose, edit, handleEditSuccess}) => {
                         disabled={loading}
                         variant="contained"
                     >
-                        {t('tanks.form.delete')} {loading && (<CircularProgress size={25}/>)}
+                        {t('tanks.form.delete')}
                     </Button>)}
                     {loading && (<CircularProgress size={25}/>)}
                 </div>
