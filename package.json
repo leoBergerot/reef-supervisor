@@ -23,6 +23,7 @@
     "babel-preset-react": "^6.24.1",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.4.2",
+    "d3-scale": "^3.2.1",
     "dotenv": "^8.2.0",
     "dotenv-webpack": "^1.7.0",
     "exif-js": "^2.3.0",
