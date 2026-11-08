@@ -10,7 +10,11 @@
     "sign_up": "S'enregistrer",
     "forgotten_password": "Mot de passe oublié",
     "invalid": "E-mail ou mot de passe incorrect.",
-    "enable_pending": "Activation du compte"
+    "enable_pending": "Activation du compte",
+    "token": "Jeton d'activation",
+    "activate": "Activer le compte",
+    "activated": "Le compte {{email}} est activé. Vous pouvez vous connecter.",
+    "token_required": "Merci d'entrer le jeton d'activation"
   },
   "register": {
     "title": "S'enregistrer",
@@ -19,7 +23,11 @@
     "email": "E-mail",
     "password": "Mot de passe",
     "button": "S'enregistrer",
-    "account_created": "{{first_name}} {{last_name}}, le compte {{email}} est créé. Vous pouvez vous connecter.",
+    "account_created": "{{first_name}} {{last_name}}, le compte {{email}} est créé.",
+    "token_help": "Aucun e-mail n'est envoyé. Activez le compte avec ce jeton.",
+    "activate": "Activer le compte",
+    "activated": "Le compte {{email}} est activé. Vous pouvez vous connecter.",
+    "open_activation": "Ouvrir l'écran d'activation",
     "has_account": "Déjà un compte ?",
     "error": {
       "first_name": "Merci d'entrer votre prénom",
@@ -32,16 +40,21 @@
   },
   "forgot_password": {
     "title": "Mot de passe oublié",
-    "subtitle": "Nous vous enverrons par e-mail les instructions pour réinitialiser votre mot de passe.",
+    "subtitle": "Aucun e-mail n'est envoyé. Le jeton de réinitialisation s'affiche ici.",
     "email": "E-mail",
     "button": "Réinitialiser mon mot de passe",
-    "error_email": "Merci d'entrer une adresse e-mail"
+    "error_email": "Merci d'entrer une adresse e-mail",
+    "unknown": "Cet e-mail n'est pas lié à un compte",
+    "issued": "Jeton pour {{email}}",
+    "open": "Choisir un nouveau mot de passe"
   },
   "recover": {
     "title": "Réinitialiser votre mot de passe",
     "password": "Nouveau mot de passe",
     "button": "Mettre à jour",
-    "error_password": "Au moins 6 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial"
+    "error_password": "Au moins 6 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial",
+    "updated": "Le mot de passe de {{email}} a été mis à jour.",
+    "invalid": "Ce jeton n'est pas valide."
   },
   "tanks": {
     "choice": "Choix de l'aquarium",
@@ -62,7 +75,11 @@
       "create_title": "Ajouter l'aquarium",
       "create_button": "Créer",
       "created": "L'aquarium {{name}} a été créé.",
+      "updated": "L'aquarium {{name}} a été mis à jour.",
+      "deleted": "L'aquarium {{name}} a été supprimé.",
       "name_required": "Merci d'entrer un nom",
+      "file_too_large": "L'image dépasse 5 Mo",
+      "not_found": "Cet aquarium est introuvable",
       "image_extension": "Merci de sélectionner une image png, gif, svg, jpeg ou jpg",
       "delete": "Supprimer",
       "current_photo": "Photo actuelle"
@@ -95,6 +112,7 @@
     "error_value": "Merci d'entrer une valeur correcte",
     "error_date": "Merci d'entrer une date correcte",
     "saved": "Mesure enregistrée",
+    "timestamp_rejected": "La date ne peut être changée ainsi que pour un paramètre sans valeur",
     "list": {
       "title": "Historique : {{name}}",
       "created_at": "Date",

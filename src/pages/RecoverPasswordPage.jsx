@@ -9,6 +9,7 @@ export function RecoverPasswordPage() {
   const { t } = useTranslation();
   const { id, token } = useParams();
   const [failure, setFailure] = useState(null);
+  const [updated, setUpdated] = useState(null);
   const {
     register,
     handleSubmit,
@@ -17,8 +18,10 @@ export function RecoverPasswordPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     setFailure(null);
+    setUpdated(null);
     try {
-      await resetPassword({ id, token, password: values.password });
+      const result = await resetPassword({ id, token: decodeURIComponent(token), password: values.password });
+      setUpdated(result);
     } catch (error) {
       setFailure(error);
     }
@@ -27,9 +30,14 @@ export function RecoverPasswordPage() {
   return (
     <section className="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-semibold text-ink">{t("recover.title")}</h1>
+      {updated ? (
+        <div className="mt-4">
+          <Notice tone="success">{t("recover.updated", { email: updated.email })}</Notice>
+        </div>
+      ) : null}
       {failure ? (
         <div className="mt-4">
-          <Notice title={t("api.missing_title")}>{describeError(failure, t)}</Notice>
+          <Notice>{describeError(failure, t)}</Notice>
         </div>
       ) : null}
       <form className="mt-5 grid gap-4" onSubmit={onSubmit} noValidate>

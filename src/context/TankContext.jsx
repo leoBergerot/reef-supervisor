@@ -1,10 +1,12 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 const TankContext = createContext(null);
 const TANK_KEY = "reef.tankId";
 
 export function TankProvider({ children }) {
   const [tankId, setTankIdState] = useState(() => localStorage.getItem(TANK_KEY));
+  const [revision, setRevision] = useState(0);
+  const touchTanks = useCallback(() => setRevision((value) => value + 1), []);
 
   const setTankId = (id) => {
     if (id == null) {
@@ -16,7 +18,7 @@ export function TankProvider({ children }) {
     setTankIdState(String(id));
   };
 
-  const value = useMemo(() => ({ tankId, setTankId }), [tankId]);
+  const value = useMemo(() => ({ tankId, setTankId, revision, touchTanks }), [tankId, revision, touchTanks]);
   return <TankContext.Provider value={value}>{children}</TankContext.Provider>;
 }
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { createTank, deleteTank, describeError, listTanks, updateTank, uploadTankPhoto } from "../api/client";
+import { createTank, deleteTank, describeError, fetchTankPhoto, listTanks, updateTank, uploadTankPhoto } from "../api/client";
 import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useTankSelection } from "../context/TankContext";
@@ -15,26 +15,30 @@ export function TanksPage() {
   const { manage } = useParams();
   const managing = manage === "manage";
   const { token, signOut } = useAuth();
-  const { setTankId } = useTankSelection();
+  const { tankId, setTankId, touchTanks, revision } = useTankSelection();
   const navigate = useNavigate();
   const toast = useToast();
   const [tanks, setTanks] = useState({ loading: true, data: [], error: null });
   const [editor, setEditor] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const load = () => {
+  useEffect(() => {
+    let cancelled = false;
     setTanks((current) => ({ ...current, loading: true }));
     listTanks(token)
-      .then((data) => setTanks({ loading: false, data: Array.isArray(data) ? data : [], error: null }))
+      .then((data) => {
+        if (cancelled) return;
+        setTanks({ loading: false, data: Array.isArray(data) ? data : [], error: null });
+      })
       .catch((error) => {
+        if (cancelled) return;
         if (error?.status === 401) signOut();
         setTanks({ loading: false, data: [], error });
       });
-  };
-
-  useEffect(() => {
-    load();
-  }, [token]);
+    return () => {
+      cancelled = true;
+    };
+  }, [token, revision]);
 
   const choose = (tank) => {
     if (managing) {
@@ -74,7 +78,7 @@ export function TanksPage() {
         {tanks.data.map((tank) => (
           <li key={tank.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <button type="button" onClick={() => choose(tank)} className="block w-full text-left" aria-label={t("tanks.select", { name: tank.name })}>
-              <img src="/tank-placeholder.svg" alt="" className="h-36 w-full bg-cyan-50 object-contain p-4" />
+              <TankPhoto token={token} tank={tank} />
               <span className="block px-4 py-3 text-lg font-semibold text-slate-800">{tank.name}</span>
             </button>
             {managing ? (
@@ -96,18 +100,59 @@ export function TanksPage() {
         onClose={() => setEditor(null)}
         onCreated={(name) => {
           toast.push(t("tanks.form.created", { name }), "success");
-          load();
+          touchTanks();
+        }}
+        onUpdated={(name) => {
+          toast.push(t("tanks.form.updated", { name }), "success");
+          touchTanks();
         }}
       />
       <DeleteDialog
         tank={pendingDelete}
+        token={token}
         onClose={() => setPendingDelete(null)}
+        onDeleted={(removed) => {
+          if (String(tankId) === String(removed.id)) setTankId(null);
+          toast.push(t("tanks.form.deleted", { name: removed.name }), "success");
+          touchTanks();
+        }}
       />
     </section>
   );
 }
 
-function TankDialog({ editor, token, onClose, onCreated }) {
+function TankPhoto({ token, tank, className = "h-36 w-full bg-cyan-50 object-contain p-4" }) {
+  const [src, setSrc] = useState(null);
+
+  useEffect(() => {
+    if (!tank?.photo_url) {
+      setSrc(null);
+      return undefined;
+    }
+    let cancelled = false;
+    let objectUrl = null;
+    fetchTankPhoto(token, tank.photo_url)
+      .then((url) => {
+        if (cancelled) {
+          if (url) URL.revokeObjectURL(url);
+          return;
+        }
+        objectUrl = url;
+        setSrc(url);
+      })
+      .catch(() => {
+        if (!cancelled) setSrc(null);
+      });
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [token, tank?.id, tank?.photo_url]);
+
+  return <img src={src || "/tank-placeholder.svg"} alt="" className={className} />;
+}
+
+function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
   const { t } = useTranslation();
   const open = Boolean(editor);
   const editing = editor?.mode === "edit";
@@ -152,35 +197,34 @@ function TankDialog({ editor, token, onClose, onCreated }) {
   const onSubmit = handleSubmit(async (values) => {
     if (fileError) return;
     const name = values.name.trim();
-    const nextFailures = [];
     try {
       if (editing) {
-        try {
-          await updateTank(editor.tank.id, name);
-        } catch (error) {
-          nextFailures.push(error);
-        }
+        const updated = await updateTank(token, editor.tank.id, name);
         if (file) {
           try {
-            await uploadTankPhoto(editor.tank.id, file);
+            await uploadTankPhoto(token, updated.id, file);
           } catch (error) {
-            nextFailures.push(error);
+            onUpdated(updated.name);
+            setFailures([error]);
+            return;
           }
         }
-        setFailures(nextFailures);
+        onUpdated(updated.name);
+        onClose();
         return;
       }
       const created = await createTank(token, name);
       if (file) {
         try {
-          await uploadTankPhoto(created.id, file);
+          await uploadTankPhoto(token, created.id, file);
         } catch (error) {
-          nextFailures.push(error);
+          onCreated(name);
+          setFailures([error]);
+          return;
         }
       }
       onCreated(name);
-      setFailures(nextFailures);
-      if (nextFailures.length === 0) onClose();
+      onClose();
     } catch (error) {
       setFailures([error]);
     }
@@ -220,7 +264,7 @@ function TankDialog({ editor, token, onClose, onCreated }) {
             </div>
             {fileError ? <Notice>{fileError}</Notice> : null}
             {preview ? <img src={preview} alt={t("tanks.form.current_photo")} className="h-32 w-full rounded-2xl object-contain bg-cyan-50" /> : (
-              <img src="/tank-placeholder.svg" alt="" className="h-32 w-full rounded-2xl bg-cyan-50 object-contain p-3" />
+              <TankPhoto token={token} tank={editor?.tank} className="h-32 w-full rounded-2xl bg-cyan-50 object-contain p-3" />
             )}
             <div className="flex gap-2">
               <QuietButton type="button" onClick={onClose} className="flex-1">
@@ -237,7 +281,7 @@ function TankDialog({ editor, token, onClose, onCreated }) {
   );
 }
 
-function DeleteDialog({ tank, onClose }) {
+function DeleteDialog({ tank, token, onClose, onDeleted }) {
   const { t } = useTranslation();
   const [failure, setFailure] = useState(null);
   const [pending, setPending] = useState(false);
@@ -250,7 +294,8 @@ function DeleteDialog({ tank, onClose }) {
     setPending(true);
     setFailure(null);
     try {
-      await deleteTank(tank.id);
+      await deleteTank(token, tank.id);
+      onDeleted(tank);
       onClose();
     } catch (error) {
       setFailure(error);
@@ -270,7 +315,7 @@ function DeleteDialog({ tank, onClose }) {
           <p className="mt-2 text-sm text-slate-600">{t("delete_modal.warning")}</p>
           {failure ? (
             <div className="mt-4">
-              <Notice title={t("api.missing_title")}>{describeError(failure, t)}</Notice>
+              <Notice>{describeError(failure, t)}</Notice>
             </div>
           ) : null}
           <div className="mt-5 flex gap-2">

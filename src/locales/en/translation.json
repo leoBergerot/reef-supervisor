@@ -10,7 +10,11 @@
     "sign_up": "Sign up",
     "forgotten_password": "Forgot password",
     "invalid": "Incorrect email or password.",
-    "enable_pending": "Account activation"
+    "enable_pending": "Account activation",
+    "token": "Activation token",
+    "activate": "Activate account",
+    "activated": "Account {{email}} is activated. You can sign in.",
+    "token_required": "Please enter the activation token"
   },
   "register": {
     "title": "Register",
@@ -19,7 +23,11 @@
     "email": "Email",
     "password": "Password",
     "button": "Register",
-    "account_created": "{{first_name}} {{last_name}}, the account {{email}} is created. You can sign in.",
+    "account_created": "{{first_name}} {{last_name}}, the account {{email}} is created.",
+    "token_help": "No email is sent. Activate the account with this token.",
+    "activate": "Activate account",
+    "activated": "Account {{email}} is activated. You can sign in.",
+    "open_activation": "Open the activation screen",
     "has_account": "Already have an account?",
     "error": {
       "first_name": "Please enter your first name",
@@ -32,16 +40,21 @@
   },
   "forgot_password": {
     "title": "Forgot password",
-    "subtitle": "We will send you instructions on how to reset your password by email.",
+    "subtitle": "No email is sent. The reset token is shown here.",
     "email": "Email",
     "button": "Send reset instructions",
-    "error_email": "Please enter an email address"
+    "error_email": "Please enter an email address",
+    "unknown": "This email is not linked to an account",
+    "issued": "Token for {{email}}",
+    "open": "Choose a new password"
   },
   "recover": {
     "title": "Reset your password",
     "password": "New password",
     "button": "Update",
-    "error_password": "At least 6 characters, with a lowercase letter, an uppercase letter, a number and a special character"
+    "error_password": "At least 6 characters, with a lowercase letter, an uppercase letter, a number and a special character",
+    "updated": "The password for {{email}} was updated.",
+    "invalid": "This token is not valid."
   },
   "tanks": {
     "choice": "Choose a tank",
@@ -62,7 +75,11 @@
       "create_title": "Add a tank",
       "create_button": "Create",
       "created": "Tank {{name}} was created.",
+      "updated": "Tank {{name}} was updated.",
+      "deleted": "Tank {{name}} was removed.",
       "name_required": "Please enter a name",
+      "file_too_large": "The image is larger than 5 MB",
+      "not_found": "This tank cannot be found",
       "image_extension": "Please select a png, gif, svg, jpeg or jpg image",
       "delete": "Remove",
       "current_photo": "Current photo"
@@ -95,6 +112,7 @@
     "error_value": "Please enter a valid value",
     "error_date": "Please enter a valid date",
     "saved": "Reading saved",
+    "timestamp_rejected": "The date can be set this way only for a parameter without a value",
     "list": {
       "title": "History: {{name}}",
       "created_at": "Date",
