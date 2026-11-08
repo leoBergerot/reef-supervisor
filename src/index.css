@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Avenir Next", "Segoe UI", ui-sans-serif, sans-serif;
+  --color-ink: #0b3a4a;
+  --color-sea: #13a1de;
+  --color-sand: #f3f7f8;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: #0f172a;
+  background:
+    radial-gradient(900px 420px at 0% -10%, rgb(19 161 222 / 18%), transparent 55%),
+    radial-gradient(700px 380px at 100% 0%, rgb(15 118 110 / 12%), transparent 50%),
+    var(--color-sand);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}

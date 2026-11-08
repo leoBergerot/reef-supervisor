@@ -1,5 +1,5 @@
 node_modules
-build
-docker
-.dockerignore
-dockerfile.prod
+dist
+.git
+.github
+*.md

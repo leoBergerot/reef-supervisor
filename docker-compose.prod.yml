@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8081:80"
+    environment:
+      API_PROXY_TARGET: ${API_PROXY_TARGET:-http://host.docker.internal:8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

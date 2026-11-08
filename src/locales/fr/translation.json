@@ -1,196 +1,160 @@
 {
-  "language": {
-    "en": "Anglais",
-    "fr": "Français"
-  },
+  "language": { "en": "Anglais", "fr": "Français" },
+  "brand": "Reef Supervisor",
   "login": {
     "sign_in": "Se connecter",
-    "email": "Email",
+    "email": "E-mail",
     "password": "Mot de passe",
     "sign_in_button": "Se connecter",
     "first_visit": "Première visite sur Reef Supervisor ?",
-    "sign_up": "S'enregistrer dès maintenant.",
+    "sign_up": "S'enregistrer",
     "forgotten_password": "Mot de passe oublié",
-    "reset_password": "Rénitialiser le mot de passe.",
-    "enable": "Votre compte à été activé avec succès",
-    "error": {
-      "no_email": "Merci d'entrer votre adresse email",
-      "no_password": "Merci d'entrer votre mot de passe",
-      "404": "Aucun compte relié à cette adresse email.",
-      "403": "Votre mot de passe est incorrect."
-    }
-  },
-  "recaptcha": {
-    "terms": {
-      "first": "Cette page est protégée par Google reCAPTCHA pour déterminer si vous n'êtes pas un robot.",
-      "link": "Termes et conditions d'utilisation",
-      "second": "de Google"
-    }
+    "invalid": "E-mail ou mot de passe incorrect.",
+    "enable_pending": "Activation du compte"
   },
   "register": {
-    "error": {
-      "password": {
-        "no": "Merci d'entrer un mot de passe",
-        "short": "Doit contenir au minimum 6 caractères",
-        "alphanumeric_only": "Merci d'entrer un mot de passe alphanumérique",
-        "alphanumeric": " et alphanumérique"
-      },
-      "first_name": "Merci d'entrer votre prénom",
-      "last_name": "Merci d'entrer votre nom de famille",
-      "email": {
-        "no": "Merci d'entrer votre email",
-        "valid": "Merci d'entrer une adresse email valide"
-      },
-      "email_already_register": "Cette adresse email est déjà utilisée"
-    },
+    "title": "S'enregistrer",
     "first_name": "Prénom",
     "last_name": "Nom",
-    "email": "Email",
+    "email": "E-mail",
     "password": "Mot de passe",
-    "title": "S'enregistrer",
     "button": "S'enregistrer",
-    "success": "{{first_name}} {{last_name}}, un email a été envoyé pour valider votre compte sur votre adresse {{email}}, (Vérifiez aussi vos courriers indésirables)"
+    "account_created": "{{first_name}} {{last_name}}, le compte {{email}} est créé. Vous pouvez vous connecter.",
+    "has_account": "Déjà un compte ?",
+    "error": {
+      "first_name": "Merci d'entrer votre prénom",
+      "last_name": "Merci d'entrer votre nom",
+      "email": "Merci d'entrer une adresse e-mail valide",
+      "password_short": "Doit contenir au minimum 6 caractères alphanumériques",
+      "password_alphanumeric": "Merci d'entrer un mot de passe alphanumérique",
+      "email_already_register": "Cette adresse e-mail est déjà utilisée"
+    }
   },
   "forgot_password": {
     "title": "Mot de passe oublié",
-    "subtitle": "Nous vous enverrons par e-mail les instructions pour réinitialiser votre mot de passe",
-    "success": "Un email a été envoyé {{email}}, (Vérifier aussi vos courriers indésirables)",
-    "error": {
-      "email_unlink": "Cet email {{email}} n'est pas lié à un compte",
-      "no_email": "Merci d'entrer une adresse email"
-    },
-    "email": "Email",
-    "button": "Réinitialiser mon mot de passe"
+    "subtitle": "Nous vous enverrons par e-mail les instructions pour réinitialiser votre mot de passe.",
+    "email": "E-mail",
+    "button": "Réinitialiser mon mot de passe",
+    "error_email": "Merci d'entrer une adresse e-mail"
   },
   "recover": {
-    "success": "{{first_name}} {{last_name}}, votre mot de passe a été mise à jour",
     "title": "Réinitialiser votre mot de passe",
-    "password": "Mot de passe",
+    "password": "Nouveau mot de passe",
     "button": "Mettre à jour",
-    "error": {
-      "password": {
-        "no": "Merci d'entrer un mot de passe",
-        "short": "Doit contenir au minimum 6 caractères",
-        "alphanumeric_only": "Le mot de passe doit contenir au moins un caractère minuscule, un chiffre en majuscule et un caractère spécial",
-        "alphanumeric": " et doit contenir au moins un caractère minuscule, une majuscule un chiffre et un caractère spécial"
-      },
-      "403": "Ce lien a expiré"
-    }
+    "error_password": "Au moins 6 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial"
   },
   "tanks": {
-    "choice": "Choix de l'aquarium :",
-    "create": "Créer votre premier aquarium pour continuer :",
-    "manage": "Gérer vos aquariums :",
+    "choice": "Choix de l'aquarium",
+    "create": "Créez votre premier aquarium pour continuer.",
+    "manage": "Gérer vos aquariums",
     "add": "Ajouter un aquarium",
     "finish": "Terminer",
+    "empty": "Aucun aquarium pour le moment.",
+    "photo": "Photo",
+    "photo_pick": "Choisir une image",
+    "photo_hint": "png, gif, svg, jpeg, jpg",
+    "select": "Ouvrir {{name}}",
     "form": {
       "cancel": "Annuler",
-      "inputs": {
-        "name": "Nom"
-      },
-      "edit": {
-        "title": "Mettre à jour l'aquarium",
-        "button": "Sauvegarder",
-        "success": "L'aquarium : {{name}} a été mise à jour avec succès"
-      },
-      "create": {
-        "success": "L'aquarium : {{name}} a été créé avec succès",
-        "title": "Ajouter l'aquarium",
-        "button": "Créer"
-      },
-      "error": {
-        "name": {
-          "no": "Merci d'entrer un nom"
-        },
-        "image": {
-          "extension": "Merci de sélectionner une image avec l'une des extensions suivante : (png, gif, svg, jpeg, jpg)"
-        }
-      },
-      "deleted": "L'aquarium {{name}} a été supprimé",
+      "name": "Nom",
+      "edit_title": "Mettre à jour l'aquarium",
+      "edit_button": "Sauvegarder",
+      "create_title": "Ajouter l'aquarium",
+      "create_button": "Créer",
+      "created": "L'aquarium {{name}} a été créé.",
+      "name_required": "Merci d'entrer un nom",
+      "image_extension": "Merci de sélectionner une image png, gif, svg, jpeg ou jpg",
       "delete": "Supprimer",
-      "deleted_name": "l'aquarium {{name}}"
+      "current_photo": "Photo actuelle"
     }
   },
   "delete_modal": {
-    "title": "Vous voulez supprimer {{name}} ?",
+    "title": "Supprimer {{name}} ?",
     "warning": "Cette action est irréversible et supprime tous les éléments qui lui sont liés.",
-    "delete": "Oui",
+    "delete": "Oui, supprimer",
     "cancel": "Non"
   },
   "menu": {
     "manage": "Gérer les aquariums",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "dashboard": "Tableau de bord",
+    "tank": "Aquarium"
   },
   "measure": {
-    "add": "Ajouter une valeur pour le paramètre {{name}}",
-    "menu": {
-      "aria": "Menu du paramètre {{name}}",
-      "title": "Valeurs : {{name}}",
-      "edit": "Editer",
-      "show_chart": "Voir le graphique"
-    },
-    "error": {
-      "value": "Merci d'entrer une valeur correcte",
-      "date": "Merci d'entrer une date correcte"
-    },
-    "inputs": {
-      "value": "{{name}} valeur",
-      "date": "Date"
-    },
-    "cancel": "Annuler l'enregistrement du paramètre {{name}}",
-    "validate": "Valider le paramètre {{name}}",
-    "parameter": {
-      "Calcium": "Calcium",
-      "Water hardness": "Alcalinité",
-      "Magnesium": "Magnésium",
-      "Temperature": "Température",
-      "Power of hydrogen": "Dureté",
-      "Phosphate": "Phosphate",
-      "Nitrate": "Nitrate",
-      "Nitrite": "Nitrite",
-      "Water change": "Changement d'eau",
-      "Density": "Densité",
-      "Silicate": "Silicate"
-    },
+    "add": "Ajouter une valeur",
+    "hide": "Masquer ce paramètre",
+    "history": "Historique",
+    "chart": "Graphique",
+    "value": "Valeur",
+    "date": "Date",
+    "cancel": "Annuler",
+    "validate": "Valider",
+    "no_value": "Sans valeur numérique",
+    "delta_unavailable": "Écart indisponible",
+    "empty_value": "—",
+    "error_value": "Merci d'entrer une valeur correcte",
+    "error_date": "Merci d'entrer une date correcte",
+    "saved": "Mesure enregistrée",
     "list": {
-      "header": {
-        "created_at": "Crée le",
-        "value": "Valeur",
-        "actions": "Actions"
-      },
-      "action": {
-        "edit": "Editer",
-        "remove": "Supprimer",
-        "save": "Sauvegarder",
-        "cancel": "Annuler"
-      },
-      "form": {
-        "error": {
-          "value": "Merci d'entrer une valeur correcte"
-        },
-        "success": "Mise à jours avec succès"
-      },
-      "toolbar": {
-        "title": "Liste des valeurs : {{name}}"
-      },
-      "delete":{
-        "success": "La mesure du {{createdAt}} a été supprimée",
-        "name": "la valeur du {{createdAt}}"
-      },
-      "row_per_page": "Valeurs par pages"
+      "title": "Historique : {{name}}",
+      "created_at": "Date",
+      "value": "Valeur",
+      "actions": "Actions",
+      "edit": "Éditer",
+      "remove": "Supprimer",
+      "save": "Sauvegarder",
+      "cancel": "Annuler",
+      "updated": "Mise à jour enregistrée",
+      "deleted": "La mesure du {{createdAt}} a été supprimée",
+      "empty": "Aucune mesure pour ce paramètre.",
+      "newest": "Les plus récentes d'abord",
+      "page": "Page {{page}} / {{total}}",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "per_page": "{{count}} valeurs par page"
     }
   },
-  "chart": {
-    "title": "Graphique des valeurs : {{name}}"
+  "preferences": {
+    "hidden_title": "Paramètres masqués",
+    "hidden_help": "Réactivez un paramètre pour le revoir sur le tableau de bord.",
+    "show": "Afficher {{name}}"
   },
-  "date_picker_range": {
-    "start_date": "Date de début",
-    "end_date": "Date de fin"
+  "chart": {
+    "title": "Graphique : {{name}}",
+    "start": "Date de début",
+    "end": "Date de fin",
+    "empty": "Aucune mesure sur cette période.",
+    "range_error": "La date de début doit précéder la date de fin.",
+    "loading": "Chargement du graphique"
+  },
+  "catalog": {
+    "empty": "Le catalogue de paramètres est vide.",
+    "error": "Le catalogue n'a pas pu être chargé."
+  },
+  "api": {
+    "missing_title": "Action indisponible",
+    "missing_body": "L'appel {{name}} n'a pas d'endpoint sur l'API. Rien n'a été modifié."
   },
   "error": {
-    "no_network": "Perte connexion internet",
+    "no_network": "Connexion à l'API impossible",
     "500": "Une erreur est survenue",
     "unauthorized": "Veuillez vous reconnecter",
     "expired_session": "Session expirée. Merci de vous reconnecter"
+  },
+  "loading": "Chargement",
+  "back_home": "Retour au tableau de bord",
+  "parameter": {
+    "Calcium": "Calcium",
+    "Alkalinity": "Alcalinité",
+    "Water hardness": "Alcalinité",
+    "Magnesium": "Magnésium",
+    "Temperature": "Température",
+    "Power of hydrogen": "Dureté",
+    "Phosphate": "Phosphate",
+    "Nitrate": "Nitrate",
+    "Nitrite": "Nitrite",
+    "Water change": "Changement d'eau",
+    "Density": "Densité",
+    "Silicate": "Silicate"
   }
 }
