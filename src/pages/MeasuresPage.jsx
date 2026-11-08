@@ -192,7 +192,7 @@ function EditDialog({ measure, parameter, token, onClose, onSaved }) {
     try {
       if (parameter.need_value && value === null) return;
       if (value === null) {
-        await setMeasureTimestamp(measure.id, new Date(values.createdAt).toISOString());
+        await setMeasureTimestamp(token, measure.id, new Date(values.createdAt).toISOString());
       } else {
         await updateMeasure(token, measure.id, {
           value,

@@ -2,13 +2,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { createUser, describeError, requestAccountActivation } from "../api/client";
+import { activateAccount, createUser, describeError, requestAccountActivation } from "../api/client";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
 
 export function RegisterPage() {
   const { t } = useTranslation();
   const [created, setCreated] = useState(null);
+  const [activation, setActivation] = useState(null);
+  const [activated, setActivated] = useState(null);
   const [activationError, setActivationError] = useState(null);
+  const [confirming, setConfirming] = useState(false);
   const [formError, setFormError] = useState("");
   const {
     register,
@@ -19,12 +22,15 @@ export function RegisterPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFormError("");
     setCreated(null);
+    setActivation(null);
+    setActivated(null);
     setActivationError(null);
     try {
       await createUser({ email: values.email.trim(), password: values.password });
       setCreated(values);
       try {
-        await requestAccountActivation(values.email.trim());
+        const issued = await requestAccountActivation(values.email.trim());
+        setActivation(issued);
       } catch (error) {
         setActivationError(error);
       }
@@ -32,6 +38,20 @@ export function RegisterPage() {
       setFormError(describeError(error, t));
     }
   });
+
+  const confirmActivation = async () => {
+    if (!activation) return;
+    setConfirming(true);
+    setActivationError(null);
+    try {
+      const result = await activateAccount(activation.token);
+      setActivated(result);
+    } catch (error) {
+      setActivationError(error);
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   return (
     <section className="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
@@ -46,9 +66,23 @@ export function RegisterPage() {
             })}
           </Notice>
         ) : null}
-        {activationError ? (
-          <Notice title={t("api.missing_title")}>{describeError(activationError, t)}</Notice>
+        {activated ? <Notice tone="success">{t("register.activated", { email: activated.email })}</Notice> : null}
+        {activation && !activated ? (
+          <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-sm text-slate-700">{t("register.token_help")}</p>
+            <p className="break-all font-mono text-xs text-ink">{activation.token}</p>
+            <PrimaryButton type="button" onClick={confirmActivation} disabled={confirming}>
+              {t("register.activate")}
+            </PrimaryButton>
+            <Link
+              className="text-sm font-semibold text-ink underline-offset-4 hover:underline"
+              to={`/login/${encodeURIComponent(activation.token)}`}
+            >
+              {t("register.open_activation")}
+            </Link>
+          </div>
         ) : null}
+        {activationError ? <Notice>{describeError(activationError, t)}</Notice> : null}
         {formError ? <Notice>{formError}</Notice> : null}
       </div>
       <form className="mt-5 grid gap-4" onSubmit={onSubmit} noValidate>

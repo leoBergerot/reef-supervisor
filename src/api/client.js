@@ -9,19 +9,6 @@ export class ApiError extends Error {
   }
 }
 
-export class MissingEndpointError extends Error {
-  constructor(functionName) {
-    super(functionName);
-    this.name = "MissingEndpointError";
-    this.code = "missing_endpoint";
-    this.functionName = functionName;
-  }
-}
-
-function missing(functionName) {
-  return Promise.reject(new MissingEndpointError(functionName));
-}
-
 async function request(path, { method = "GET", body, token, form } = {}) {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -29,6 +16,8 @@ async function request(path, { method = "GET", body, token, form } = {}) {
   if (form) {
     headers["Content-Type"] = "application/x-www-form-urlencoded";
     payload = form;
+  } else if (body instanceof FormData) {
+    payload = body;
   } else if (body !== undefined) {
     headers["Content-Type"] = "application/json";
     payload = JSON.stringify(body);
@@ -76,36 +65,62 @@ export function createTank(token, name) {
   return request("/tanks", { method: "POST", token, body: { name } });
 }
 
-export function updateTank() {
-  return missing("updateTank");
+export function updateTank(token, id, name) {
+  return request(`/tanks/${id}`, { method: "PATCH", token, body: { name } });
 }
 
-export function deleteTank() {
-  return missing("deleteTank");
+export function deleteTank(token, id) {
+  return request(`/tanks/${id}`, { method: "DELETE", token });
 }
 
-export function uploadTankPhoto() {
-  return missing("uploadTankPhoto");
+export function uploadTankPhoto(token, id, file) {
+  const body = new FormData();
+  body.append("file", file);
+  return request(`/tanks/${id}/photo`, { method: "PATCH", token, body });
 }
 
-export function activateAccount() {
-  return missing("activateAccount");
+export async function fetchTankPhoto(token, photoUrl) {
+  if (!photoUrl) return null;
+  let response;
+  try {
+    response = await fetch(`${base}${photoUrl}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  } catch {
+    throw new ApiError("network", 0, null);
+  }
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new ApiError("http", response.status, null);
+  }
+  return URL.createObjectURL(await response.blob());
 }
 
-export function requestAccountActivation() {
-  return missing("requestAccountActivation");
+export function requestAccountActivation(email) {
+  return request("/account-activations", { method: "POST", body: { email } });
 }
 
-export function requestPasswordReset() {
-  return missing("requestPasswordReset");
+export function activateAccount(token) {
+  return request("/account-activations/confirm", { method: "POST", body: { token } });
 }
 
-export function resetPassword() {
-  return missing("resetPassword");
+export function requestPasswordReset(email) {
+  return request("/password-resets", { method: "POST", body: { email } });
 }
 
-export function setMeasureTimestamp() {
-  return missing("setMeasureTimestamp");
+export function resetPassword({ id, token, password }) {
+  return request("/password-resets/confirm", {
+    method: "POST",
+    body: { id: Number(id), token, password },
+  });
+}
+
+export function setMeasureTimestamp(token, id, createdAt) {
+  return request(`/measures/${id}/timestamp`, {
+    method: "PATCH",
+    token,
+    body: { created_at: createdAt },
+  });
 }
 
 export function listParameters(token) {
@@ -147,11 +162,8 @@ export async function createMeasure(token, { parameterId, tankId, value, created
   });
 
   if (value === null || value === undefined) {
-    const chosen = new Date(createdAt).getTime();
-    if (Number.isFinite(chosen) && Math.abs(chosen - Date.now()) > 60_000) {
-      return { measure: created, warning: new MissingEndpointError("setMeasureTimestamp") };
-    }
-    return { measure: created, warning: null };
+    const stamped = await setMeasureTimestamp(token, created.id, createdAt);
+    return { measure: stamped, warning: null };
   }
 
   try {
@@ -199,13 +211,16 @@ export async function listMeasuresInRange(token, { tankId, parameterId, start, e
 
 export function describeError(error, t) {
   if (!error) return t("error.500");
-  if (error.code === "missing_endpoint") {
-    return t("api.missing_body", { name: error.functionName });
-  }
   if (error.status === 0) return t("error.no_network");
   const detail = error.detail;
   if (detail === "Email already registered") return t("register.error.email_already_register");
+  if (detail === "Email not registered") return t("forgot_password.unknown");
   if (detail === "Incorrect username or password") return t("login.invalid");
+  if (detail === "Invalid token") return t("recover.invalid");
+  if (detail === "Unsupported file type" || detail === "Empty file") return t("tanks.form.image_extension");
+  if (detail === "File is too large") return t("tanks.form.file_too_large");
+  if (detail === "Tank not found" || detail === "Photo not found") return t("tanks.form.not_found");
+  if (detail === "Timestamp can only be set on a parameter that has no value") return t("measure.timestamp_rejected");
   if (error.status === 401) return t("error.unauthorized");
   if (typeof detail === "string" && detail.trim()) return detail;
   if (Array.isArray(detail)) {

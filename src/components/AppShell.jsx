@@ -29,7 +29,7 @@ export function GuestLayout() {
 export function AppShell() {
   const { t } = useTranslation();
   const { token, signOut } = useAuth();
-  const { tankId, setTankId } = useTankSelection();
+  const { tankId, setTankId, revision } = useTankSelection();
   const navigate = useNavigate();
   const [tanks, setTanks] = useState(null);
 
@@ -45,7 +45,7 @@ export function AppShell() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, revision]);
 
   useEffect(() => {
     if (!tanks || !tankId) return;
