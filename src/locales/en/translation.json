@@ -104,6 +104,7 @@
       "custom_add": "Add",
       "custom_remove": "Remove",
       "custom_name_required": "Enter a parameter name",
+      "custom_unit_required": "Enter a unit",
       "custom_duplicate": "This custom parameter is already listed"
     }
   },
@@ -195,6 +196,7 @@
     "Nitrite": "Nitrite",
     "Water change": "Water change",
     "Density": "Density",
+    "Salinity": "Salinity",
     "Silicate": "Silicate"
   }
 }

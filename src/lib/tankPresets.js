@@ -9,7 +9,7 @@ export const DEFAULT_PARAMETER_NAMES = Object.freeze({
     "Magnesium",
     "Nitrate",
     "Phosphate",
-    "Density",
+    "Salinity",
   ]),
   freshwater: Object.freeze([
     "Temperature",

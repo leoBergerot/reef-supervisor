@@ -62,10 +62,9 @@ export function listTanks(token) {
 }
 
 /**
- * Create a tank.
- * Agreed body (sibling FastAPI work):
+ * Create a tank (PR #6 / feat/tank-water-type-params):
  * `{ name, water_type, enabled_parameter_ids?, custom_parameters? }`
- * where custom_parameters is `[{ name, unit }]`.
+ * custom_parameters: `[{ name, unit }]` — unit required by the API.
  */
 export function createTank(token, payload) {
   const name = typeof payload === "string" ? payload : payload?.name;
@@ -78,7 +77,7 @@ export function createTank(token, payload) {
     if (payload.customParameters?.length) {
       body.custom_parameters = payload.customParameters.map((item) => ({
         name: item.name,
-        unit: item.unit || null,
+        unit: item.unit,
       }));
     }
   }
@@ -93,20 +92,26 @@ export function listTankParameters(token, tankId) {
   return request(`/tanks/${tankId}/parameters`, { token });
 }
 
-export function updateTankParameter(token, tankId, parameterId, enabled) {
-  return request(`/tanks/${tankId}/parameters/${parameterId}`, {
+/** PATCH /tanks/{id}/parameters — `{ parameters: [{ parameter_id, enabled }] }`. */
+export function updateTankParameters(token, tankId, parameters) {
+  return request(`/tanks/${tankId}/parameters`, {
     method: "PATCH",
     token,
-    body: { enabled },
+    body: {
+      parameters: parameters.map((item) => ({
+        parameter_id: item.parameterId,
+        enabled: item.enabled,
+      })),
+    },
   });
 }
 
-/** Create a per-tank custom parameter once the sibling API exposes POST. */
+/** POST /tanks/{id}/parameters/custom — `{ name, unit }`. */
 export function createCustomTankParameter(token, tankId, { name, unit }) {
-  return request(`/tanks/${tankId}/parameters`, {
+  return request(`/tanks/${tankId}/parameters/custom`, {
     method: "POST",
     token,
-    body: { name, unit: unit || null },
+    body: { name, unit },
   });
 }
 
