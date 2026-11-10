@@ -294,6 +294,10 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
       setCustomError(t("tanks.form.custom_name_required"));
       return;
     }
+    if (!unit) {
+      setCustomError(t("tanks.form.custom_unit_required"));
+      return;
+    }
     const duplicate = customParameters.some((item) => item.name.toLowerCase() === name.toLowerCase());
     if (duplicate) {
       setCustomError(t("tanks.form.custom_duplicate"));
