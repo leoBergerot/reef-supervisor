@@ -519,6 +519,7 @@ function MeasureRow({
       name: parameter.name,
       sub_name: parameter.sub_name,
       need_value: parameter.need_value,
+      range: parameter.range ?? null,
     });
     navigate(path);
   };

@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { deleteMeasure, describeError, listMeasures, setMeasureTimestamp, updateMeasure } from "../api/client";
+import { deleteMeasure, describeError, listMeasures, listTanks, setMeasureTimestamp, updateMeasure } from "../api/client";
 import { DateTimeField, Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
 import { formatDateTime, numericValue, parameterLabel, toDateTimeInput } from "../lib/format";
+import { evaluateRangeState, rangeStateClasses, resolveParameterRange } from "../lib/parameterRanges";
 
 const PAGE_SIZE = 10;
 
@@ -24,11 +25,29 @@ export function MeasuresPage() {
   const [state, setState] = useState({ loading: true, data: [], totalPage: 1, error: null });
   const [editing, setEditing] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [waterType, setWaterType] = useState("seawater");
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en" : "fr";
 
   useEffect(() => {
     if (!tankId) navigate("/tanks", { replace: true });
   }, [tankId, navigate]);
+
+  useEffect(() => {
+    if (!token || !tankId) return;
+    let cancelled = false;
+    listTanks(token)
+      .then((tanks) => {
+        if (cancelled) return;
+        const tank = (Array.isArray(tanks) ? tanks : []).find((item) => String(item.id) === String(tankId));
+        setWaterType(tank?.water_type === "freshwater" ? "freshwater" : "seawater");
+      })
+      .catch(() => {
+        if (!cancelled) setWaterType("seawater");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, tankId]);
 
   const load = () => {
     if (!parameter || !tankId) return;
@@ -123,6 +142,7 @@ export function MeasuresPage() {
       <EditDialog
         measure={editing}
         parameter={parameter}
+        waterType={waterType}
         token={token}
         locale={locale}
         onClose={() => setEditing(null)}
@@ -167,7 +187,7 @@ function RowActions({ onEdit, onDelete }) {
   );
 }
 
-function EditDialog({ measure, parameter, token, locale, onClose, onSaved }) {
+function EditDialog({ measure, parameter, waterType, token, locale, onClose, onSaved }) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const [failure, setFailure] = useState(null);
@@ -176,6 +196,7 @@ function EditDialog({ measure, parameter, token, locale, onClose, onSaved }) {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { value: "", createdAt: "" } });
 
@@ -187,6 +208,12 @@ function EditDialog({ measure, parameter, token, locale, onClose, onSaved }) {
     });
     setFailure(null);
   }, [measure, reset]);
+
+  const watchedValue = watch("value");
+  const range = resolveParameterRange(parameter?.name, waterType, parameter?.range ?? null);
+  const rangeState =
+    parameter?.need_value === false ? null : evaluateRangeState(numericValue(watchedValue), range);
+  const colors = rangeStateClasses(rangeState);
 
   const onSubmit = handleSubmit(async (values) => {
     setFailure(null);
@@ -223,14 +250,24 @@ function EditDialog({ measure, parameter, token, locale, onClose, onSaved }) {
             {parameter?.need_value === false ? (
               <p className="text-sm text-slate-500">{t("measure.no_value")}</p>
             ) : (
-              <TextField
-                label={t("measure.value")}
-                inputMode="decimal"
-                error={errors.value?.message}
-                {...register("value", {
-                  validate: (value) => numericValue(value) !== null || t("measure.error_value"),
-                })}
-              />
+              <>
+                <TextField
+                  label={t("measure.value")}
+                  inputMode="decimal"
+                  error={errors.value?.message}
+                  {...register("value", {
+                    validate: (value) => numericValue(value) !== null || t("measure.error_value"),
+                  })}
+                />
+                {range ? (
+                  <p className="text-[11px] text-slate-400">
+                    {t("measure.batch.range_hint", { min: range.min, max: range.max })}
+                  </p>
+                ) : null}
+                {rangeState && rangeState !== "ok" ? (
+                  <p className={`text-xs ${colors.text}`}>{t("measure.batch.range_soft")}</p>
+                ) : null}
+              </>
             )}
             <Controller
               name="createdAt"
