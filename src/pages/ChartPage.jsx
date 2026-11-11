@@ -8,7 +8,15 @@ import { DateField, Notice, Spinner } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
-import { endOfDay, monthAgoDate, numericValue, parameterLabel, startOfDay, toDateInput } from "../lib/format";
+import {
+  endOfDay,
+  monthAgoDate,
+  numericValue,
+  parameterLabel,
+  startOfDay,
+  toDateInput,
+  todayIsoDate,
+} from "../lib/format";
 
 export function ChartPage() {
   const { t, i18n } = useTranslation();
@@ -18,26 +26,27 @@ export function ChartPage() {
   const navigate = useNavigate();
   const [state, setState] = useState({ loading: false, points: [], error: null });
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en" : "fr";
+  const today = todayIsoDate();
   const {
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
       start: toDateInput(monthAgoDate()),
-      end: toDateInput(new Date()),
+      end: today,
     },
   });
   const start = watch("start");
   const end = watch("end");
-  const rangeError = start && end && startOfDay(start) > endOfDay(end);
 
   useEffect(() => {
     if (!tankId) navigate("/tanks", { replace: true });
   }, [tankId, navigate]);
 
   useEffect(() => {
-    if (!parameter || !tankId || !start || !end || rangeError) return undefined;
+    if (!parameter || !tankId || !start || !end) return undefined;
     let cancelled = false;
     setState({ loading: true, points: [], error: null });
     listMeasuresInRange(token, {
@@ -61,7 +70,7 @@ export function ChartPage() {
     return () => {
       cancelled = true;
     };
-  }, [token, tankId, parameter, start, end, rangeError, signOut]);
+  }, [token, tankId, parameter, start, end, signOut]);
 
   if (!parameter) {
     return (
@@ -91,7 +100,13 @@ export function ChartPage() {
               error={errors.start?.message}
               name={field.name}
               value={field.value}
-              onChange={field.onChange}
+              max={today}
+              onChange={(next) => {
+                field.onChange(next);
+                if (next && end && next > end) {
+                  setValue("end", next, { shouldDirty: true, shouldValidate: true });
+                }
+              }}
               onBlur={field.onBlur}
               ref={field.ref}
             />
@@ -108,22 +123,23 @@ export function ChartPage() {
               error={errors.end?.message}
               name={field.name}
               value={field.value}
-              onChange={field.onChange}
+              max={today}
+              onChange={(next) => {
+                field.onChange(next);
+                if (next && start && next < start) {
+                  setValue("start", next, { shouldDirty: true, shouldValidate: true });
+                }
+              }}
               onBlur={field.onBlur}
               ref={field.ref}
             />
           )}
         />
       </form>
-      {rangeError ? (
-        <div className="mt-4">
-          <Notice>{t("chart.range_error")}</Notice>
-        </div>
-      ) : null}
       <div className="mt-4">
         {state.loading ? <Spinner label={t("chart.loading")} /> : null}
         {state.error ? <Notice>{describeError(state.error, t)}</Notice> : null}
-        {!state.loading && !state.error && !rangeError && state.points.length === 0 ? <Notice tone="empty">{t("chart.empty")}</Notice> : null}
+        {!state.loading && !state.error && state.points.length === 0 ? <Notice tone="empty">{t("chart.empty")}</Notice> : null}
         {state.points.length > 0 ? <LineChart points={state.points} language={locale} unit={parameter.sub_name || ""} /> : null}
       </div>
     </section>
