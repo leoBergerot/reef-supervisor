@@ -1,3 +1,5 @@
+import { parseApiDate } from "../lib/format";
+
 const base = "/api";
 
 export class ApiError extends Error {
@@ -250,8 +252,8 @@ export async function listMeasuresInRange(token, { tankId, parameterId, start, e
   return pages
     .flatMap((page) => page.data)
     .filter((measure) => {
-      const time = new Date(measure.created_at).getTime();
-      return time >= startMs && time <= endMs;
+      const time = parseApiDate(measure.created_at).getTime();
+      return Number.isFinite(time) && time >= startMs && time <= endMs;
     });
 }
 
