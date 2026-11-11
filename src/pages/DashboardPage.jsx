@@ -1,29 +1,53 @@
-import { Menu, MenuButton, MenuItem, MenuItems, Popover, PopoverButton, PopoverPanel, Switch } from "@headlessui/react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Switch,
+} from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   createMeasure,
   describeError,
   listMeasures,
-  listParameters,
-  listPreferences,
-  updatePreference,
+  listTankParameters,
+  updateTankParameters,
 } from "../api/client";
-import { Notice, PrimaryButton, Spinner, TextField } from "../components/ui";
+import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
 import { formatDateTime, formatDelta, numericValue, parameterLabel, toDateTimeInput } from "../lib/format";
 
+function sortRows(rows) {
+  return [...rows].sort((a, b) => {
+    const order = (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    if (order !== 0) return order;
+    return a.id - b.id;
+  });
+}
+
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
   const { token, signOut } = useAuth();
   const { tankId } = useTankSelection();
   const navigate = useNavigate();
-  const [catalog, setCatalog] = useState({ loading: true, parameters: [], preferences: [], error: null });
+  const toast = useToast();
+  const [catalog, setCatalog] = useState({ loading: true, rows: [], error: null });
+  const [editing, setEditing] = useState(false);
+  const [pendingHide, setPendingHide] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!tankId) {
@@ -33,85 +57,167 @@ export function DashboardPage() {
 
   const load = () => {
     setCatalog((current) => ({ ...current, loading: true, error: null }));
-    Promise.all([listParameters(token), listPreferences(token)])
-      .then(([parameters, preferences]) => {
+    listTankParameters(token, tankId)
+      .then((rows) => {
         setCatalog({
           loading: false,
-          parameters: Array.isArray(parameters) ? parameters : [],
-          preferences: Array.isArray(preferences) ? preferences : [],
+          rows: sortRows(Array.isArray(rows) ? rows : []),
           error: null,
         });
       })
       .catch((error) => {
         if (error?.status === 401) signOut();
-        setCatalog({ loading: false, parameters: [], preferences: [], error });
+        setCatalog({ loading: false, rows: [], error });
       });
   };
 
   useEffect(() => {
-    if (token && tankId) load();
+    if (token && tankId) {
+      setEditing(false);
+      load();
+    }
   }, [token, tankId]);
 
   if (!tankId) return null;
   if (catalog.loading) return <Spinner label={t("loading")} />;
   if (catalog.error) {
-    return (
-      <Notice title={t("catalog.error")}>{describeError(catalog.error, t)}</Notice>
-    );
+    return <Notice title={t("catalog.error")}>{describeError(catalog.error, t)}</Notice>;
   }
-  if (catalog.parameters.length === 0) return <Notice tone="empty">{t("catalog.empty")}</Notice>;
 
-  const preferenceByParameter = new Map(catalog.preferences.map((item) => [item.parameter.id, item]));
-  const visible = catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled !== false);
-  const hidden = catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled === false);
+  const visible = catalog.rows.filter((row) => row.enabled);
+  const hidden = catalog.rows.filter((row) => !row.enabled);
 
-  const setEnabled = async (preference, enabled) => {
+  const persistOrderAndFlags = async (rows) => {
+    setBusy(true);
     try {
-      await updatePreference(token, preference.id, enabled);
-      load();
+      const updated = await updateTankParameters(
+        token,
+        tankId,
+        rows.map((row, index) => ({
+          parameterId: row.parameter.id,
+          enabled: row.enabled,
+          sortOrder: index,
+        })),
+      );
+      setCatalog({
+        loading: false,
+        rows: sortRows(Array.isArray(updated) ? updated : rows),
+        error: null,
+      });
+      return true;
     } catch (error) {
       if (error?.status === 401) signOut();
-      setCatalog((current) => ({ ...current, error }));
+      toast.push(describeError(error, t), "error");
+      return false;
+    } finally {
+      setBusy(false);
     }
+  };
+
+  const moveVisible = async (parameterId, direction) => {
+    const nextVisible = [...visible];
+    const index = nextVisible.findIndex((row) => row.parameter.id === parameterId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= nextVisible.length) return;
+    const swapped = [...nextVisible];
+    [swapped[index], swapped[target]] = [swapped[target], swapped[index]];
+    const hiddenTail = catalog.rows.filter((row) => !row.enabled);
+    await persistOrderAndFlags([...swapped, ...hiddenTail]);
+  };
+
+  const confirmHide = async () => {
+    if (!pendingHide) return;
+    const next = catalog.rows.map((row) =>
+      row.parameter.id === pendingHide.parameter.id ? { ...row, enabled: false } : row,
+    );
+    const ok = await persistOrderAndFlags(sortRows(next));
+    if (ok) {
+      toast.push(t("dashboard.hidden", { name: parameterLabel(t, pendingHide.parameter.name) }), "success");
+      setPendingHide(null);
+    }
+  };
+
+  const showAgain = async (row) => {
+    const nextVisible = [...visible, { ...row, enabled: true }];
+    const nextHidden = hidden.filter((item) => item.parameter.id !== row.parameter.id);
+    const ok = await persistOrderAndFlags([...nextVisible, ...nextHidden]);
+    if (ok) toast.push(t("dashboard.shown", { name: parameterLabel(t, row.parameter.name) }), "success");
   };
 
   return (
     <div className="grid gap-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink">{t("menu.dashboard")}</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {editing ? t("dashboard.edit_help") : t("dashboard.view_help")}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/tanks/manage"
+            className="inline-flex h-11 items-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700"
+          >
+            {t("dashboard.manage_parameters")}
+          </Link>
+          <QuietButton
+            type="button"
+            disabled={busy}
+            onClick={() => setEditing((current) => !current)}
+            className={editing ? "border-sea bg-cyan-50 text-ink" : ""}
+          >
+            {editing ? t("dashboard.done") : t("dashboard.edit")}
+          </QuietButton>
+        </div>
+      </div>
+
+      {catalog.rows.length === 0 ? (
+        <Notice tone="empty">
+          {t("dashboard.empty")}{" "}
+          <Link to="/tanks/manage" className="font-semibold text-ink underline">
+            {t("dashboard.manage_parameters")}
+          </Link>
+        </Notice>
+      ) : null}
+
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {visible.map((parameter) => (
+        {visible.map((row, index) => (
           <MeasureCard
-            key={parameter.id}
-            parameter={parameter}
-            preference={preferenceByParameter.get(parameter.id)}
+            key={row.parameter.id}
+            parameter={row.parameter}
             tankId={tankId}
             token={token}
             language={i18n.resolvedLanguage}
-            onHide={() => {
-              const preference = preferenceByParameter.get(parameter.id);
-              if (preference) setEnabled(preference, false);
-            }}
+            editing={editing}
+            canMoveUp={index > 0}
+            canMoveDown={index < visible.length - 1}
+            onMoveUp={() => moveVisible(row.parameter.id, -1)}
+            onMoveDown={() => moveVisible(row.parameter.id, 1)}
+            onHide={() => setPendingHide(row)}
+            busy={busy}
           />
         ))}
       </section>
+
       {hidden.length > 0 ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-semibold text-ink">{t("preferences.hidden_title")}</h2>
           <p className="mt-1 text-sm text-slate-500">{t("preferences.hidden_help")}</p>
           <ul className="mt-4 grid gap-3">
-            {hidden.map((parameter) => {
-              const preference = preferenceByParameter.get(parameter.id);
-              const label = parameterLabel(t, parameter.name);
+            {hidden.map((row) => {
+              const label = parameterLabel(t, row.parameter.name);
               return (
-                <li key={parameter.id} className="flex items-center justify-between gap-3">
+                <li key={row.parameter.id} className="flex items-center justify-between gap-3">
                   <span className="text-sm font-medium">
                     {label}
-                    {parameter.sub_name ? <span className="text-slate-400"> ({parameter.sub_name})</span> : null}
+                    {row.parameter.sub_name ? <span className="text-slate-400"> ({row.parameter.sub_name})</span> : null}
                   </span>
                   <Switch
                     checked={false}
-                    onChange={() => preference && setEnabled(preference, true)}
+                    disabled={busy}
+                    onChange={() => showAgain(row)}
                     aria-label={t("preferences.show", { name: label })}
-                    className="group inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition data-[checked]:bg-sea"
+                    className="group inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition data-[checked]:bg-sea data-[disabled]:opacity-50"
                   >
                     <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
                   </Switch>
@@ -121,11 +227,57 @@ export function DashboardPage() {
           </ul>
         </section>
       ) : null}
+
+      <HideConfirmDialog
+        row={pendingHide}
+        busy={busy}
+        onClose={() => setPendingHide(null)}
+        onConfirm={confirmHide}
+      />
     </div>
   );
 }
 
-function MeasureCard({ parameter, preference, tankId, token, language, onHide }) {
+function HideConfirmDialog({ row, busy, onClose, onConfirm }) {
+  const { t } = useTranslation();
+  const label = row ? parameterLabel(t, row.parameter.name) : "";
+
+  return (
+    <Dialog open={Boolean(row)} onClose={busy ? () => {} : onClose} className="relative z-50">
+      <DialogBackdrop className="fixed inset-0 bg-slate-900/40" />
+      <div className="fixed inset-0 flex items-end justify-center p-4 sm:items-center">
+        <DialogPanel className="w-full max-w-md rounded-3xl bg-white p-5 shadow-xl">
+          <DialogTitle className="text-lg font-semibold text-ink">
+            {t("dashboard.hide_title", { name: label })}
+          </DialogTitle>
+          <p className="mt-2 text-sm text-slate-600">{t("dashboard.hide_warning")}</p>
+          <div className="mt-5 flex gap-2">
+            <QuietButton type="button" onClick={onClose} disabled={busy} className="flex-1">
+              {t("dashboard.hide_cancel")}
+            </QuietButton>
+            <PrimaryButton type="button" onClick={onConfirm} disabled={busy} tone="danger" className="flex-1">
+              {t("dashboard.hide_confirm")}
+            </PrimaryButton>
+          </div>
+        </DialogPanel>
+      </div>
+    </Dialog>
+  );
+}
+
+function MeasureCard({
+  parameter,
+  tankId,
+  token,
+  language,
+  editing,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
+  onHide,
+  busy,
+}) {
   const { t } = useTranslation();
   const { setParameter } = useParameter();
   const navigate = useNavigate();
@@ -166,36 +318,70 @@ function MeasureCard({ parameter, preference, tankId, token, language, onHide })
   };
 
   return (
-    <article className="flex min-h-56 flex-col rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+    <article
+      className={`flex min-h-56 flex-col rounded-3xl border bg-white p-4 shadow-sm ${
+        editing ? "border-sea/40 ring-1 ring-sea/20" : "border-slate-200"
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <h2 className="text-sm font-semibold text-slate-700">
           {label}
           {parameter.sub_name ? <span className="font-medium text-slate-400"> ({parameter.sub_name})</span> : null}
         </h2>
-        <Menu>
-          <MenuButton className="rounded-lg px-2 py-1 text-slate-500 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea" aria-label={label}>
-            ···
-          </MenuButton>
-          <MenuItems anchor="bottom end" className="z-40 w-52 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg focus:outline-none">
-            <MenuItem>
-              <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/measures")}>
-                {t("measure.history")}
-              </button>
-            </MenuItem>
-            <MenuItem>
-              <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/chart")}>
-                {t("measure.chart")}
-              </button>
-            </MenuItem>
-            {preference ? (
+        {editing ? (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              disabled={busy || !canMoveUp}
+              onClick={onMoveUp}
+              aria-label={t("dashboard.move_up", { name: label })}
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              disabled={busy || !canMoveDown}
+              onClick={onMoveDown}
+              aria-label={t("dashboard.move_down", { name: label })}
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+            >
+              ↓
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onHide}
+              aria-label={t("dashboard.hide_action", { name: label })}
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:bg-rose-50 disabled:opacity-40"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <Menu>
+            <MenuButton className="rounded-lg px-2 py-1 text-slate-500 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea" aria-label={label}>
+              ···
+            </MenuButton>
+            <MenuItems anchor="bottom end" className="z-40 w-52 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg focus:outline-none">
+              <MenuItem>
+                <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/measures")}>
+                  {t("measure.history")}
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/chart")}>
+                  {t("measure.chart")}
+                </button>
+              </MenuItem>
               <MenuItem>
                 <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={onHide}>
                   {t("measure.hide")}
                 </button>
               </MenuItem>
-            ) : null}
-          </MenuItems>
-        </Menu>
+            </MenuItems>
+          </Menu>
+        )}
       </div>
       <div className="mt-4 flex-1">
         {state.loading ? (
@@ -222,24 +408,28 @@ function MeasureCard({ parameter, preference, tankId, token, language, onHide })
           </>
         )}
       </div>
-      <Popover key={formKey} className="relative mt-3">
-        <PopoverButton className="h-10 rounded-xl bg-cyan-50 px-3 text-sm font-semibold text-ink data-[hover]:bg-cyan-100">
-          {t("measure.add")}
-        </PopoverButton>
-        <PopoverPanel anchor="bottom start" className="z-40 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-          <AddReading
-            parameter={parameter}
-            tankId={tankId}
-            token={token}
-            onSaved={() => {
-              toast.push(t("measure.saved"), "success");
-              setFormKey((key) => key + 1);
-              load();
-            }}
-            onRefresh={load}
-          />
-        </PopoverPanel>
-      </Popover>
+      {!editing ? (
+        <Popover key={formKey} className="relative mt-3">
+          <PopoverButton className="h-10 rounded-xl bg-cyan-50 px-3 text-sm font-semibold text-ink data-[hover]:bg-cyan-100">
+            {t("measure.add")}
+          </PopoverButton>
+          <PopoverPanel anchor="bottom start" className="z-40 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+            <AddReading
+              parameter={parameter}
+              tankId={tankId}
+              token={token}
+              onSaved={() => {
+                toast.push(t("measure.saved"), "success");
+                setFormKey((key) => key + 1);
+                load();
+              }}
+              onRefresh={load}
+            />
+          </PopoverPanel>
+        </Popover>
+      ) : (
+        <p className="mt-3 text-xs text-slate-500">{t("dashboard.edit_card_hint")}</p>
+      )}
     </article>
   );
 }
