@@ -8,6 +8,7 @@ import { useToast } from "./context/ToastContext";
 import { ChartPage } from "./pages/ChartPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { GroupedMeasurePage } from "./pages/GroupedMeasurePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MeasuresPage } from "./pages/MeasuresPage";
 import { RecoverPasswordPage } from "./pages/RecoverPasswordPage";
@@ -51,6 +52,7 @@ export default function App() {
       <Route element={<RequireAuth />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/tanks/:manage?" element={<TanksPage />} />
+        <Route path="/measures/entry" element={<GroupedMeasurePage />} />
         <Route path="/measures" element={<MeasuresPage />} />
         <Route path="/chart" element={<ChartPage />} />
       </Route>

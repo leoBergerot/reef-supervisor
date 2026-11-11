@@ -212,6 +212,14 @@ export function DashboardPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {!editing && visible.length > 0 ? (
+            <Link
+              to="/measures/entry"
+              className="inline-flex h-11 items-center rounded-xl bg-ink px-4 text-sm font-semibold text-white transition hover:bg-[#12485c]"
+            >
+              {t("dashboard.batch_entry")}
+            </Link>
+          ) : null}
           <Link
             to="/tanks/manage"
             className="inline-flex h-11 items-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700"
@@ -617,6 +625,7 @@ function MeasureRow({
                   tankId={tankId}
                   token={token}
                   locale={locale}
+                  waterType={waterType}
                   lastValue={last?.value}
                   onSaved={() => {
                     toast.push(t("measure.saved"), "success");
@@ -663,7 +672,7 @@ function MeasureRow({
   );
 }
 
-function AddReading({ parameter, tankId, token, locale, lastValue, onSaved, onRefresh }) {
+function AddReading({ parameter, tankId, token, locale, waterType, lastValue, onSaved, onRefresh }) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const [failure, setFailure] = useState(null);
@@ -672,6 +681,7 @@ function AddReading({ parameter, tankId, token, locale, lastValue, onSaved, onRe
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -679,6 +689,13 @@ function AddReading({ parameter, tankId, token, locale, lastValue, onSaved, onRe
       createdAt: toDateTimeInput(new Date()),
     },
   });
+
+  const watchedValue = watch("value");
+  const range = resolveParameterRange(parameter.name, waterType, parameter.range ?? null);
+  const rangeState = parameter.need_value
+    ? evaluateRangeState(numericValue(watchedValue), range)
+    : null;
+  const colors = rangeStateClasses(rangeState);
 
   const onSubmit = handleSubmit(async (values) => {
     setFailure(null);
@@ -706,14 +723,22 @@ function AddReading({ parameter, tankId, token, locale, lastValue, onSaved, onRe
     <form className="grid gap-3" onSubmit={onSubmit} noValidate>
       {failure ? <Notice title={failure.code === "missing_endpoint" ? t("api.missing_title") : undefined}>{describeError(failure, t)}</Notice> : null}
       {parameter.need_value ? (
-        <TextField
-          label={t("measure.value")}
-          inputMode="decimal"
-          error={errors.value?.message}
-          {...register("value", {
-            validate: (value) => numericValue(value) !== null || t("measure.error_value"),
-          })}
-        />
+        <>
+          <TextField
+            label={t("measure.value")}
+            inputMode="decimal"
+            error={errors.value?.message}
+            {...register("value", {
+              validate: (value) => numericValue(value) !== null || t("measure.error_value"),
+            })}
+          />
+          {range ? (
+            <p className="text-[11px] text-slate-400">{t("measure.batch.range_hint", { min: range.min, max: range.max })}</p>
+          ) : null}
+          {rangeState && rangeState !== "ok" ? (
+            <p className={`text-xs ${colors.text}`}>{t("measure.batch.range_soft")}</p>
+          ) : null}
+        </>
       ) : (
         <p className="text-sm text-slate-500">{t("measure.no_value")}</p>
       )}
