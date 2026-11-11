@@ -3,6 +3,7 @@ import { Button, Field, Input, Label, Popover, PopoverButton, PopoverPanel } fro
 import { DayPicker } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import {
+  clampIsoDate,
   formatIsoDateForLocale,
   formatIsoDateTimeForLocale,
   isoDateToLocalDate,
@@ -12,6 +13,15 @@ import {
   parseLocaleDateTimeToIso,
   splitIsoDateTime,
 } from "../lib/format";
+
+function dayPickerDisabled(min, max) {
+  const before = min ? isoDateToLocalDate(min) : undefined;
+  const after = max ? isoDateToLocalDate(max) : undefined;
+  if (before && after) return { before, after };
+  if (before) return { before };
+  if (after) return { after };
+  return undefined;
+}
 
 const control =
   "h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-900 outline-none transition data-[focus]:border-sea data-[invalid]:border-rose-500";
@@ -35,10 +45,11 @@ export function TextField({ label, error, ref, ...props }) {
  * French UI: DD/MM/YYYY text + calendar popover. English keeps a native date input.
  */
 export const DateField = forwardRef(function DateField(
-  { label, error, locale = "fr", value = "", onChange, onBlur, name, ...props },
+  { label, error, locale = "fr", value = "", onChange, onBlur, name, min, max, ...props },
   ref,
 ) {
   const isFrench = !String(locale).startsWith("en");
+  const emit = (iso) => onChange?.(iso ? clampIsoDate(iso, min, max) : "");
 
   if (!isFrench) {
     return (
@@ -50,7 +61,9 @@ export const DateField = forwardRef(function DateField(
         lang="en"
         name={name}
         value={value}
-        onChange={(event) => onChange?.(event.target.value)}
+        min={min || undefined}
+        max={max || undefined}
+        onChange={(event) => emit(event.target.value)}
         onBlur={onBlur}
         {...props}
       />
@@ -64,7 +77,9 @@ export const DateField = forwardRef(function DateField(
       error={error}
       name={name}
       value={value}
-      onChange={onChange}
+      min={min}
+      max={max}
+      onChange={emit}
       onBlur={onBlur}
       {...props}
     />
@@ -72,20 +87,22 @@ export const DateField = forwardRef(function DateField(
 });
 
 const FrenchDateField = forwardRef(function FrenchDateField(
-  { label, error, name, value = "", onChange, onBlur, ...props },
+  { label, error, name, value = "", onChange, onBlur, min, max, ...props },
   ref,
 ) {
   const [text, setText] = useState(() => formatIsoDateForLocale(value, "fr"));
   const [focused, setFocused] = useState(false);
   const selected = isoDateToLocalDate(value);
+  const disabled = dayPickerDisabled(min, max);
 
   useEffect(() => {
     if (!focused) setText(formatIsoDateForLocale(value, "fr"));
   }, [value, focused]);
 
   const commitIso = (iso) => {
-    onChange?.(iso);
-    setText(formatIsoDateForLocale(iso, "fr"));
+    const next = iso ? clampIsoDate(iso, min, max) : "";
+    onChange?.(next);
+    setText(formatIsoDateForLocale(next, "fr"));
   };
 
   return (
@@ -113,14 +130,15 @@ const FrenchDateField = forwardRef(function FrenchDateField(
                 return;
               }
               const iso = parseLocaleDateToIso(next, "fr");
-              if (iso) onChange?.(iso);
+              if (iso) onChange?.(clampIsoDate(iso, min, max));
             }}
             onBlur={(event) => {
               setFocused(false);
               const iso = parseLocaleDateToIso(text, "fr");
               if (iso) {
-                setText(formatIsoDateForLocale(iso, "fr"));
-                onChange?.(iso);
+                const clamped = clampIsoDate(iso, min, max);
+                setText(formatIsoDateForLocale(clamped, "fr"));
+                onChange?.(clamped);
               } else if (!text.trim()) {
                 setText("");
                 onChange?.("");
@@ -149,6 +167,7 @@ const FrenchDateField = forwardRef(function FrenchDateField(
               locale={fr}
               selected={selected}
               defaultMonth={selected ?? new Date()}
+              disabled={disabled}
               onSelect={(date) => {
                 if (!date) {
                   commitIso("");
