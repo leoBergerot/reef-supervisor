@@ -92,16 +92,23 @@ export function listTankParameters(token, tankId) {
   return request(`/tanks/${tankId}/parameters`, { token });
 }
 
-/** PATCH /tanks/{id}/parameters — `{ parameters: [{ parameter_id, enabled }] }`. */
+/**
+ * PATCH /tanks/{id}/parameters —
+ * `{ parameters: [{ parameter_id, enabled, sort_order? }] }`.
+ */
 export function updateTankParameters(token, tankId, parameters) {
   return request(`/tanks/${tankId}/parameters`, {
     method: "PATCH",
     token,
     body: {
-      parameters: parameters.map((item) => ({
-        parameter_id: item.parameterId,
-        enabled: item.enabled,
-      })),
+      parameters: parameters.map((item) => {
+        const row = {
+          parameter_id: item.parameterId,
+          enabled: item.enabled,
+        };
+        if (item.sortOrder != null) row.sort_order = item.sortOrder;
+        return row;
+      }),
     },
   });
 }

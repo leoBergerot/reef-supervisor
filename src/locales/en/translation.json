@@ -105,8 +105,34 @@
       "custom_remove": "Remove",
       "custom_name_required": "Enter a parameter name",
       "custom_unit_required": "Enter a unit",
-      "custom_duplicate": "This custom parameter is already listed"
+      "custom_duplicate": "This custom parameter is already listed",
+      "custom_existing_title": "Your custom parameters",
+      "custom_existing_help": "Uncheck to hide them on the dashboard. History is kept.",
+      "parameters_button": "Parameters",
+      "parameters_edit_title": "Parameters — {{name}}",
+      "parameters_edit_hint": "Name and photo stay here. Open parameters to show, hide, or add tracked values.",
+      "parameters_save": "Save parameters",
+      "parameters_updated": "Parameters for {{name}} were updated.",
+      "water_type_immutable": "water type cannot be changed"
     }
+  },
+  "dashboard": {
+    "edit": "Edit",
+    "done": "Done",
+    "edit_help": "Reorder with the arrows, or remove a tile (history is kept).",
+    "view_help": "Add readings, or tap Edit to rearrange the dashboard.",
+    "edit_card_hint": "Use the arrows to reorder. × hides the tile.",
+    "manage_parameters": "Manage parameters",
+    "empty": "No parameters are enabled for this tank yet.",
+    "move_up": "Move {{name}} up",
+    "move_down": "Move {{name}} down",
+    "hide_action": "Hide {{name}}",
+    "hide_title": "Hide {{name}}?",
+    "hide_warning": "The tile leaves the dashboard. Readings stay available if you show it again.",
+    "hide_confirm": "Hide",
+    "hide_cancel": "Cancel",
+    "hidden": "{{name}} was hidden.",
+    "shown": "{{name}} is visible again."
   },
   "delete_modal": {
     "title": "Remove {{name}}?",
