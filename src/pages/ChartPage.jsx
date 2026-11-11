@@ -8,7 +8,7 @@ import { Notice, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
-import { endOfDay, monthAgoDate, numericValue, parameterLabel, startOfDay, toDateInput } from "../lib/format";
+import { endOfDay, monthAgoDate, numericValue, parameterLabel, parseApiDate, startOfDay, toDateInput } from "../lib/format";
 
 export function ChartPage() {
   const { t, i18n } = useTranslation();
@@ -49,8 +49,16 @@ export function ChartPage() {
       .then((measures) => {
         if (cancelled) return;
         const points = measures
-          .map((measure) => ({ date: new Date(measure.created_at), value: numericValue(measure.value) }))
-          .filter((point) => point.value !== null && !Number.isNaN(point.date.getTime()));
+          .map((measure) => {
+            const date = parseApiDate(measure.created_at);
+            if (Number.isNaN(date.getTime())) return null;
+            // Event-style parameters (no numeric value) still plot on the time axis.
+            if (parameter.need_value === false) return { date, value: 1 };
+            const value = numericValue(measure.value);
+            if (value === null) return null;
+            return { date, value };
+          })
+          .filter(Boolean);
         setState({ loading: false, points, error: null });
       })
       .catch((error) => {
@@ -92,7 +100,15 @@ export function ChartPage() {
         {state.loading ? <Spinner label={t("chart.loading")} /> : null}
         {state.error ? <Notice>{describeError(state.error, t)}</Notice> : null}
         {!state.loading && !state.error && !rangeError && state.points.length === 0 ? <Notice tone="empty">{t("chart.empty")}</Notice> : null}
-        {state.points.length > 0 ? <LineChart points={state.points} language={locale} unit={parameter.sub_name || ""} /> : null}
+        {state.points.length > 0 ? (
+          <LineChart
+            points={state.points}
+            language={locale}
+            unit={parameter.need_value === false ? "" : parameter.sub_name || ""}
+            domainStart={startOfDay(start)}
+            domainEnd={endOfDay(end)}
+          />
+        ) : null}
       </div>
     </section>
   );

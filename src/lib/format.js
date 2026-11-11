@@ -25,8 +25,18 @@ export function tokenExpiryMs(token) {
   }
 }
 
+/** Parse API timestamps. Naive ISO values are UTC wall-clock (see API UTCNaiveDateTime). */
+export function parseApiDate(value) {
+  if (value instanceof Date) return new Date(value.getTime());
+  if (value == null || value === "") return new Date(Number.NaN);
+  if (typeof value === "number") return new Date(value);
+  const raw = String(value).trim();
+  if (/[zZ]$/.test(raw) || /[+-]\d{2}:?\d{2}$/.test(raw)) return new Date(raw);
+  return new Date(`${raw}Z`);
+}
+
 export function formatDateTime(value, language) {
-  const date = value instanceof Date ? value : new Date(value);
+  const date = value instanceof Date ? value : parseApiDate(value);
   if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat(language === "fr" ? "fr-FR" : "en-GB", {
     day: "2-digit",
@@ -43,7 +53,8 @@ export function toDateInput(date) {
 }
 
 export function toDateTimeInput(date) {
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const absolute = date instanceof Date ? date : parseApiDate(date);
+  const local = new Date(absolute.getTime() - absolute.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
 }
 

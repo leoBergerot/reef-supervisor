@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
-import { formatDateTime, numericValue, parameterLabel, toDateTimeInput } from "../lib/format";
+import { formatDateTime, numericValue, parameterLabel, parseApiDate, toDateTimeInput } from "../lib/format";
 
 const PAGE_SIZE = 10;
 
@@ -181,7 +181,7 @@ function EditDialog({ measure, parameter, token, onClose, onSaved }) {
     if (!measure) return;
     reset({
       value: measure.value ?? "",
-      createdAt: toDateTimeInput(new Date(measure.created_at)),
+      createdAt: toDateTimeInput(parseApiDate(measure.created_at)),
     });
     setFailure(null);
   }, [measure, reset]);

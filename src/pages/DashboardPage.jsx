@@ -9,7 +9,9 @@ import {
   listMeasures,
   listParameters,
   listPreferences,
+  listTankParameters,
   updatePreference,
+  updateTankParameters,
 } from "../api/client";
 import { Notice, PrimaryButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
@@ -23,7 +25,13 @@ export function DashboardPage() {
   const { token, signOut } = useAuth();
   const { tankId } = useTankSelection();
   const navigate = useNavigate();
-  const [catalog, setCatalog] = useState({ loading: true, parameters: [], preferences: [], error: null });
+  const [catalog, setCatalog] = useState({
+    loading: true,
+    parameters: [],
+    preferences: [],
+    tankParameters: [],
+    error: null,
+  });
 
   useEffect(() => {
     if (!tankId) {
@@ -33,18 +41,33 @@ export function DashboardPage() {
 
   const load = () => {
     setCatalog((current) => ({ ...current, loading: true, error: null }));
-    Promise.all([listParameters(token), listPreferences(token)])
-      .then(([parameters, preferences]) => {
+    Promise.all([
+      listParameters(token),
+      listPreferences(token),
+      listTankParameters(token, tankId).catch((error) => {
+        if (error?.status === 401) throw error;
+        return null;
+      }),
+    ])
+      .then(([parameters, preferences, tankParameters]) => {
+        const all = Array.isArray(parameters) ? parameters : [];
+        // Prefer per-tank enabled parameters after water_type wiring; fall back to account prefs.
+        const fromTank = Array.isArray(tankParameters)
+          ? tankParameters
+              .filter((item) => item.enabled !== false && item.parameter)
+              .map((item) => item.parameter)
+          : null;
         setCatalog({
           loading: false,
-          parameters: Array.isArray(parameters) ? parameters : [],
+          parameters: fromTank ?? all,
           preferences: Array.isArray(preferences) ? preferences : [],
+          tankParameters: Array.isArray(tankParameters) ? tankParameters : [],
           error: null,
         });
       })
       .catch((error) => {
         if (error?.status === 401) signOut();
-        setCatalog({ loading: false, parameters: [], preferences: [], error });
+        setCatalog({ loading: false, parameters: [], preferences: [], tankParameters: [], error });
       });
   };
 
@@ -62,12 +85,27 @@ export function DashboardPage() {
   if (catalog.parameters.length === 0) return <Notice tone="empty">{t("catalog.empty")}</Notice>;
 
   const preferenceByParameter = new Map(catalog.preferences.map((item) => [item.parameter.id, item]));
-  const visible = catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled !== false);
-  const hidden = catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled === false);
+  const tankParameterById = new Map(catalog.tankParameters.map((item) => [item.parameter?.id, item]));
+  const useTankFilter = catalog.tankParameters.length > 0;
+  const visible = useTankFilter
+    ? catalog.parameters
+    : catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled !== false);
+  const hidden = useTankFilter
+    ? catalog.tankParameters
+        .filter((item) => item.enabled === false && item.parameter)
+        .map((item) => item.parameter)
+    : catalog.parameters.filter((parameter) => preferenceByParameter.get(parameter.id)?.enabled === false);
 
-  const setEnabled = async (preference, enabled) => {
+  const setEnabled = async (parameter, enabled) => {
     try {
-      await updatePreference(token, preference.id, enabled);
+      const tankParameter = tankParameterById.get(parameter.id);
+      if (tankParameter) {
+        await updateTankParameters(token, tankId, [{ parameterId: parameter.id, enabled }]);
+      } else {
+        const preference = preferenceByParameter.get(parameter.id);
+        if (!preference) return;
+        await updatePreference(token, preference.id, enabled);
+      }
       load();
     } catch (error) {
       if (error?.status === 401) signOut();
@@ -86,10 +124,7 @@ export function DashboardPage() {
             tankId={tankId}
             token={token}
             language={i18n.resolvedLanguage}
-            onHide={() => {
-              const preference = preferenceByParameter.get(parameter.id);
-              if (preference) setEnabled(preference, false);
-            }}
+            onHide={() => setEnabled(parameter, false)}
           />
         ))}
       </section>
@@ -99,7 +134,6 @@ export function DashboardPage() {
           <p className="mt-1 text-sm text-slate-500">{t("preferences.hidden_help")}</p>
           <ul className="mt-4 grid gap-3">
             {hidden.map((parameter) => {
-              const preference = preferenceByParameter.get(parameter.id);
               const label = parameterLabel(t, parameter.name);
               return (
                 <li key={parameter.id} className="flex items-center justify-between gap-3">
@@ -109,7 +143,7 @@ export function DashboardPage() {
                   </span>
                   <Switch
                     checked={false}
-                    onChange={() => preference && setEnabled(preference, true)}
+                    onChange={() => setEnabled(parameter, true)}
                     aria-label={t("preferences.show", { name: label })}
                     className="group inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition data-[checked]:bg-sea"
                   >
@@ -187,7 +221,7 @@ function MeasureCard({ parameter, preference, tankId, token, language, onHide })
                 {t("measure.chart")}
               </button>
             </MenuItem>
-            {preference ? (
+            {onHide ? (
               <MenuItem>
                 <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={onHide}>
                   {t("measure.hide")}
