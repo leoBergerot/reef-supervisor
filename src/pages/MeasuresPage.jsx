@@ -1,10 +1,10 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { deleteMeasure, describeError, listMeasures, setMeasureTimestamp, updateMeasure } from "../api/client";
-import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
+import { DateTimeField, Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
@@ -124,6 +124,7 @@ export function MeasuresPage() {
         measure={editing}
         parameter={parameter}
         token={token}
+        locale={locale}
         onClose={() => setEditing(null)}
         onSaved={() => {
           toast.push(t("measure.list.updated"), "success");
@@ -166,12 +167,13 @@ function RowActions({ onEdit, onDelete }) {
   );
 }
 
-function EditDialog({ measure, parameter, token, onClose, onSaved }) {
+function EditDialog({ measure, parameter, token, locale, onClose, onSaved }) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const [failure, setFailure] = useState(null);
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -230,11 +232,22 @@ function EditDialog({ measure, parameter, token, onClose, onSaved }) {
                 })}
               />
             )}
-            <TextField
-              label={t("measure.date")}
-              type="datetime-local"
-              error={errors.createdAt?.message}
-              {...register("createdAt", { required: t("measure.error_date") })}
+            <Controller
+              name="createdAt"
+              control={control}
+              rules={{ required: t("measure.error_date") }}
+              render={({ field }) => (
+                <DateTimeField
+                  label={t("measure.date")}
+                  locale={locale}
+                  error={errors.createdAt?.message}
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                />
+              )}
             />
             <div className="flex gap-2">
               <QuietButton type="button" onClick={onClose} className="flex-1">

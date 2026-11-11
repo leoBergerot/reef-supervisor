@@ -1,10 +1,18 @@
 @import "tailwindcss";
+@import "react-day-picker/style.css";
 
 @theme {
   --font-sans: "Avenir Next", "Segoe UI", ui-sans-serif, sans-serif;
   --color-ink: #0b3a4a;
   --color-sea: #13a1de;
   --color-sand: #f3f7f8;
+}
+
+.rdp-root {
+  --rdp-accent-color: var(--color-sea);
+  --rdp-accent-background-color: rgb(19 161 222 / 12%);
+  --rdp-today-color: var(--color-ink);
+  font-size: 0.875rem;
 }
 
 html,
