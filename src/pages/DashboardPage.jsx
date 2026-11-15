@@ -534,6 +534,7 @@ function MeasureCard({
               parameter={parameter}
               tankId={tankId}
               token={token}
+              lastValue={last?.value}
               onSaved={() => {
                 toast.push(t("measure.saved"), "success");
                 setFormKey((key) => key + 1);
@@ -550,17 +551,18 @@ function MeasureCard({
   );
 }
 
-function AddReading({ parameter, tankId, token, onSaved, onRefresh }) {
+function AddReading({ parameter, tankId, token, lastValue, onSaved, onRefresh }) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const [failure, setFailure] = useState(null);
+  const prefill = parameter.need_value ? numericValue(lastValue) : null;
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      value: "",
+      value: prefill === null ? "" : String(prefill),
       createdAt: toDateTimeInput(new Date()),
     },
   });
