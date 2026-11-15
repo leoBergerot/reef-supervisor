@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { describeError, listMeasuresInRange } from "../api/client";
 import { LineChart } from "../components/LineChart";
-import { Notice, Spinner, TextField } from "../components/ui";
+import { DateField, Notice, Spinner } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
@@ -19,7 +19,7 @@ export function ChartPage() {
   const [state, setState] = useState({ loading: false, points: [], error: null });
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en" : "fr";
   const {
-    register,
+    control,
     watch,
     formState: { errors },
   } = useForm({
@@ -80,8 +80,40 @@ export function ChartPage() {
     <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       <h1 className="text-2xl font-semibold text-ink">{t("chart.title", { name: label })}</h1>
       <form className="mt-4 grid gap-4 sm:grid-cols-2" noValidate>
-        <TextField label={t("chart.start")} type="date" error={errors.start?.message} {...register("start", { required: true })} />
-        <TextField label={t("chart.end")} type="date" error={errors.end?.message} {...register("end", { required: true })} />
+        <Controller
+          name="start"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <DateField
+              label={t("chart.start")}
+              locale={locale}
+              error={errors.start?.message}
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              ref={field.ref}
+            />
+          )}
+        />
+        <Controller
+          name="end"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <DateField
+              label={t("chart.end")}
+              locale={locale}
+              error={errors.end?.message}
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              ref={field.ref}
+            />
+          )}
+        />
       </form>
       {rangeError ? (
         <div className="mt-4">
