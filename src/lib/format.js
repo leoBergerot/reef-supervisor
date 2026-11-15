@@ -82,9 +82,72 @@ export function parseLocaleDateToIso(text, locale) {
   return "";
 }
 
+const ISO_DATE_TIME_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
+const FR_DATE_TIME_RE = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})[ T](\d{1,2}):(\d{2})$/;
+
 export function toDateTimeInput(date) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
+}
+
+/** Display an ISO YYYY-MM-DDTHH:mm value for the app locale (FR → DD/MM/YYYY HH:mm). */
+export function formatIsoDateTimeForLocale(value, locale) {
+  if (!value || !ISO_DATE_TIME_RE.test(value)) return "";
+  const [, year, month, day, hour, minute] = ISO_DATE_TIME_RE.exec(value);
+  if (!isValidIsoDate(`${year}-${month}-${day}`)) return "";
+  if (locale === "fr") return `${day}/${month}/${year} ${hour}:${minute}`;
+  return value;
+}
+
+/** Parse a locale-typed datetime back to ISO YYYY-MM-DDTHH:mm. */
+export function parseLocaleDateTimeToIso(text, locale) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return "";
+  if (ISO_DATE_TIME_RE.test(raw)) {
+    const [, year, month, day] = ISO_DATE_TIME_RE.exec(raw);
+    return isValidIsoDate(`${year}-${month}-${day}`) ? raw : "";
+  }
+  if (locale === "fr") {
+    const match = FR_DATE_TIME_RE.exec(raw);
+    if (!match) return "";
+    const day = match[1].padStart(2, "0");
+    const month = match[2].padStart(2, "0");
+    const year = match[3];
+    const hour = match[4].padStart(2, "0");
+    const minute = match[5];
+    const isoDate = `${year}-${month}-${day}`;
+    if (!isValidIsoDate(isoDate)) return "";
+    return `${isoDate}T${hour}:${minute}`;
+  }
+  return "";
+}
+
+/** Convert ISO YYYY-MM-DD to a local Date at midnight (or null). */
+export function isoDateToLocalDate(iso) {
+  if (!iso || !isValidIsoDate(iso)) return undefined;
+  const [, year, month, day] = ISO_DATE_RE.exec(iso);
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}
+
+/** Convert a Date to ISO YYYY-MM-DD in local time. */
+export function localDateToIsoDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  return toDateInput(date);
+}
+
+/** Split ISO YYYY-MM-DDTHH:mm into date + time parts. */
+export function splitIsoDateTime(value) {
+  if (!value || !ISO_DATE_TIME_RE.test(value)) return { date: "", time: "" };
+  const [, year, month, day, hour, minute] = ISO_DATE_TIME_RE.exec(value);
+  return { date: `${year}-${month}-${day}`, time: `${hour}:${minute}` };
+}
+
+/** Join ISO date + HH:mm into YYYY-MM-DDTHH:mm. */
+export function joinIsoDateTime(date, time) {
+  if (!date || !isValidIsoDate(date)) return "";
+  const match = /^(\d{2}):(\d{2})$/.exec(String(time ?? "").trim());
+  if (!match) return "";
+  return `${date}T${match[1]}:${match[2]}`;
 }
 
 export function startOfDay(value) {
