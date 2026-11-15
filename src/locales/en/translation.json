@@ -82,7 +82,30 @@
       "not_found": "This tank cannot be found",
       "image_extension": "Please select a png, gif, svg, jpeg or jpg image",
       "delete": "Remove",
-      "current_photo": "Current photo"
+      "current_photo": "Current photo",
+      "water_type": "Water type",
+      "water_type_required": "Choose a water type",
+      "water_type_seawater": "Seawater / reef",
+      "water_type_seawater_hint": "Corals, KH, Ca, Mg…",
+      "water_type_freshwater": "Freshwater",
+      "water_type_freshwater_hint": "Community, pH, KH, NO₂…",
+      "replace_defaults": "Replace the selection with {{type}} defaults?",
+      "parameters_title": "Tracked parameters",
+      "parameters_selected": "{{count}} selected",
+      "parameters_search": "Search parameters",
+      "parameters_empty": "No parameter matches",
+      "parameters_later": "You can add or hide more later. Hiding a parameter does not delete its history.",
+      "select_filtered": "Select all (filtered)",
+      "reset_defaults": "Reset defaults",
+      "custom_title": "Custom parameter",
+      "custom_help": "Add a parameter outside the catalog (name + unit).",
+      "custom_name": "Name",
+      "custom_unit": "Unit",
+      "custom_add": "Add",
+      "custom_remove": "Remove",
+      "custom_name_required": "Enter a parameter name",
+      "custom_unit_required": "Enter a unit",
+      "custom_duplicate": "This custom parameter is already listed"
     }
   },
   "delete_modal": {
@@ -173,6 +196,7 @@
     "Nitrite": "Nitrite",
     "Water change": "Water change",
     "Density": "Density",
+    "Salinity": "Salinity",
     "Silicate": "Silicate"
   }
 }

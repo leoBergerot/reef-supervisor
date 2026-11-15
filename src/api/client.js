@@ -61,12 +61,58 @@ export function listTanks(token) {
   return request("/tanks", { token });
 }
 
-export function createTank(token, name) {
-  return request("/tanks", { method: "POST", token, body: { name } });
+/**
+ * Create a tank (PR #6 / feat/tank-water-type-params):
+ * `{ name, water_type, enabled_parameter_ids?, custom_parameters? }`
+ * custom_parameters: `[{ name, unit }]` — unit required by the API.
+ */
+export function createTank(token, payload) {
+  const name = typeof payload === "string" ? payload : payload?.name;
+  const body = { name };
+  if (payload && typeof payload === "object") {
+    if (payload.waterType != null) body.water_type = payload.waterType;
+    if (payload.enabledParameterIds !== undefined) {
+      body.enabled_parameter_ids = payload.enabledParameterIds;
+    }
+    if (payload.customParameters?.length) {
+      body.custom_parameters = payload.customParameters.map((item) => ({
+        name: item.name,
+        unit: item.unit,
+      }));
+    }
+  }
+  return request("/tanks", { method: "POST", token, body });
 }
 
 export function updateTank(token, id, name) {
   return request(`/tanks/${id}`, { method: "PATCH", token, body: { name } });
+}
+
+export function listTankParameters(token, tankId) {
+  return request(`/tanks/${tankId}/parameters`, { token });
+}
+
+/** PATCH /tanks/{id}/parameters — `{ parameters: [{ parameter_id, enabled }] }`. */
+export function updateTankParameters(token, tankId, parameters) {
+  return request(`/tanks/${tankId}/parameters`, {
+    method: "PATCH",
+    token,
+    body: {
+      parameters: parameters.map((item) => ({
+        parameter_id: item.parameterId,
+        enabled: item.enabled,
+      })),
+    },
+  });
+}
+
+/** POST /tanks/{id}/parameters/custom — `{ name, unit }`. */
+export function createCustomTankParameter(token, tankId, { name, unit }) {
+  return request(`/tanks/${tankId}/parameters/custom`, {
+    method: "POST",
+    token,
+    body: { name, unit },
+  });
 }
 
 export function deleteTank(token, id) {
