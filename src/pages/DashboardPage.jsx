@@ -31,7 +31,7 @@ import {
   Switch,
 } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -41,7 +41,7 @@ import {
   listTankParameters,
   updateTankParameters,
 } from "../api/client";
-import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
+import { DateTimeField, Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useParameter } from "../context/ParameterContext";
 import { useTankSelection } from "../context/TankContext";
@@ -273,7 +273,7 @@ export function DashboardPage() {
         </section>
       )}
 
-      {hidden.length > 0 ? (
+      {editing && hidden.length > 0 ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-semibold text-ink">{t("preferences.hidden_title")}</h2>
           <p className="mt-1 text-sm text-slate-500">{t("preferences.hidden_help")}</p>
@@ -534,6 +534,7 @@ function MeasureCard({
               parameter={parameter}
               tankId={tankId}
               token={token}
+              locale={locale}
               lastValue={last?.value}
               onSaved={() => {
                 toast.push(t("measure.saved"), "success");
@@ -551,13 +552,14 @@ function MeasureCard({
   );
 }
 
-function AddReading({ parameter, tankId, token, lastValue, onSaved, onRefresh }) {
+function AddReading({ parameter, tankId, token, locale, lastValue, onSaved, onRefresh }) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const [failure, setFailure] = useState(null);
   const prefill = parameter.need_value ? numericValue(lastValue) : null;
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -604,11 +606,22 @@ function AddReading({ parameter, tankId, token, lastValue, onSaved, onRefresh })
       ) : (
         <p className="text-sm text-slate-500">{t("measure.no_value")}</p>
       )}
-      <TextField
-        label={t("measure.date")}
-        type="datetime-local"
-        error={errors.createdAt?.message}
-        {...register("createdAt", { required: t("measure.error_date") })}
+      <Controller
+        name="createdAt"
+        control={control}
+        rules={{ required: t("measure.error_date") }}
+        render={({ field }) => (
+          <DateTimeField
+            label={t("measure.date")}
+            locale={locale}
+            error={errors.createdAt?.message}
+            name={field.name}
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            ref={field.ref}
+          />
+        )}
       />
       <PrimaryButton type="submit" disabled={isSubmitting}>
         {t("measure.validate")}
