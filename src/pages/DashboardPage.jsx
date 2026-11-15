@@ -203,37 +203,41 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="grid gap-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-ink">{t("menu.dashboard")}</h1>
-          <p className="mt-1 text-sm text-slate-500">
+    <div className="grid gap-4 sm:gap-8">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold text-ink sm:text-2xl">{t("menu.dashboard")}</h1>
+          <p className="mt-0.5 text-xs text-slate-500 sm:mt-1 sm:text-sm">
             {editing ? t("dashboard.edit_help") : t("dashboard.view_help")}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {!editing && visible.length > 0 ? (
             <Link
               to="/measures/entry"
-              className="inline-flex h-11 items-center rounded-xl bg-ink px-4 text-sm font-semibold text-white transition hover:bg-[#12485c]"
+              className="inline-flex h-9 items-center rounded-xl bg-ink px-3 text-xs font-semibold text-white transition hover:bg-[#12485c] sm:h-11 sm:px-4 sm:text-sm"
             >
               {t("dashboard.batch_entry")}
             </Link>
           ) : null}
           <Link
             to="/tanks/manage"
-            className="inline-flex h-11 items-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700"
+            className="inline-flex h-9 items-center rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 sm:h-11 sm:px-4 sm:text-sm"
           >
             {t("dashboard.manage_parameters")}
           </Link>
-          <QuietButton
+          <button
             type="button"
             disabled={busy}
             onClick={() => setEditing((current) => !current)}
-            className={editing ? "border-sea bg-cyan-50 text-ink" : ""}
+            className={`inline-flex h-9 items-center rounded-xl border px-3 text-xs font-semibold transition disabled:opacity-50 sm:h-11 sm:px-4 sm:text-sm ${
+              editing
+                ? "border-sea bg-cyan-50 text-ink"
+                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
           >
             {editing ? t("dashboard.done") : t("dashboard.edit")}
-          </QuietButton>
+          </button>
         </div>
       </div>
 
@@ -432,7 +436,7 @@ function DragHandleIcon() {
 
 function Sparkline({ values, color }) {
   if (!values?.length) {
-    return <div className="mx-auto h-8 w-[5.5rem] rounded bg-slate-50" aria-hidden="true" />;
+    return <div className="h-6 w-14 shrink-0 rounded bg-slate-50 sm:mx-auto sm:h-8 sm:w-[5.5rem]" aria-hidden="true" />;
   }
   const width = 88;
   const height = 28;
@@ -449,7 +453,12 @@ function Sparkline({ values, color }) {
     .join(" ");
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="mx-auto h-8 w-[5.5rem]" aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      className="h-6 w-14 shrink-0 sm:mx-auto sm:h-8 sm:w-[5.5rem]"
+      aria-hidden="true"
+      preserveAspectRatio="none"
+    >
       <polyline fill="none" stroke={color} strokeWidth="1.75" strokeLinejoin="round" strokeLinecap="round" points={points} />
       {values.length === 1 ? (
         <circle cx={width / 2} cy={height / 2} r="2.5" fill={color} />
@@ -534,140 +543,147 @@ function MeasureRow({
 
   return (
     <div
-      className={`relative grid grid-cols-1 gap-2 px-3 py-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_5.5rem_minmax(0,0.9fr)_auto] sm:items-center sm:gap-3 sm:px-4 ${
+      className={`relative grid grid-cols-1 gap-1 px-2.5 py-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_5.5rem_minmax(0,0.9fr)_auto] sm:items-center sm:gap-3 sm:px-4 sm:py-3 ${
         editing ? "bg-cyan-50/40" : "bg-white"
       } ${overlay ? "rounded-xl" : ""}`}
     >
-      <span className={`absolute inset-y-2 left-0 w-1 rounded-r ${colors.bar}`} aria-hidden="true" />
+      <span className={`absolute inset-y-1.5 left-0 w-1 rounded-r sm:inset-y-2 ${colors.bar}`} aria-hidden="true" />
 
       <div className="min-w-0 pl-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="truncate text-sm font-semibold text-slate-800">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <h2 className="min-w-0 truncate text-[13px] font-semibold leading-tight text-slate-800 sm:text-sm">
             {label}
             {parameter.sub_name ? <span className="font-medium text-slate-400"> ({parameter.sub_name})</span> : null}
           </h2>
           {rangeState ? (
-            <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${colors.badge}`}>
+            <span className={`shrink-0 rounded-md px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide sm:px-1.5 sm:text-[10px] ${colors.badge}`}>
               {t(`dashboard.range_${rangeState}`)}
             </span>
           ) : null}
         </div>
         {!overlay && last ? (
-          <p className="mt-0.5 truncate text-xs text-slate-500">{formatDateTime(last.created_at, locale)}</p>
+          <p className="mt-0.5 truncate text-[10px] leading-tight text-slate-500 sm:text-xs">{formatDateTime(last.created_at, locale)}</p>
         ) : null}
       </div>
 
-      <div className="pl-2 sm:pl-0">
-        {overlay ? (
-          <p className="text-sm text-slate-500">{t("dashboard.dragging")}</p>
-        ) : state.loading ? (
-          <div className="h-7 w-24 animate-pulse rounded-lg bg-slate-100" />
-        ) : state.error ? (
-          <p className="text-xs text-rose-600">{describeError(state.error, t)}</p>
-        ) : (
-          <p className={`text-lg font-semibold tracking-tight tabular-nums ${colors.text}`}>
-            {shown === null ? t("measure.empty_value") : shown}
-            {parameter.sub_name ? <span className="ml-1 text-xs font-medium text-slate-400">{parameter.sub_name}</span> : null}
-          </p>
-        )}
-      </div>
+      {/* Mobile: value + sparkline + delta + actions on one dense row; desktop flattens into the parent grid. */}
+      <div className="grid grid-cols-[minmax(0,auto)_minmax(2.5rem,1fr)_minmax(0,auto)_auto] items-center gap-1.5 overflow-hidden pl-2 sm:contents">
+        <div className="min-w-0">
+          {overlay ? (
+            <p className="text-xs text-slate-500 sm:text-sm">{t("dashboard.dragging")}</p>
+          ) : state.loading ? (
+            <div className="h-6 w-16 animate-pulse rounded-md bg-slate-100 sm:h-7 sm:w-24 sm:rounded-lg" />
+          ) : state.error ? (
+            <p className="truncate text-[10px] text-rose-600 sm:text-xs">{describeError(state.error, t)}</p>
+          ) : (
+            <p className={`truncate text-base font-semibold tracking-tight tabular-nums leading-none sm:text-lg ${colors.text}`}>
+              {shown === null ? t("measure.empty_value") : shown}
+              {parameter.sub_name ? <span className="ml-1 text-[10px] font-medium text-slate-400 sm:text-xs">{parameter.sub_name}</span> : null}
+            </p>
+          )}
+        </div>
 
-      <div className="hidden sm:block">
-        {overlay || state.loading || state.error ? null : <Sparkline values={sparkValues} color={colors.spark} />}
-      </div>
+        <div className="flex min-w-0 items-center justify-center overflow-hidden">
+          {overlay || state.loading || state.error ? (
+            <div className="h-6 w-14 shrink-0 rounded bg-slate-50 sm:mx-auto sm:h-8 sm:w-[5.5rem]" aria-hidden="true" />
+          ) : (
+            <Sparkline values={sparkValues} color={colors.spark} />
+          )}
+        </div>
 
-      <div className="pl-2 text-sm sm:pl-0">
-        {overlay || state.loading || state.error ? null : delta ? (
-          <p className={`font-medium tabular-nums ${delta.up ? "text-emerald-600" : "text-rose-600"}`}>
-            {delta.up ? "+" : ""}
-            {delta.delta}
-            {parameter.sub_name ? ` ${parameter.sub_name}` : ""}
-          </p>
-        ) : last && previous ? (
-          <p className="text-xs text-slate-400">{t("measure.delta_unavailable")}</p>
-        ) : (
-          <p className="text-xs text-slate-400">—</p>
-        )}
-      </div>
+        <div className="min-w-0 text-[11px] sm:text-sm">
+          {overlay || state.loading || state.error ? null : delta ? (
+            <p className={`truncate font-medium tabular-nums ${delta.up ? "text-emerald-600" : "text-rose-600"}`}>
+              {delta.up ? "+" : ""}
+              {delta.delta}
+              <span className="hidden sm:inline">{parameter.sub_name ? ` ${parameter.sub_name}` : ""}</span>
+            </p>
+          ) : last && previous ? (
+            <p className="truncate text-[10px] text-slate-400 sm:text-xs">{t("measure.delta_unavailable")}</p>
+          ) : (
+            <p className="text-[10px] text-slate-400 sm:text-xs">—</p>
+          )}
+        </div>
 
-      <div className="flex items-center justify-end gap-1 pl-2 sm:pl-0">
-        {editing ? (
-          <>
-            <button
-              type="button"
-              disabled={busy && !overlay}
-              aria-label={t("dashboard.drag_handle", { name: label })}
-              className="inline-flex size-9 touch-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 cursor-grab active:cursor-grabbing"
-              {...handleProps}
-            >
-              <DragHandleIcon />
-            </button>
-            {!overlay ? (
+        <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
+          {editing ? (
+            <>
               <button
                 type="button"
-                disabled={busy}
-                onClick={onHide}
-                aria-label={t("dashboard.hide_action", { name: label })}
-                className="inline-flex size-9 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:bg-rose-50 disabled:opacity-40"
+                disabled={busy && !overlay}
+                aria-label={t("dashboard.drag_handle", { name: label })}
+                className="inline-flex size-8 touch-none items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 cursor-grab active:cursor-grabbing sm:size-9"
+                {...handleProps}
               >
-                ×
+                <DragHandleIcon />
               </button>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <Popover key={formKey} className="relative">
-              <PopoverButton className="h-9 rounded-lg bg-cyan-50 px-2.5 text-xs font-semibold text-ink data-[hover]:bg-cyan-100">
-                {t("measure.add")}
-              </PopoverButton>
-              <PopoverPanel anchor="bottom end" className="z-40 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-                <AddReading
-                  parameter={parameter}
-                  tankId={tankId}
-                  token={token}
-                  locale={locale}
-                  waterType={waterType}
-                  lastValue={last?.value}
-                  onSaved={() => {
-                    toast.push(t("measure.saved"), "success");
-                    setFormKey((key) => key + 1);
-                    load();
-                  }}
-                  onRefresh={load}
-                />
-              </PopoverPanel>
-            </Popover>
-            <Menu>
-              <MenuButton
-                className="inline-flex size-9 items-center justify-center rounded-lg text-slate-500 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea"
-                aria-label={label}
-              >
-                ···
-              </MenuButton>
-              <MenuItems anchor="bottom end" className="z-40 w-52 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg focus:outline-none">
-                <MenuItem>
-                  <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/measures")}>
-                    {t("measure.history")}
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/chart")}>
-                    {t("measure.chart")}
-                  </button>
-                </MenuItem>
-                <MenuItem>
-                  <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={onHide}>
-                    {t("measure.hide")}
-                  </button>
-                </MenuItem>
-              </MenuItems>
-            </Menu>
-          </>
-        )}
+              {!overlay ? (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={onHide}
+                  aria-label={t("dashboard.hide_action", { name: label })}
+                  className="inline-flex size-8 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:bg-rose-50 disabled:opacity-40 sm:size-9"
+                >
+                  ×
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Popover key={formKey} className="relative">
+                <PopoverButton className="h-8 rounded-lg bg-cyan-50 px-2 text-[11px] font-semibold text-ink data-[hover]:bg-cyan-100 sm:h-9 sm:px-2.5 sm:text-xs">
+                  {t("measure.add")}
+                </PopoverButton>
+                <PopoverPanel anchor="bottom end" className="z-40 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+                  <AddReading
+                    parameter={parameter}
+                    tankId={tankId}
+                    token={token}
+                    locale={locale}
+                    waterType={waterType}
+                    lastValue={last?.value}
+                    onSaved={() => {
+                      toast.push(t("measure.saved"), "success");
+                      setFormKey((key) => key + 1);
+                      load();
+                    }}
+                    onRefresh={load}
+                  />
+                </PopoverPanel>
+              </Popover>
+              <Menu>
+                <MenuButton
+                  className="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea sm:size-9"
+                  aria-label={label}
+                >
+                  ···
+                </MenuButton>
+                <MenuItems anchor="bottom end" className="z-40 w-52 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg focus:outline-none">
+                  <MenuItem>
+                    <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/measures")}>
+                      {t("measure.history")}
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={() => open("/chart")}>
+                      {t("measure.chart")}
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button type="button" className="block w-full rounded-lg px-3 py-2 text-left data-[focus]:bg-cyan-50" onClick={onHide}>
+                      {t("measure.hide")}
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
+            </>
+          )}
+        </div>
       </div>
 
       {editing && !overlay ? (
-        <p className="col-span-full pl-2 text-xs text-slate-500 sm:hidden">{t("dashboard.edit_row_hint")}</p>
+        <p className="pl-2 text-[10px] text-slate-500 sm:hidden">{t("dashboard.edit_row_hint")}</p>
       ) : null}
     </div>
   );
