@@ -192,7 +192,7 @@ export function formatDelta(last, previous) {
   const current = numericValue(last);
   const before = numericValue(previous);
   if (current === null || before === null) return null;
-  const delta = Math.round((current - before) * 100) / 100;
+  const delta = Math.round((current - before) * 10000) / 10000;
   const percent = before !== 0 ? Math.round((delta / before) * 10000) / 100 : null;
   return { delta, percent, up: delta >= 0 };
 }

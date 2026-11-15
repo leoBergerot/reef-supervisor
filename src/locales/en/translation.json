@@ -174,9 +174,9 @@
     "timestamp_rejected": "The date can be set this way only for a parameter without a value",
     "batch": {
       "title": "Grouped entry",
-      "help": "One shared date for every enabled parameter. Edit values, uncheck what you skip, then save.",
-      "shared_date": "Session date and time",
-      "shared_date_help": "Applied to every reading saved in this pass.",
+      "help": "One date for every parameter. Value on the right, uncheck what you skip, then save.",
+      "shared_date": "Date and time",
+      "shared_date_help": "Applied to every reading in this pass.",
       "select_all": "Select all",
       "select_none": "Select none",
       "selected": "{{count}} selected",
