@@ -42,6 +42,46 @@ export function toDateInput(date) {
   return local.toISOString().slice(0, 10);
 }
 
+const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+const FR_DATE_RE = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/;
+
+function isValidIsoDate(iso) {
+  const match = ISO_DATE_RE.exec(iso);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+/** Display an ISO YYYY-MM-DD value for the app locale (FR → DD/MM/YYYY). */
+export function formatIsoDateForLocale(iso, locale) {
+  if (!iso || !isValidIsoDate(iso)) return "";
+  if (locale === "fr") {
+    const [, year, month, day] = ISO_DATE_RE.exec(iso);
+    return `${day}/${month}/${year}`;
+  }
+  return iso;
+}
+
+/** Parse a locale-typed date back to ISO YYYY-MM-DD (empty string if invalid). */
+export function parseLocaleDateToIso(text, locale) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return "";
+  if (ISO_DATE_RE.test(raw)) return isValidIsoDate(raw) ? raw : "";
+  if (locale === "fr") {
+    const match = FR_DATE_RE.exec(raw);
+    if (!match) return "";
+    const day = match[1].padStart(2, "0");
+    const month = match[2].padStart(2, "0");
+    const year = match[3];
+    const iso = `${year}-${month}-${day}`;
+    return isValidIsoDate(iso) ? iso : "";
+  }
+  return "";
+}
+
 export function toDateTimeInput(date) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
