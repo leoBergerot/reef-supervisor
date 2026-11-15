@@ -208,8 +208,9 @@ export function listMeasures(token, { page = 1, parameterId, tankId } = {}) {
   return request(`/measures?${query}`, { token });
 }
 
+/** Keep up to 4 decimal places (salinity density e.g. 1.024). */
 function roundValue(value) {
-  return Math.round(Number(value) * 100) / 100;
+  return Math.round(Number(value) * 10000) / 10000;
 }
 
 export async function createMeasure(token, { parameterId, tankId, value, createdAt }) {

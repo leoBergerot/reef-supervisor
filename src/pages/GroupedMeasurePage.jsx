@@ -232,11 +232,11 @@ export function GroupedMeasurePage() {
   }
 
   return (
-    <section className="grid gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="grid gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-semibold text-ink">{t("measure.batch.title")}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t("measure.batch.help")}</p>
+          <h1 className="text-xl font-semibold text-ink sm:text-2xl">{t("measure.batch.title")}</h1>
+          <p className="mt-0.5 text-sm text-slate-500">{t("measure.batch.help")}</p>
         </div>
         <Link to="/" className="text-sm font-semibold text-ink underline-offset-4 hover:underline">
           {t("back_home")}
@@ -251,8 +251,8 @@ export function GroupedMeasurePage() {
           </Link>
         </Notice>
       ) : (
-        <form className="grid gap-5" onSubmit={onSubmit} noValidate>
-          <div className="sticky top-[4.25rem] z-20 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur">
+        <form className="grid gap-3" onSubmit={onSubmit} noValidate>
+          <div className="sticky top-[4.25rem] z-20 rounded-xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur sm:px-4">
             <DateTimeField
               label={t("measure.batch.shared_date")}
               locale={locale}
@@ -264,12 +264,11 @@ export function GroupedMeasurePage() {
                 setDateError(null);
               }}
             />
-            <p className="mt-2 text-xs text-slate-500">{t("measure.batch.shared_date_help")}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <QuietButton type="button" className="h-9 px-3 text-xs" onClick={() => setAllIncluded(true)}>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <QuietButton type="button" className="h-8 px-2.5 text-xs" onClick={() => setAllIncluded(true)}>
                 {t("measure.batch.select_all")}
               </QuietButton>
-              <QuietButton type="button" className="h-9 px-3 text-xs" onClick={() => setAllIncluded(false)}>
+              <QuietButton type="button" className="h-8 px-2.5 text-xs" onClick={() => setAllIncluded(false)}>
                 {t("measure.batch.select_none")}
               </QuietButton>
               <p className="text-xs text-slate-500">{t("measure.batch.selected", { count: selectedCount })}</p>
@@ -282,7 +281,7 @@ export function GroupedMeasurePage() {
             </Notice>
           ) : null}
 
-          <ul className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <ul className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             {catalog.rows.map((row, index) => (
               <GroupedRow
                 key={row.parameter.id}
@@ -309,7 +308,7 @@ export function GroupedMeasurePage() {
             ))}
           </ul>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="sticky bottom-3 z-20 flex gap-2 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur">
             <QuietButton type="button" onClick={() => navigate("/")} className="flex-1 sm:flex-none">
               {t("measure.cancel")}
             </QuietButton>
@@ -327,24 +326,45 @@ function GroupedRow({ row, waterType, included, value, error, inputRef, onToggle
   const { t } = useTranslation();
   const parameter = row.parameter;
   const label = parameterLabel(t, parameter.name);
+  const unit = parameter.sub_name || "";
   const needsValue = parameter.need_value !== false;
   const parsed = needsValue ? numericValue(value) : null;
   const range = resolveParameterRange(parameter.name, waterType, parameter.range ?? null);
   const rangeState = needsValue && included ? evaluateRangeState(parsed, range) : null;
   const colors = rangeStateClasses(rangeState);
   const inputId = `batch-value-${parameter.id}`;
+  const warn = rangeState === "soft_warn" || rangeState === "strong_warn";
+  const titleHint = [
+    range && needsValue ? t("measure.batch.range_hint", { min: range.min, max: range.max }) : null,
+    warn ? t("measure.batch.range_soft") : null,
+    error || null,
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
+  const borderTone = error
+    ? "border-rose-500"
+    : rangeState === "strong_warn"
+      ? "border-rose-400"
+      : rangeState === "soft_warn"
+        ? "border-amber-400"
+        : rangeState === "ok"
+          ? "border-emerald-400"
+          : "border-slate-200";
 
   return (
     <li
-      className={`relative grid gap-2 border-t border-slate-100 px-3 py-3 first:border-t-0 sm:grid-cols-[auto_minmax(0,1.3fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-3 sm:px-4 ${
+      className={`relative flex min-h-[3.25rem] items-center gap-2 border-t border-slate-100 px-2 py-1.5 first:border-t-0 sm:gap-3 sm:px-3 ${
         included ? "bg-white" : "bg-slate-50/70"
       }`}
+      title={titleHint || undefined}
     >
-      {rangeState ? (
-        <span className={`absolute inset-y-2 left-0 w-1 rounded-r ${colors.bar}`} aria-hidden="true" />
-      ) : null}
+      <span
+        className={`absolute inset-y-1.5 left-0 w-1 rounded-r ${rangeState ? colors.bar : "bg-transparent"}`}
+        aria-hidden="true"
+      />
 
-      <label className="flex items-center gap-2 pl-2 sm:pl-1">
+      <label className="flex shrink-0 items-center pl-2">
         <input
           type="checkbox"
           className="size-4 rounded border-slate-300 text-sea focus:ring-sea"
@@ -354,21 +374,14 @@ function GroupedRow({ row, waterType, included, value, error, inputRef, onToggle
         />
       </label>
 
-      <div className="min-w-0 pl-2 sm:pl-0">
-        <label htmlFor={needsValue ? inputId : undefined} className="block text-sm font-semibold text-slate-800">
-          {label}
-          {parameter.sub_name ? <span className="font-medium text-slate-400"> ({parameter.sub_name})</span> : null}
-        </label>
-        {range && needsValue ? (
-          <p className="mt-0.5 text-[11px] text-slate-400">
-            {t("measure.batch.range_hint", { min: range.min, max: range.max })}
-          </p>
-        ) : null}
-      </div>
+      <label htmlFor={needsValue ? inputId : undefined} className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+        {label}
+        {unit ? <span className="ml-1 font-normal text-slate-400">{unit}</span> : null}
+      </label>
 
-      <div className="pl-2 sm:pl-0">
+      <div className="w-[7.5rem] shrink-0 sm:w-[9rem]">
         {needsValue ? (
-          <div className="grid gap-1">
+          <>
             <input
               ref={inputRef}
               id={inputId}
@@ -377,34 +390,21 @@ function GroupedRow({ row, waterType, included, value, error, inputRef, onToggle
               autoComplete="off"
               value={value}
               disabled={!included}
-              onChange={(event) => onValueChange(event.target.value)}
-              className={`h-11 w-full rounded-xl border bg-white px-3 text-slate-900 outline-none transition disabled:bg-slate-100 disabled:text-slate-400 data-[focus]:border-sea ${
-                error ? "border-rose-500" : "border-slate-200"
-              }`}
+              title={titleHint || undefined}
               aria-invalid={Boolean(error)}
+              aria-describedby={error ? `${inputId}-error` : undefined}
+              onChange={(event) => onValueChange(event.target.value)}
+              className={`h-11 w-full rounded-lg border bg-white px-2.5 text-right text-base tabular-nums text-slate-900 outline-none transition disabled:bg-slate-100 disabled:text-slate-400 data-[focus]:border-sea sm:h-12 sm:px-3 sm:text-lg ${borderTone}`}
             />
             {error ? (
-              <p className="text-sm text-rose-600" role="alert">
+              <span id={`${inputId}-error`} className="sr-only" role="alert">
                 {error}
-              </p>
+              </span>
             ) : null}
-          </div>
+          </>
         ) : (
-          <p className="text-sm text-slate-500">{t("measure.no_value")}</p>
+          <p className="text-right text-xs text-slate-400">{t("measure.no_value")}</p>
         )}
-      </div>
-
-      <div className="pl-2 sm:justify-self-end sm:pl-0">
-        {rangeState ? (
-          <span className={`inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${colors.badge}`}>
-            {t(`dashboard.range_${rangeState}`)}
-          </span>
-        ) : (
-          <span className="text-xs text-slate-300">—</span>
-        )}
-        {rangeState && rangeState !== "ok" ? (
-          <p className={`mt-1 text-[11px] ${colors.text}`}>{t("measure.batch.range_soft")}</p>
-        ) : null}
       </div>
     </li>
   );
