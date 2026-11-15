@@ -1,0 +1,99 @@
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { describeError, listMeasuresInRange } from "../api/client";
+import { LineChart } from "../components/LineChart";
+import { Notice, Spinner, TextField } from "../components/ui";
+import { useAuth } from "../context/AuthContext";
+import { useParameter } from "../context/ParameterContext";
+import { useTankSelection } from "../context/TankContext";
+import { endOfDay, monthAgoDate, numericValue, parameterLabel, startOfDay, toDateInput } from "../lib/format";
+
+export function ChartPage() {
+  const { t, i18n } = useTranslation();
+  const { token, signOut } = useAuth();
+  const { tankId } = useTankSelection();
+  const { parameter } = useParameter();
+  const navigate = useNavigate();
+  const [state, setState] = useState({ loading: false, points: [], error: null });
+  const locale = i18n.resolvedLanguage?.startsWith("en") ? "en" : "fr";
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      start: toDateInput(monthAgoDate()),
+      end: toDateInput(new Date()),
+    },
+  });
+  const start = watch("start");
+  const end = watch("end");
+  const rangeError = start && end && startOfDay(start) > endOfDay(end);
+
+  useEffect(() => {
+    if (!tankId) navigate("/tanks", { replace: true });
+  }, [tankId, navigate]);
+
+  useEffect(() => {
+    if (!parameter || !tankId || !start || !end || rangeError) return undefined;
+    let cancelled = false;
+    setState({ loading: true, points: [], error: null });
+    listMeasuresInRange(token, {
+      tankId,
+      parameterId: parameter.id,
+      start: startOfDay(start),
+      end: endOfDay(end),
+    })
+      .then((measures) => {
+        if (cancelled) return;
+        const points = measures
+          .map((measure) => ({ date: new Date(measure.created_at), value: numericValue(measure.value) }))
+          .filter((point) => point.value !== null && !Number.isNaN(point.date.getTime()));
+        setState({ loading: false, points, error: null });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        if (error?.status === 401) signOut();
+        setState({ loading: false, points: [], error });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, tankId, parameter, start, end, rangeError, signOut]);
+
+  if (!parameter) {
+    return (
+      <div className="grid gap-4">
+        <Notice tone="empty">{t("chart.empty")}</Notice>
+        <Link to="/" className="text-sm font-semibold text-ink underline-offset-4 hover:underline">
+          {t("back_home")}
+        </Link>
+      </div>
+    );
+  }
+
+  const label = parameterLabel(t, parameter.name);
+
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <h1 className="text-2xl font-semibold text-ink">{t("chart.title", { name: label })}</h1>
+      <form className="mt-4 grid gap-4 sm:grid-cols-2" noValidate>
+        <TextField label={t("chart.start")} type="date" error={errors.start?.message} {...register("start", { required: true })} />
+        <TextField label={t("chart.end")} type="date" error={errors.end?.message} {...register("end", { required: true })} />
+      </form>
+      {rangeError ? (
+        <div className="mt-4">
+          <Notice>{t("chart.range_error")}</Notice>
+        </div>
+      ) : null}
+      <div className="mt-4">
+        {state.loading ? <Spinner label={t("chart.loading")} /> : null}
+        {state.error ? <Notice>{describeError(state.error, t)}</Notice> : null}
+        {!state.loading && !state.error && !rangeError && state.points.length === 0 ? <Notice tone="empty">{t("chart.empty")}</Notice> : null}
+        {state.points.length > 0 ? <LineChart points={state.points} language={locale} unit={parameter.sub_name || ""} /> : null}
+      </div>
+    </section>
+  );
+}

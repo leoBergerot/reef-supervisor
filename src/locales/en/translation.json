@@ -1,196 +1,178 @@
 {
-  "language": {
-    "en": "English",
-    "fr": "French"
-  },
+  "language": { "en": "English", "fr": "French" },
+  "brand": "Reef Supervisor",
   "login": {
     "sign_in": "Sign in",
     "email": "Email",
     "password": "Password",
     "sign_in_button": "Sign in",
-    "first_visit": "First time on Reef Supervisor ?",
+    "first_visit": "First time on Reef Supervisor?",
     "sign_up": "Sign up",
-    "forgotten_password": "Forgotten password ?",
-    "reset_password": "Reset password.",
-    "enable": "Your account was successfully enabled",
-    "error": {
-      "no_email": "Please enter an email address",
-      "no_password": "Please enter your password",
-      "404": "There is no account for this email",
-      "403": "Your password is incorrect."
-    }
-  },
-  "recaptcha": {
-    "terms": {
-      "first": "This page is protected by Google reCAPTCHA to ensure that you are not a robot.",
-      "link": "Terms of usage",
-      "second": "of Google"
-    }
+    "forgotten_password": "Forgot password",
+    "invalid": "Incorrect email or password.",
+    "enable_pending": "Account activation",
+    "token": "Activation token",
+    "activate": "Activate account",
+    "activated": "Account {{email}} is activated. You can sign in.",
+    "token_required": "Please enter the activation token"
   },
   "register": {
-    "error": {
-      "password": {
-        "no": "Please enter a password",
-        "short": "Must be at least 6 characters long",
-        "alphanumeric_only": "The password must contain at least a lowercase character, an uppercase one a number and a special character",
-        "alphanumeric": " and must contain at least a lowercase character, an uppercase one a number and a special character"
-      },
-      "first_name": "Please enter your first name",
-      "last_name": "Please enter your last name",
-      "email": {
-        "no": "Please enter your email",
-        "valid": "Please enter a valid email"
-      },
-      "email_already_register": "Email is already used. Choose another, or use the forgotten password link"
-    },
+    "title": "Register",
     "first_name": "First name",
     "last_name": "Last name",
     "email": "Email",
     "password": "Password",
-    "title": "Register",
     "button": "Register",
-    "success": "{{first_name}} {{last_name}}, an email was sent to {{email}} to validate your account, (check also your junk box)"
+    "account_created": "{{first_name}} {{last_name}}, the account {{email}} is created.",
+    "token_help": "No email is sent. Activate the account with this token.",
+    "activate": "Activate account",
+    "activated": "Account {{email}} is activated. You can sign in.",
+    "open_activation": "Open the activation screen",
+    "has_account": "Already have an account?",
+    "error": {
+      "first_name": "Please enter your first name",
+      "last_name": "Please enter your last name",
+      "email": "Please enter a valid email",
+      "password_short": "Must be at least 6 alphanumeric characters",
+      "password_alphanumeric": "Please enter an alphanumeric password",
+      "email_already_register": "This email is already used"
+    }
   },
   "forgot_password": {
     "title": "Forgot password",
-    "subtitle": "We will send you instructions on how to reset your password by email.",
-    "success": "An email has been sent to {{email}}, (check also your junk box)",
-    "error": {
-      "email_unlink": "This email {{email}} is not linked to any account",
-      "no_email": "Please enter an email address"
-    },
+    "subtitle": "No email is sent. The reset token is shown here.",
     "email": "Email",
-    "button": "Send me an email"
+    "button": "Send reset instructions",
+    "error_email": "Please enter an email address",
+    "unknown": "This email is not linked to an account",
+    "issued": "Token for {{email}}",
+    "open": "Choose a new password"
   },
   "recover": {
-    "success": "{{first_name}} {{last_name}}, your password was changed",
     "title": "Reset your password",
-    "password": "Password",
+    "password": "New password",
     "button": "Update",
-    "error": {
-      "password": {
-        "no": "Please enter your password",
-        "short": "Must be at least 6 characters long",
-        "alphanumeric_only": "The password must contain at least a lowercase character, an uppercase one a number and a special character",
-        "alphanumeric": " and alphanumeric /** @TODO same as login **/"
-      },
-      "403": "This link is expired"
-    }
+    "error_password": "At least 6 characters, with a lowercase letter, an uppercase letter, a number and a special character",
+    "updated": "The password for {{email}} was updated.",
+    "invalid": "This token is not valid."
   },
   "tanks": {
-    "choice": "Choose a tank :",
-    "create": "Create your first tank to continue :",
-    "manage": "Manage tanks :",
-    "add": "Add tank",
-    "finish": "Finish",
+    "choice": "Choose a tank",
+    "create": "Create your first tank to continue.",
+    "manage": "Manage your tanks",
+    "add": "Add a tank",
+    "finish": "Done",
+    "empty": "No tank yet.",
+    "photo": "Photo",
+    "photo_pick": "Choose an image",
+    "photo_hint": "png, gif, svg, jpeg, jpg",
+    "select": "Open {{name}}",
     "form": {
       "cancel": "Cancel",
-      "inputs": {
-        "name": "Name"
-      },
-      "edit": {
-        "success": "Tank : {{name}} was successfully updated",
-        "title": "Update tank",
-        "button": "Save"
-      },
-      "create": {
-        "success": "Tank : {{name}} was successfully created",
-        "title": "Add tank",
-        "button": "Create"
-      },
-      "error": {
-        "name": {
-          "no": "Please enter a name"
-        },
-        "image": {
-          "extension": "Pleaze select image whith one of this extension : (png, gif, svg, jpeg, jpg)"
-        }
-      },
-      "deleted": "Tank {{name}} has been deleted",
+      "name": "Name",
+      "edit_title": "Update tank",
+      "edit_button": "Save",
+      "create_title": "Add a tank",
+      "create_button": "Create",
+      "created": "Tank {{name}} was created.",
+      "updated": "Tank {{name}} was updated.",
+      "deleted": "Tank {{name}} was removed.",
+      "name_required": "Please enter a name",
+      "file_too_large": "The image is larger than 5 MB",
+      "not_found": "This tank cannot be found",
+      "image_extension": "Please select a png, gif, svg, jpeg or jpg image",
       "delete": "Remove",
-      "deleted_name": "tank {{name}}"
+      "current_photo": "Current photo"
     }
   },
   "delete_modal": {
-    "title": "Do you want to remove tank {{name}} ?",
-    "warning": "This action is not reversible and removed all linked elements.",
-    "delete": "Yes",
+    "title": "Remove {{name}}?",
+    "warning": "This action cannot be undone and removes everything linked to it.",
+    "delete": "Yes, remove",
     "cancel": "No"
   },
   "menu": {
     "manage": "Manage tanks",
-    "logout": "Logout"
+    "logout": "Log out",
+    "dashboard": "Dashboard",
+    "tank": "Tank"
   },
   "measure": {
-    "add": "Add {{name}} parameter value",
-    "menu": {
-      "aria": "Menu {{name}} parameter",
-      "title": "Values : {{name}}",
-      "edit": "Edit",
-      "show_chart": "Show chart"
-    },
-    "error": {
-      "value": "Please enter a correct value",
-      "date": "Please enter a correct date"
-    },
-    "inputs": {
-      "value": "{{name}} value",
-      "date": "Date"
-    },
-    "cancel": "Cancel saved {{name}} parameter",
-    "validate": "Validate {{name}} parameter value",
-    "parameter": {
-      "Calcium": "Calcium",
-      "Water hardness": "Water hardness",
-      "Magnesium": "Magnesium",
-      "Temperature": "Temperature",
-      "Power of hydrogen": "Power of hydrogen",
-      "Phosphate": "Phosphate",
-      "Nitrate": "Nitrate",
-      "Nitrite": "Nitrite",
-      "Water change": "Water change",
-      "Density": "Density",
-      "Silicate": "Silicate"
-    },
+    "add": "Add a value",
+    "hide": "Hide this parameter",
+    "history": "History",
+    "chart": "Chart",
+    "value": "Value",
+    "date": "Date",
+    "cancel": "Cancel",
+    "validate": "Save",
+    "no_value": "No numeric value",
+    "delta_unavailable": "Delta unavailable",
+    "empty_value": "—",
+    "error_value": "Please enter a valid value",
+    "error_date": "Please enter a valid date",
+    "saved": "Reading saved",
+    "timestamp_rejected": "The date can be set this way only for a parameter without a value",
     "list": {
-      "header": {
-        "created_at": "Created at",
-        "value": "Value",
-        "actions": "Actions"
-      },
-      "action": {
-        "edit": "Edit",
-        "remove": "Delete",
-        "save": "Save",
-        "cancel": "Cancel"
-      },
-      "form": {
-        "error": {
-          "value": "Please enter a correct value"
-        },
-        "success": "Updated successful"
-      },
-      "toolbar": {
-        "title": "List {{name}} values"
-      },
-      "delete": {
-        "success": "Measure at {{createdAt}} has been deleted",
-        "name": "value at {{createdAt}}"
-      },
-      "row_per_page": "Values per page"
+      "title": "History: {{name}}",
+      "created_at": "Date",
+      "value": "Value",
+      "actions": "Actions",
+      "edit": "Edit",
+      "remove": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "updated": "Update saved",
+      "deleted": "Reading from {{createdAt}} was deleted",
+      "empty": "No readings for this parameter.",
+      "newest": "Newest first",
+      "page": "Page {{page}} / {{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "per_page": "{{count}} values per page"
     }
   },
-  "chart": {
-    "title": "Chart values : {{name}}"
+  "preferences": {
+    "hidden_title": "Hidden parameters",
+    "hidden_help": "Turn a parameter back on to see it on the dashboard.",
+    "show": "Show {{name}}"
   },
-  "date_picker_range": {
-    "start_date": "Start Date",
-    "end_date": "End date"
+  "chart": {
+    "title": "Chart: {{name}}",
+    "start": "Start date",
+    "end": "End date",
+    "empty": "No readings in this range.",
+    "range_error": "The start date must be before the end date.",
+    "loading": "Loading chart"
+  },
+  "catalog": {
+    "empty": "The parameter catalog is empty.",
+    "error": "The catalog could not be loaded."
+  },
+  "api": {
+    "missing_title": "Action unavailable",
+    "missing_body": "The call {{name}} has no API endpoint. Nothing was changed."
   },
   "error": {
-    "no_network": "No internet",
-    "500": "An error has happened",
-    "unauthorized": "Please, sign in",
-    "expired_session": "Your session has expired. Please sign-in again"
+    "no_network": "Cannot reach the API",
+    "500": "Something went wrong",
+    "unauthorized": "Please sign in again",
+    "expired_session": "Your session has expired. Please sign in again"
+  },
+  "loading": "Loading",
+  "back_home": "Back to the dashboard",
+  "parameter": {
+    "Calcium": "Calcium",
+    "Alkalinity": "Alkalinity",
+    "Water hardness": "Water hardness",
+    "Magnesium": "Magnesium",
+    "Temperature": "Temperature",
+    "Power of hydrogen": "Power of hydrogen",
+    "Phosphate": "Phosphate",
+    "Nitrate": "Nitrate",
+    "Nitrite": "Nitrite",
+    "Water change": "Water change",
+    "Density": "Density",
+    "Silicate": "Silicate"
   }
 }
