@@ -1,5 +1,4 @@
 import {
-  Checkbox,
   Dialog,
   DialogBackdrop,
   DialogPanel,
@@ -9,26 +8,30 @@ import {
   Radio,
   RadioGroup,
 } from "@headlessui/react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+  createCustomTankParameter,
   createTank,
   deleteTank,
   describeError,
   fetchTankPhoto,
   listParameters,
+  listTankParameters,
   listTanks,
   updateTank,
+  updateTankParameters,
   uploadTankPhoto,
 } from "../api/client";
+import { TankParameterPicker } from "../components/TankParameterPicker";
 import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
-import { imageExtensionOk, parameterLabel } from "../lib/format";
-import { parameterMatchesQuery, presetParameterIds } from "../lib/tankPresets";
+import { imageExtensionOk } from "../lib/format";
+import { presetParameterIds } from "../lib/tankPresets";
 
 export function TanksPage() {
   const { t } = useTranslation();
@@ -40,6 +43,7 @@ export function TanksPage() {
   const toast = useToast();
   const [tanks, setTanks] = useState({ loading: true, data: [], error: null });
   const [editor, setEditor] = useState(null);
+  const [parametersEditor, setParametersEditor] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
 
   useEffect(() => {
@@ -100,11 +104,19 @@ export function TanksPage() {
             <button type="button" onClick={() => choose(tank)} className="block w-full text-left" aria-label={t("tanks.select", { name: tank.name })}>
               <TankPhoto token={token} tank={tank} />
               <span className="block px-4 py-3 text-lg font-semibold text-slate-800">{tank.name}</span>
+              {tank.water_type ? (
+                <span className="block px-4 pb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {t(`tanks.form.water_type_${tank.water_type}`)}
+                </span>
+              ) : null}
             </button>
             {managing ? (
-              <div className="flex gap-2 px-4 pb-4">
+              <div className="flex flex-wrap gap-2 px-4 pb-4">
                 <QuietButton type="button" onClick={() => setEditor({ mode: "edit", tank })}>
                   {t("tanks.form.edit_button")}
+                </QuietButton>
+                <QuietButton type="button" onClick={() => setParametersEditor(tank)}>
+                  {t("tanks.form.parameters_button")}
                 </QuietButton>
                 <QuietButton type="button" onClick={() => setPendingDelete(tank)}>
                   {t("tanks.form.delete")}
@@ -118,12 +130,25 @@ export function TanksPage() {
         editor={editor}
         token={token}
         onClose={() => setEditor(null)}
+        onOpenParameters={(tank) => {
+          setEditor(null);
+          setParametersEditor(tank);
+        }}
         onCreated={(name) => {
           toast.push(t("tanks.form.created", { name }), "success");
           touchTanks();
         }}
         onUpdated={(name) => {
           toast.push(t("tanks.form.updated", { name }), "success");
+          touchTanks();
+        }}
+      />
+      <TankParametersDialog
+        tank={parametersEditor}
+        token={token}
+        onClose={() => setParametersEditor(null)}
+        onSaved={(name) => {
+          toast.push(t("tanks.form.parameters_updated", { name }), "success");
           touchTanks();
         }}
       />
@@ -172,7 +197,54 @@ function TankPhoto({ token, tank, className = "h-36 w-full bg-cyan-50 object-con
   return <img src={src || "/tank-placeholder.svg"} alt="" className={className} />;
 }
 
-function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
+function usePendingCustoms() {
+  const { t } = useTranslation();
+  const [customParameters, setCustomParameters] = useState([]);
+  const [customDraft, setCustomDraft] = useState({ name: "", unit: "" });
+  const [customError, setCustomError] = useState("");
+
+  const resetCustoms = () => {
+    setCustomParameters([]);
+    setCustomDraft({ name: "", unit: "" });
+    setCustomError("");
+  };
+
+  const addCustomParameter = (extraNames = []) => {
+    const name = customDraft.name.trim();
+    const unit = customDraft.unit.trim();
+    if (!name) {
+      setCustomError(t("tanks.form.custom_name_required"));
+      return false;
+    }
+    if (!unit) {
+      setCustomError(t("tanks.form.custom_unit_required"));
+      return false;
+    }
+    const duplicatePending = customParameters.some((item) => item.name.toLowerCase() === name.toLowerCase());
+    const duplicateExtra = extraNames.some((value) => String(value).toLowerCase() === name.toLowerCase());
+    if (duplicatePending || duplicateExtra) {
+      setCustomError(t("tanks.form.custom_duplicate"));
+      return false;
+    }
+    setCustomParameters((current) => [...current, { key: `${name}-${Date.now()}`, name, unit }]);
+    setCustomDraft({ name: "", unit: "" });
+    setCustomError("");
+    return true;
+  };
+
+  return {
+    customParameters,
+    setCustomParameters,
+    customDraft,
+    setCustomDraft,
+    customError,
+    setCustomError,
+    resetCustoms,
+    addCustomParameter,
+  };
+}
+
+function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParameters }) {
   const { t } = useTranslation();
   const open = Boolean(editor);
   const editing = editor?.mode === "edit";
@@ -183,11 +255,15 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
   const [catalog, setCatalog] = useState({ loading: false, parameters: [], error: null });
   const [paramQuery, setParamQuery] = useState("");
   const [paramsDirty, setParamsDirty] = useState(false);
-  const [customParameters, setCustomParameters] = useState([]);
-  const [customDraft, setCustomDraft] = useState({ name: "", unit: "" });
-  const [customError, setCustomError] = useState("");
-  const customNameId = useId();
-  const customUnitId = useId();
+  const {
+    customParameters,
+    setCustomParameters,
+    customDraft,
+    setCustomDraft,
+    customError,
+    resetCustoms,
+    addCustomParameter,
+  } = usePendingCustoms();
   const {
     register,
     handleSubmit,
@@ -220,9 +296,7 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
     setFailures([]);
     setParamQuery("");
     setParamsDirty(false);
-    setCustomParameters([]);
-    setCustomDraft({ name: "", unit: "" });
-    setCustomError("");
+    resetCustoms();
     setCatalog({ loading: !editing, parameters: [], error: null });
   }, [open, editor, editing, reset]);
 
@@ -287,27 +361,6 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
     setParamsDirty(true);
   };
 
-  const addCustomParameter = () => {
-    const name = customDraft.name.trim();
-    const unit = customDraft.unit.trim();
-    if (!name) {
-      setCustomError(t("tanks.form.custom_name_required"));
-      return;
-    }
-    if (!unit) {
-      setCustomError(t("tanks.form.custom_unit_required"));
-      return;
-    }
-    const duplicate = customParameters.some((item) => item.name.toLowerCase() === name.toLowerCase());
-    if (duplicate) {
-      setCustomError(t("tanks.form.custom_duplicate"));
-      return;
-    }
-    setCustomParameters((current) => [...current, { key: `${name}-${Date.now()}`, name, unit }]);
-    setCustomDraft({ name: "", unit: "" });
-    setCustomError("");
-  };
-
   const onFile = (event) => {
     const next = event.target.files?.[0];
     if (!next) return;
@@ -366,10 +419,6 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
     }
   });
 
-  const filteredParameters = catalog.parameters.filter((parameter) =>
-    parameterMatchesQuery(parameter, paramQuery, parameterLabel(t, parameter.name)),
-  );
-
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <DialogBackdrop className="fixed inset-0 bg-slate-900/40" />
@@ -408,6 +457,11 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
                   ) : null}
                   <input type="hidden" {...register("waterType", { required: t("tanks.form.water_type_required") })} />
                 </Field>
+              ) : editor?.tank?.water_type ? (
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium text-slate-700">{t("tanks.form.water_type")}: </span>
+                  {t(`tanks.form.water_type_${editor.tank.water_type}`)}
+                </p>
               ) : null}
 
               <TextField
@@ -437,123 +491,35 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
               )}
 
               {!editing ? (
-                <div className="grid gap-3 rounded-2xl border border-slate-200 p-3">
-                  <div className="flex flex-wrap items-end justify-between gap-2">
-                    <div>
-                      <h3 className="text-sm font-semibold text-ink">{t("tanks.form.parameters_title")}</h3>
-                      <p className="mt-0.5 text-xs text-slate-500">{t("tanks.form.parameters_selected", { count: parameterIds.length })}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <QuietButton type="button" className="h-9 px-3 text-xs" onClick={() => selectFiltered(filteredParameters.map((item) => item.id), true)}>
-                        {t("tanks.form.select_filtered")}
-                      </QuietButton>
-                      <QuietButton type="button" className="h-9 px-3 text-xs" onClick={() => applyDefaults(waterType, true)}>
-                        {t("tanks.form.reset_defaults")}
-                      </QuietButton>
-                    </div>
-                  </div>
-
-                  <label className="grid gap-1.5">
-                    <span className="sr-only">{t("tanks.form.parameters_search")}</span>
-                    <input
-                      type="search"
-                      value={paramQuery}
-                      onChange={(event) => setParamQuery(event.target.value)}
-                      placeholder={t("tanks.form.parameters_search")}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-900 outline-none transition focus:border-sea"
-                    />
-                  </label>
-
-                  {catalog.loading ? <Spinner label={t("loading")} /> : null}
-                  {catalog.error ? <Notice>{describeError(catalog.error, t)}</Notice> : null}
-
-                  {!catalog.loading && !catalog.error ? (
-                    <ul className="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/70 p-2">
-                      {filteredParameters.length === 0 ? (
-                        <li className="px-2 py-3 text-sm text-slate-500">{t("tanks.form.parameters_empty")}</li>
-                      ) : (
-                        filteredParameters.map((parameter) => {
-                          const label = parameterLabel(t, parameter.name);
-                          const checked = parameterIds.includes(parameter.id);
-                          return (
-                            <li key={parameter.id}>
-                              <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-white">
-                                <Checkbox
-                                  checked={checked}
-                                  onChange={(value) => toggleParameter(parameter.id, value)}
-                                  className="group flex size-5 shrink-0 items-center justify-center rounded border border-slate-300 bg-white data-[checked]:border-sea data-[checked]:bg-sea"
-                                >
-                                  <svg viewBox="0 0 14 14" fill="none" className="size-3 stroke-white opacity-0 group-data-[checked]:opacity-100">
-                                    <path d="M3 7.5 5.5 10 11 4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                  </svg>
-                                </Checkbox>
-                                <span className="text-sm font-medium text-slate-800">
-                                  {label}
-                                  {parameter.sub_name ? <span className="font-normal text-slate-400"> ({parameter.sub_name})</span> : null}
-                                </span>
-                              </label>
-                            </li>
-                          );
-                        })
-                      )}
-                    </ul>
-                  ) : null}
-
-                  <p className="text-xs text-slate-500">{t("tanks.form.parameters_later")}</p>
-
-                  <div className="grid gap-2 border-t border-slate-100 pt-3">
-                    <h4 className="text-sm font-semibold text-ink">{t("tanks.form.custom_title")}</h4>
-                    <p className="text-xs text-slate-500">{t("tanks.form.custom_help")}</p>
-                    <div className="grid gap-2 sm:grid-cols-[1fr_8rem_auto]">
-                      <label className="grid gap-1" htmlFor={customNameId}>
-                        <span className="text-xs font-medium text-slate-600">{t("tanks.form.custom_name")}</span>
-                        <input
-                          id={customNameId}
-                          value={customDraft.name}
-                          onChange={(event) => setCustomDraft((current) => ({ ...current, name: event.target.value }))}
-                          className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-900 outline-none focus:border-sea"
-                        />
-                      </label>
-                      <label className="grid gap-1" htmlFor={customUnitId}>
-                        <span className="text-xs font-medium text-slate-600">{t("tanks.form.custom_unit")}</span>
-                        <input
-                          id={customUnitId}
-                          value={customDraft.unit}
-                          onChange={(event) => setCustomDraft((current) => ({ ...current, unit: event.target.value }))}
-                          className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-900 outline-none focus:border-sea"
-                        />
-                      </label>
-                      <QuietButton type="button" onClick={addCustomParameter} className="sm:mt-5">
-                        {t("tanks.form.custom_add")}
-                      </QuietButton>
-                    </div>
-                    {customError ? (
-                      <p className="text-sm text-rose-600" role="alert">
-                        {customError}
-                      </p>
-                    ) : null}
-                    {customParameters.length > 0 ? (
-                      <ul className="grid gap-2">
-                        {customParameters.map((item) => (
-                          <li key={item.key} className="flex items-center justify-between gap-2 rounded-xl bg-cyan-50 px-3 py-2 text-sm">
-                            <span className="font-medium text-ink">
-                              {item.name}
-                              {item.unit ? <span className="font-normal text-slate-500"> ({item.unit})</span> : null}
-                            </span>
-                            <button
-                              type="button"
-                              className="text-xs font-semibold text-rose-700"
-                              onClick={() => setCustomParameters((current) => current.filter((entry) => entry.key !== item.key))}
-                            >
-                              {t("tanks.form.custom_remove")}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
+                <TankParameterPicker
+                  catalog={catalog.parameters}
+                  catalogLoading={catalog.loading}
+                  catalogError={catalog.error}
+                  parameterIds={parameterIds}
+                  onToggleParameter={toggleParameter}
+                  onSelectFiltered={selectFiltered}
+                  onResetDefaults={() => applyDefaults(waterType, true)}
+                  paramQuery={paramQuery}
+                  onParamQueryChange={setParamQuery}
+                  pendingCustoms={customParameters}
+                  onAddPendingCustom={() => addCustomParameter()}
+                  onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
+                  customDraft={customDraft}
+                  onCustomDraftChange={setCustomDraft}
+                  customError={customError}
+                />
+              ) : (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-3 py-3">
+                  <p className="text-sm text-slate-600">{t("tanks.form.parameters_edit_hint")}</p>
+                  <QuietButton
+                    type="button"
+                    className="mt-3"
+                    onClick={() => onOpenParameters(editor.tank)}
+                  >
+                    {t("tanks.form.parameters_button")}
+                  </QuietButton>
                 </div>
-              ) : null}
+              )}
 
               <div className="flex gap-2">
                 <QuietButton type="button" onClick={onClose} className="flex-1">
@@ -564,6 +530,194 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated }) {
                 </PrimaryButton>
               </div>
             </form>
+          </div>
+        </DialogPanel>
+      </div>
+    </Dialog>
+  );
+}
+
+function TankParametersDialog({ tank, token, onClose, onSaved }) {
+  const { t } = useTranslation();
+  const open = Boolean(tank);
+  const [failures, setFailures] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [catalog, setCatalog] = useState([]);
+  const [parameterIds, setParameterIds] = useState([]);
+  const [linkedCustoms, setLinkedCustoms] = useState([]);
+  const [paramQuery, setParamQuery] = useState("");
+  const [baseline, setBaseline] = useState({ catalogEnabled: [], customs: [] });
+  const {
+    customParameters,
+    setCustomParameters,
+    customDraft,
+    setCustomDraft,
+    customError,
+    resetCustoms,
+    addCustomParameter,
+  } = usePendingCustoms();
+
+  useEffect(() => {
+    if (!open || !token || !tank) return undefined;
+    let cancelled = false;
+    setFailures([]);
+    setParamQuery("");
+    resetCustoms();
+    setLoading(true);
+    Promise.all([listParameters(token), listTankParameters(token, tank.id)])
+      .then(([parameters, tankParameters]) => {
+        if (cancelled) return;
+        const catalogList = Array.isArray(parameters) ? parameters : [];
+        const rows = Array.isArray(tankParameters) ? tankParameters : [];
+        const linkedCatalogIds = rows.filter((row) => !row.is_custom).map((row) => row.parameter.id);
+        const enabledCatalog = rows
+          .filter((row) => !row.is_custom && row.enabled)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
+          .map((row) => row.parameter.id);
+        const customs = rows
+          .filter((row) => row.is_custom)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
+          .map((row) => ({
+            parameterId: row.parameter.id,
+            name: row.parameter.name,
+            unit: row.parameter.sub_name,
+            enabled: row.enabled,
+            sortOrder: row.sort_order ?? 0,
+          }));
+        setCatalog(catalogList);
+        setParameterIds(enabledCatalog);
+        setLinkedCustoms(customs);
+        setBaseline({ linkedCatalogIds, customs });
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setCatalog([]);
+        setParameterIds([]);
+        setLinkedCustoms([]);
+        setFailures([error]);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, token, tank]);
+
+  const toggleParameter = (id, checked) => {
+    setParameterIds((current) => (checked ? [...new Set([...current, id])] : current.filter((value) => value !== id)));
+  };
+
+  const selectFiltered = (ids, checked) => {
+    setParameterIds((current) => {
+      const next = new Set(current);
+      ids.forEach((id) => {
+        if (checked) next.add(id);
+        else next.delete(id);
+      });
+      return [...next];
+    });
+  };
+
+  const applyDefaults = () => {
+    const type = tank?.water_type || "seawater";
+    setParameterIds(presetParameterIds(catalog, type));
+  };
+
+  const onSave = async () => {
+    setSaving(true);
+    setFailures([]);
+    try {
+      const enabledOrder = [
+        ...parameterIds,
+        ...linkedCustoms.filter((item) => item.enabled).map((item) => item.parameterId),
+      ];
+      const catalogIds = new Set([...(baseline.linkedCatalogIds || []), ...parameterIds]);
+      const catalogPatch = [...catalogIds].map((parameterId) => ({
+        parameterId,
+        enabled: parameterIds.includes(parameterId),
+        sortOrder: enabledOrder.includes(parameterId)
+          ? enabledOrder.indexOf(parameterId)
+          : enabledOrder.length + parameterId,
+      }));
+      const customPatch = linkedCustoms.map((item) => ({
+        parameterId: item.parameterId,
+        enabled: item.enabled,
+        sortOrder: enabledOrder.includes(item.parameterId)
+          ? enabledOrder.indexOf(item.parameterId)
+          : enabledOrder.length + item.parameterId,
+      }));
+      const patch = [...catalogPatch, ...customPatch];
+      if (patch.length > 0) {
+        await updateTankParameters(token, tank.id, patch);
+      }
+      for (const item of customParameters) {
+        await createCustomTankParameter(token, tank.id, { name: item.name, unit: item.unit });
+      }
+      onSaved(tank.name);
+      onClose();
+    } catch (error) {
+      setFailures([error]);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} className="relative z-50">
+      <DialogBackdrop className="fixed inset-0 bg-slate-900/40" />
+      <div className="fixed inset-0 flex items-end justify-center p-4 sm:items-center">
+        <DialogPanel className="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl">
+          <div className="overflow-y-auto p-5">
+            <DialogTitle className="text-lg font-semibold text-ink">
+              {t("tanks.form.parameters_edit_title", { name: tank?.name })}
+            </DialogTitle>
+            {tank?.water_type ? (
+              <p className="mt-1 text-sm text-slate-500">
+                {t(`tanks.form.water_type_${tank.water_type}`)} — {t("tanks.form.water_type_immutable")}
+              </p>
+            ) : null}
+
+            <div className="mt-4 grid gap-4">
+              {failures.map((error) => (
+                <Notice key={error.functionName || error.message}>{describeError(error, t)}</Notice>
+              ))}
+              {loading ? <Spinner label={t("loading")} /> : null}
+              {!loading ? (
+                <TankParameterPicker
+                  catalog={catalog}
+                  parameterIds={parameterIds}
+                  onToggleParameter={toggleParameter}
+                  onSelectFiltered={selectFiltered}
+                  onResetDefaults={applyDefaults}
+                  paramQuery={paramQuery}
+                  onParamQueryChange={setParamQuery}
+                  pendingCustoms={customParameters}
+                  onAddPendingCustom={() =>
+                    addCustomParameter(linkedCustoms.map((item) => item.name).concat(customParameters.map((item) => item.name)))
+                  }
+                  onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
+                  customDraft={customDraft}
+                  onCustomDraftChange={setCustomDraft}
+                  customError={customError}
+                  linkedCustoms={linkedCustoms}
+                  onToggleLinkedCustom={(parameterId, enabled) => {
+                    setLinkedCustoms((current) =>
+                      current.map((item) => (item.parameterId === parameterId ? { ...item, enabled } : item)),
+                    );
+                  }}
+                  laterHint
+                />
+              ) : null}
+              <div className="flex gap-2">
+                <QuietButton type="button" onClick={onClose} className="flex-1" disabled={saving}>
+                  {t("tanks.form.cancel")}
+                </QuietButton>
+                <PrimaryButton type="button" onClick={onSave} disabled={saving || loading} className="flex-1">
+                  {t("tanks.form.parameters_save")}
+                </PrimaryButton>
+              </div>
+            </div>
           </div>
         </DialogPanel>
       </div>

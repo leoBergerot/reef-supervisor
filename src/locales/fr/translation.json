@@ -105,8 +105,34 @@
       "custom_remove": "Retirer",
       "custom_name_required": "Indiquez un nom de paramètre",
       "custom_unit_required": "Indiquez une unité",
-      "custom_duplicate": "Ce paramètre personnalisé est déjà dans la liste"
+      "custom_duplicate": "Ce paramètre personnalisé est déjà dans la liste",
+      "custom_existing_title": "Vos paramètres personnalisés",
+      "custom_existing_help": "Décochez pour les masquer sur le tableau de bord. L'historique est conservé.",
+      "parameters_button": "Paramètres",
+      "parameters_edit_title": "Paramètres — {{name}}",
+      "parameters_edit_hint": "Nom et photo restent ici. Ouvrez les paramètres pour afficher, masquer ou en ajouter.",
+      "parameters_save": "Enregistrer les paramètres",
+      "parameters_updated": "Les paramètres de {{name}} ont été mis à jour.",
+      "water_type_immutable": "le type d'eau ne peut pas être modifié"
     }
+  },
+  "dashboard": {
+    "edit": "Modifier",
+    "done": "Terminé",
+    "edit_help": "Réordonnez avec les flèches, ou retirez une tuile (l'historique est conservé).",
+    "view_help": "Ajoutez des mesures, ou touchez Modifier pour réorganiser le tableau de bord.",
+    "edit_card_hint": "Utilisez les flèches pour réordonner. × masque la tuile.",
+    "manage_parameters": "Gérer les paramètres",
+    "empty": "Aucun paramètre n'est activé pour cet aquarium.",
+    "move_up": "Monter {{name}}",
+    "move_down": "Descendre {{name}}",
+    "hide_action": "Masquer {{name}}",
+    "hide_title": "Masquer {{name}} ?",
+    "hide_warning": "La tuile quitte le tableau de bord. Les mesures restent disponibles si vous la réaffichez.",
+    "hide_confirm": "Masquer",
+    "hide_cancel": "Annuler",
+    "hidden": "{{name}} a été masqué.",
+    "shown": "{{name}} est de nouveau visible."
   },
   "delete_modal": {
     "title": "Supprimer {{name}} ?",
