@@ -176,8 +176,17 @@ export function setMeasureTimestamp(token, id, createdAt) {
   });
 }
 
-export function listParameters(token) {
-  return request("/parameters", { token });
+export function listParameters(token, { waterType } = {}) {
+  const query = new URLSearchParams();
+  if (waterType) query.set("water_type", waterType);
+  const suffix = query.toString() ? `?${query}` : "";
+  return request(`/parameters${suffix}`, { token });
+}
+
+/** GET /parameters/ranges?water_type= — default min/max bands (display warnings only). */
+export function listParameterRanges(token, waterType = "seawater") {
+  const query = new URLSearchParams({ water_type: waterType === "freshwater" ? "freshwater" : "seawater" });
+  return request(`/parameters/ranges?${query}`, { token });
 }
 
 export function listPreferences(token) {
