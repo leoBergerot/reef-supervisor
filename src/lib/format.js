@@ -135,6 +135,19 @@ export function localDateToIsoDate(date) {
   return toDateInput(date);
 }
 
+/** Clamp an ISO YYYY-MM-DD value to optional inclusive min/max bounds. */
+export function clampIsoDate(iso, min, max) {
+  if (!iso || !isValidIsoDate(iso)) return iso || "";
+  if (min && isValidIsoDate(min) && iso < min) return min;
+  if (max && isValidIsoDate(max) && iso > max) return max;
+  return iso;
+}
+
+/** Today's calendar date as ISO YYYY-MM-DD in local time. */
+export function todayIsoDate() {
+  return toDateInput(new Date());
+}
+
 /** Split ISO YYYY-MM-DDTHH:mm into date + time parts. */
 export function splitIsoDateTime(value) {
   if (!value || !ISO_DATE_TIME_RE.test(value)) return { date: "", time: "" };
