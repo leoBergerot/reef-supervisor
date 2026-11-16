@@ -201,19 +201,19 @@ function AccountMenu({ email, onChangePassword, onLogout }) {
   return (
     <Menu>
       <MenuButton
-        className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white p-0.5 pr-1.5 text-left shadow-sm transition hover:border-slate-300 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea sm:pr-2"
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-2 text-left shadow-sm transition hover:border-slate-300 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-sea sm:gap-2.5 sm:pr-2.5"
         aria-label={t("menu.account")}
       >
-        <span className="flex size-9 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold tracking-wide text-white">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-xs font-semibold tracking-wide text-white sm:size-9">
           {initials || <IconUser className="size-4" />}
         </span>
         <span className="hidden min-w-0 max-w-[10rem] sm:block">
-          <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-slate-500">
+          <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-slate-500 sm:text-[11px]">
             {t("menu.account")}
           </span>
-          <span className="block truncate text-sm font-medium text-slate-800">{email || t("menu.account")}</span>
+          <span className="block truncate text-sm font-semibold text-slate-900">{email || t("menu.account")}</span>
         </span>
-        <IconChevron className="mr-0.5 hidden size-4 shrink-0 text-slate-400 sm:block" />
+        <IconChevron className="hidden size-4 shrink-0 text-slate-400 sm:block" />
       </MenuButton>
       <MenuItems
         anchor="bottom end"
@@ -231,7 +231,7 @@ function AccountMenu({ email, onChangePassword, onLogout }) {
             className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-800 data-[focus]:bg-cyan-50"
           >
             <IconKey className="size-4 shrink-0 text-slate-500" />
-            {t("menu.change_password")}
+            {t("menu.manage_account")}
           </button>
         </MenuItem>
         <div className="px-2 py-1.5">
