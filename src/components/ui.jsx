@@ -9,6 +9,7 @@ import {
   isoDateToLocalDate,
   joinIsoDateTime,
   localDateToIsoDate,
+  normalizeTimeHHmm,
   parseLocaleDateToIso,
   parseLocaleDateTimeToIso,
   splitIsoDateTime,
@@ -191,7 +192,7 @@ const FrenchDateField = forwardRef(function FrenchDateField(
 
 /**
  * Locale-aware datetime field. Form value stays ISO YYYY-MM-DDTHH:mm.
- * French UI: DD/MM/YYYY + time with calendar; English keeps datetime-local.
+ * French UI: DD/MM/YYYY + custom 24h HH:mm + calendar; English keeps datetime-local.
  */
 export const DateTimeField = forwardRef(function DateTimeField(
   { label, error, locale = "fr", value = "", onChange, onBlur, name, ...props },
@@ -237,19 +238,41 @@ const FrenchDateTimeField = forwardRef(function FrenchDateTimeField(
   const parts = splitIsoDateTime(value);
   const [text, setText] = useState(() => formatIsoDateTimeForLocale(value, "fr"));
   const [time, setTime] = useState(() => parts.time || "00:00");
+  const [timeText, setTimeText] = useState(() => parts.time || "00:00");
   const [focused, setFocused] = useState(false);
+  const [timeFocused, setTimeFocused] = useState(false);
   const selected = isoDateToLocalDate(parts.date);
 
   useEffect(() => {
     if (!focused) setText(formatIsoDateTimeForLocale(value, "fr"));
     const next = splitIsoDateTime(value);
-    if (next.time) setTime(next.time);
-  }, [value, focused]);
+    if (next.time) {
+      setTime(next.time);
+      if (!timeFocused) setTimeText(next.time);
+    }
+  }, [value, focused, timeFocused]);
 
   const emit = (dateIso, timeValue) => {
-    const next = joinIsoDateTime(dateIso, timeValue || time || "00:00");
+    const nextTime = normalizeTimeHHmm(timeValue) || time || "00:00";
+    const next = joinIsoDateTime(dateIso, nextTime);
+    if (!next) return;
+    setTime(nextTime);
+    if (!timeFocused) setTimeText(nextTime);
     onChange?.(next);
-    setText(formatIsoDateTimeForLocale(next, "fr"));
+    if (!focused) setText(formatIsoDateTimeForLocale(next, "fr"));
+  };
+
+  const commitTime = (rawTime) => {
+    const nextTime = normalizeTimeHHmm(rawTime) || time || "00:00";
+    setTime(nextTime);
+    setTimeText(nextTime);
+    const dateIso = parts.date || parseLocaleDateToIso(text.split(/\s+/)[0] ?? "", "fr");
+    if (dateIso) {
+      const next = joinIsoDateTime(dateIso, nextTime);
+      if (!next) return;
+      onChange?.(next);
+      if (!focused) setText(formatIsoDateTimeForLocale(next, "fr"));
+    }
   };
 
   return (
@@ -280,7 +303,10 @@ const FrenchDateTimeField = forwardRef(function FrenchDateTimeField(
               if (iso) {
                 onChange?.(iso);
                 const split = splitIsoDateTime(iso);
-                if (split.time) setTime(split.time);
+                if (split.time) {
+                  setTime(split.time);
+                  if (!timeFocused) setTimeText(split.time);
+                }
               }
             }}
             onBlur={(event) => {
@@ -290,7 +316,10 @@ const FrenchDateTimeField = forwardRef(function FrenchDateTimeField(
                 setText(formatIsoDateTimeForLocale(iso, "fr"));
                 onChange?.(iso);
                 const split = splitIsoDateTime(iso);
-                if (split.time) setTime(split.time);
+                if (split.time) {
+                  setTime(split.time);
+                  if (!timeFocused) setTimeText(split.time);
+                }
               } else if (!text.trim()) {
                 setText("");
                 onChange?.("");
@@ -302,16 +331,28 @@ const FrenchDateTimeField = forwardRef(function FrenchDateTimeField(
             {...props}
           />
           <Input
-            type="time"
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="hh:mm"
             lang="fr-FR"
-            value={time}
-            className={control}
-            aria-label={`${label} — heure`}
+            value={timeText}
+            maxLength={5}
+            className={`${control} tabular-nums`}
+            aria-label={`${label} — heure (24h)`}
+            onFocus={() => setTimeFocused(true)}
             onChange={(event) => {
               const nextTime = event.target.value;
-              setTime(nextTime);
+              setTimeText(nextTime);
+              const normalized = normalizeTimeHHmm(nextTime);
+              if (!normalized) return;
+              setTime(normalized);
               const dateIso = parts.date || parseLocaleDateToIso(text.split(/\s+/)[0] ?? "", "fr");
-              if (dateIso && nextTime) emit(dateIso, nextTime);
+              if (dateIso) emit(dateIso, normalized);
+            }}
+            onBlur={() => {
+              setTimeFocused(false);
+              commitTime(timeText);
             }}
           />
           <PopoverButton
