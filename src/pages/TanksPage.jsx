@@ -22,7 +22,6 @@ import {
   createTank,
   deleteTank,
   describeError,
-  fetchTankPhoto,
   listParameters,
   listTankParameters,
   listTanks,
@@ -32,6 +31,7 @@ import {
 } from "../api/client";
 import { TankParameterPicker } from "../components/TankParameterPicker";
 import { Notice, PrimaryButton, QuietButton, Spinner, TextField } from "../components/ui";
+import { TankPhoto } from "../components/TankPhoto";
 import { useAuth } from "../context/AuthContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
@@ -235,37 +235,6 @@ function IconTrash() {
       <path d="M5 6.5h10M8 6.5V5h4v1.5M7 6.5v8.5h6V6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
-}
-
-function TankPhoto({ token, tank, className = "h-40 w-full bg-cyan-50 object-cover" }) {
-  const [src, setSrc] = useState(null);
-
-  useEffect(() => {
-    if (!tank?.photo_url) {
-      setSrc(null);
-      return undefined;
-    }
-    let cancelled = false;
-    let objectUrl = null;
-    fetchTankPhoto(token, tank.photo_url)
-      .then((url) => {
-        if (cancelled) {
-          if (url) URL.revokeObjectURL(url);
-          return;
-        }
-        objectUrl = url;
-        setSrc(url);
-      })
-      .catch(() => {
-        if (!cancelled) setSrc(null);
-      });
-    return () => {
-      cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [token, tank?.id, tank?.photo_url]);
-
-  return <img src={src || "/tank-placeholder.svg"} alt="" className={src ? className : `${className} object-contain p-4`} />;
 }
 
 function usePendingCustoms() {

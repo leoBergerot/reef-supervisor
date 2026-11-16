@@ -158,7 +158,24 @@
     "manage": "Manage tanks",
     "logout": "Log out",
     "dashboard": "Dashboard",
-    "tank": "Tank"
+    "tank": "Tank",
+    "switch_tank": "Switch tank",
+    "pick_tank": "Choose a tank",
+    "no_tank": "No tank",
+    "account": "Account",
+    "change_password": "Change password",
+    "language": "Language"
+  },
+  "account": {
+    "change_password_title": "Change password",
+    "current_password": "Current password",
+    "current_password_required": "Please enter your current password",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "password_mismatch": "Passwords do not match",
+    "save_password": "Save",
+    "password_updated": "Password updated",
+    "email_missing": "Could not determine the signed-in account"
   },
   "measure": {
     "add": "Add a value",

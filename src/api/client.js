@@ -57,6 +57,15 @@ export function createUser({ email, password }) {
   return request("/users", { method: "POST", body: { email, password } });
 }
 
+/** PATCH /users — authenticated update of email + password for the current user. */
+export function updateCurrentUser(token, { email, password }) {
+  return request("/users", {
+    method: "PATCH",
+    token,
+    body: { email, password },
+  });
+}
+
 export function listTanks(token) {
   return request("/tanks", { token });
 }
