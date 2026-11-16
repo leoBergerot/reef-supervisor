@@ -7,6 +7,11 @@ import {
   Label,
   Radio,
   RadioGroup,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
 } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -33,6 +38,9 @@ import { useToast } from "../context/ToastContext";
 import { imageExtensionOk } from "../lib/format";
 import { presetParameterIds } from "../lib/tankPresets";
 
+const TAB_GENERAL = 0;
+const TAB_PARAMETERS = 1;
+
 export function TanksPage() {
   const { t } = useTranslation();
   const { manage } = useParams();
@@ -43,7 +51,6 @@ export function TanksPage() {
   const toast = useToast();
   const [tanks, setTanks] = useState({ loading: true, data: [], error: null });
   const [editor, setEditor] = useState(null);
-  const [parametersEditor, setParametersEditor] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
 
   useEffect(() => {
@@ -62,11 +69,11 @@ export function TanksPage() {
     return () => {
       cancelled = true;
     };
-  }, [token, revision]);
+  }, [token, revision, signOut]);
 
   const choose = (tank) => {
     if (managing) {
-      setEditor({ mode: "edit", tank });
+      setEditor({ mode: "edit", tank, tab: "general" });
       return;
     }
     setTankId(tank.id);
@@ -83,11 +90,14 @@ export function TanksPage() {
           {!tanks.loading && tanks.data.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("tanks.empty")}</p> : null}
         </div>
         <div className="flex gap-2">
-          <PrimaryButton type="button" onClick={() => setEditor({ mode: "create", tank: null })}>
+          <PrimaryButton type="button" onClick={() => setEditor({ mode: "create", tank: null, tab: "general" })}>
             {t("tanks.add")}
           </PrimaryButton>
           {managing && tanks.data.length > 0 ? (
-            <Link to="/" className="inline-flex h-11 items-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700">
+            <Link
+              to="/"
+              className="inline-flex h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm"
+            >
               {t("tanks.finish")}
             </Link>
           ) : null}
@@ -101,39 +111,53 @@ export function TanksPage() {
       <ul className="mt-4 grid gap-4 sm:grid-cols-2">
         {tanks.data.map((tank) => (
           <li key={tank.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <button type="button" onClick={() => choose(tank)} className="block w-full text-left" aria-label={t("tanks.select", { name: tank.name })}>
+            <button
+              type="button"
+              onClick={() => choose(tank)}
+              className="block w-full text-left"
+              aria-label={t("tanks.select", { name: tank.name })}
+            >
               <TankPhoto token={token} tank={tank} />
-              <span className="block px-4 py-3 text-lg font-semibold text-slate-800">{tank.name}</span>
+              <span className="block px-4 pt-3 text-lg font-semibold leading-snug text-ink">{tank.name}</span>
               {tank.water_type ? (
-                <span className="block px-4 pb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                  {t(`tanks.form.water_type_${tank.water_type}`)}
+                <span className="mt-1.5 inline-flex px-4 pb-3">
+                  <span className="rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-sea">
+                    {t(`tanks.form.water_type_${tank.water_type}`)}
+                  </span>
                 </span>
-              ) : null}
+              ) : (
+                <span className="block pb-3" />
+              )}
             </button>
             {managing ? (
-              <div className="flex flex-wrap gap-2 px-4 pb-4">
-                <QuietButton type="button" onClick={() => setEditor({ mode: "edit", tank })}>
-                  {t("tanks.form.edit_button")}
-                </QuietButton>
-                <QuietButton type="button" onClick={() => setParametersEditor(tank)}>
-                  {t("tanks.form.parameters_button")}
-                </QuietButton>
-                <QuietButton type="button" onClick={() => setPendingDelete(tank)}>
-                  {t("tanks.form.delete")}
-                </QuietButton>
+              <div className="grid grid-cols-3 gap-2 border-t border-slate-200 bg-slate-50 px-3 py-3">
+                <ActionButton
+                  tone="primary"
+                  label={t("tanks.form.edit_action")}
+                  onClick={() => setEditor({ mode: "edit", tank, tab: "general" })}
+                  icon={<IconEdit />}
+                />
+                <ActionButton
+                  tone="secondary"
+                  label={t("tanks.form.parameters_button")}
+                  onClick={() => setEditor({ mode: "edit", tank, tab: "parameters" })}
+                  icon={<IconSliders />}
+                />
+                <ActionButton
+                  tone="danger"
+                  label={t("tanks.form.delete")}
+                  onClick={() => setPendingDelete(tank)}
+                  icon={<IconTrash />}
+                />
               </div>
             ) : null}
           </li>
         ))}
       </ul>
-      <TankDialog
+      <TankEditorSheet
         editor={editor}
         token={token}
         onClose={() => setEditor(null)}
-        onOpenParameters={(tank) => {
-          setEditor(null);
-          setParametersEditor(tank);
-        }}
         onCreated={(name) => {
           toast.push(t("tanks.form.created", { name }), "success");
           touchTanks();
@@ -142,12 +166,7 @@ export function TanksPage() {
           toast.push(t("tanks.form.updated", { name }), "success");
           touchTanks();
         }}
-      />
-      <TankParametersDialog
-        tank={parametersEditor}
-        token={token}
-        onClose={() => setParametersEditor(null)}
-        onSaved={(name) => {
+        onParametersUpdated={(name) => {
           toast.push(t("tanks.form.parameters_updated", { name }), "success");
           touchTanks();
         }}
@@ -166,7 +185,59 @@ export function TanksPage() {
   );
 }
 
-function TankPhoto({ token, tank, className = "h-36 w-full bg-cyan-50 object-contain p-4" }) {
+function ActionButton({ label, onClick, icon, tone = "secondary" }) {
+  const tones = {
+    primary: "border-ink/20 bg-ink text-white hover:bg-[#12485c]",
+    secondary: "border-slate-300 bg-white text-slate-800 hover:bg-white hover:border-slate-400",
+    danger: "border-rose-300 bg-white text-rose-800 hover:bg-rose-50",
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-center text-xs font-semibold shadow-sm transition sm:flex-row sm:gap-1.5 sm:text-sm ${tones[tone]}`}
+    >
+      <span className="shrink-0" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="leading-tight">{label}</span>
+    </button>
+  );
+}
+
+function IconEdit() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="size-4" aria-hidden="true">
+      <path
+        d="M4 13.5V16h2.5L14.8 7.7l-2.5-2.5L4 13.5Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="m11.4 5.9 2.5 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconSliders() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="size-4" aria-hidden="true">
+      <path d="M3.5 6.5h13M3.5 13.5h13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="7.5" cy="6.5" r="2" fill="currentColor" />
+      <circle cx="12.5" cy="13.5" r="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function IconTrash() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="size-4" aria-hidden="true">
+      <path d="M5 6.5h10M8 6.5V5h4v1.5M7 6.5v8.5h6V6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TankPhoto({ token, tank, className = "h-40 w-full bg-cyan-50 object-cover" }) {
   const [src, setSrc] = useState(null);
 
   useEffect(() => {
@@ -194,7 +265,7 @@ function TankPhoto({ token, tank, className = "h-36 w-full bg-cyan-50 object-con
     };
   }, [token, tank?.id, tank?.photo_url]);
 
-  return <img src={src || "/tank-placeholder.svg"} alt="" className={className} />;
+  return <img src={src || "/tank-placeholder.svg"} alt="" className={src ? className : `${className} object-contain p-4`} />;
 }
 
 function usePendingCustoms() {
@@ -244,10 +315,12 @@ function usePendingCustoms() {
   };
 }
 
-function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParameters }) {
+function TankEditorSheet({ editor, token, onClose, onCreated, onUpdated, onParametersUpdated }) {
   const { t } = useTranslation();
   const open = Boolean(editor);
   const editing = editor?.mode === "edit";
+  const initialTab = editor?.tab === "parameters" ? TAB_PARAMETERS : TAB_GENERAL;
+  const [selectedTab, setSelectedTab] = useState(initialTab);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [fileError, setFileError] = useState("");
@@ -255,6 +328,11 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
   const [catalog, setCatalog] = useState({ loading: false, parameters: [], error: null });
   const [paramQuery, setParamQuery] = useState("");
   const [paramsDirty, setParamsDirty] = useState(false);
+  const [paramsLoading, setParamsLoading] = useState(false);
+  const [paramsSaving, setParamsSaving] = useState(false);
+  const [parameterIds, setParameterIds] = useState([]);
+  const [linkedCustoms, setLinkedCustoms] = useState([]);
+  const [baseline, setBaseline] = useState({ linkedCatalogIds: [], customs: [] });
   const {
     customParameters,
     setCustomParameters,
@@ -281,13 +359,13 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
   });
 
   const waterType = watch("waterType");
-  const parameterIds = watch("parameterIds") ?? [];
+  const createParameterIds = watch("parameterIds") ?? [];
 
   useEffect(() => {
     if (!open) return;
     reset({
       name: editor?.tank?.name ?? "",
-      waterType: "seawater",
+      waterType: editor?.tank?.water_type === "freshwater" ? "freshwater" : "seawater",
       parameterIds: [],
     });
     setFile(null);
@@ -297,7 +375,11 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     setParamQuery("");
     setParamsDirty(false);
     resetCustoms();
+    setParameterIds([]);
+    setLinkedCustoms([]);
+    setBaseline({ linkedCatalogIds: [], customs: [] });
     setCatalog({ loading: !editing, parameters: [], error: null });
+    setSelectedTab(editor?.tab === "parameters" ? TAB_PARAMETERS : TAB_GENERAL);
   }, [open, editor, editing, reset]);
 
   useEffect(() => {
@@ -322,9 +404,56 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     };
   }, [open, editing, token, getValues, setValue]);
 
-  useEffect(() => () => {
-    if (preview) URL.revokeObjectURL(preview);
-  }, [preview]);
+  useEffect(() => {
+    if (!open || !editing || !token || !editor?.tank) return undefined;
+    let cancelled = false;
+    setParamsLoading(true);
+    setFailures([]);
+    Promise.all([listParameters(token), listTankParameters(token, editor.tank.id)])
+      .then(([parameters, tankParameters]) => {
+        if (cancelled) return;
+        const catalogList = Array.isArray(parameters) ? parameters : [];
+        const rows = Array.isArray(tankParameters) ? tankParameters : [];
+        const linkedCatalogIds = rows.filter((row) => !row.is_custom).map((row) => row.parameter.id);
+        const enabledCatalog = rows
+          .filter((row) => !row.is_custom && row.enabled)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
+          .map((row) => row.parameter.id);
+        const customs = rows
+          .filter((row) => row.is_custom)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
+          .map((row) => ({
+            parameterId: row.parameter.id,
+            name: row.parameter.name,
+            unit: row.parameter.sub_name,
+            enabled: row.enabled,
+            sortOrder: row.sort_order ?? 0,
+          }));
+        setCatalog({ loading: false, parameters: catalogList, error: null });
+        setParameterIds(enabledCatalog);
+        setLinkedCustoms(customs);
+        setBaseline({ linkedCatalogIds, customs });
+        setParamsLoading(false);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setCatalog({ loading: false, parameters: [], error });
+        setParameterIds([]);
+        setLinkedCustoms([]);
+        setFailures([error]);
+        setParamsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, editing, token, editor?.tank]);
+
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   const applyDefaults = (type = waterType, markClean = true) => {
     setValue("parameterIds", presetParameterIds(catalog.parameters, type), { shouldDirty: false });
@@ -344,14 +473,14 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     }
   };
 
-  const toggleParameter = (id, checked) => {
+  const toggleCreateParameter = (id, checked) => {
     const current = getValues("parameterIds") ?? [];
     const next = checked ? [...new Set([...current, id])] : current.filter((value) => value !== id);
     setValue("parameterIds", next, { shouldDirty: true });
     setParamsDirty(true);
   };
 
-  const selectFiltered = (ids, checked) => {
+  const selectFilteredCreate = (ids, checked) => {
     const current = new Set(getValues("parameterIds") ?? []);
     ids.forEach((id) => {
       if (checked) current.add(id);
@@ -359,6 +488,26 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     });
     setValue("parameterIds", [...current], { shouldDirty: true });
     setParamsDirty(true);
+  };
+
+  const toggleEditParameter = (id, checked) => {
+    setParameterIds((current) => (checked ? [...new Set([...current, id])] : current.filter((value) => value !== id)));
+  };
+
+  const selectFilteredEdit = (ids, checked) => {
+    setParameterIds((current) => {
+      const next = new Set(current);
+      ids.forEach((id) => {
+        if (checked) next.add(id);
+        else next.delete(id);
+      });
+      return [...next];
+    });
+  };
+
+  const applyEditDefaults = () => {
+    const type = editor?.tank?.water_type || "seawater";
+    setParameterIds(presetParameterIds(catalog.parameters, type));
   };
 
   const onFile = (event) => {
@@ -375,7 +524,7 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     setPreview(URL.createObjectURL(next));
   };
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmitGeneral = handleSubmit(async (values) => {
     if (fileError) return;
     const name = values.name.trim();
     try {
@@ -419,213 +568,9 @@ function TankDialog({ editor, token, onClose, onCreated, onUpdated, onOpenParame
     }
   });
 
-  return (
-    <Dialog open={open} onClose={onClose} className="relative z-50">
-      <DialogBackdrop className="fixed inset-0 bg-slate-900/40" />
-      <div className="fixed inset-0 flex items-end justify-center p-4 sm:items-center">
-        <DialogPanel className="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl">
-          <div className="overflow-y-auto p-5">
-            <DialogTitle className="text-lg font-semibold text-ink">
-              {editing ? t("tanks.form.edit_title") : t("tanks.form.create_title")}
-            </DialogTitle>
-            <form className="mt-4 grid gap-4" onSubmit={onSubmit} noValidate>
-              {failures.map((error) => (
-                <Notice key={error.functionName || error.message} title={error.code === "missing_endpoint" ? t("api.missing_title") : undefined}>
-                  {describeError(error, t)}
-                </Notice>
-              ))}
-
-              {!editing ? (
-                <Field className="grid gap-2">
-                  <Label className="text-sm font-medium text-slate-700">{t("tanks.form.water_type")}</Label>
-                  <RadioGroup value={waterType} onChange={onWaterTypeChange} className="grid gap-2 sm:grid-cols-2">
-                    {["seawater", "freshwater"].map((type) => (
-                      <Radio
-                        key={type}
-                        value={type}
-                        className="group cursor-pointer rounded-2xl border border-slate-200 px-3 py-3 transition data-[checked]:border-sea data-[checked]:bg-cyan-50 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-sea"
-                      >
-                        <span className="block text-sm font-semibold text-ink">{t(`tanks.form.water_type_${type}`)}</span>
-                        <span className="mt-1 block text-xs text-slate-500">{t(`tanks.form.water_type_${type}_hint`)}</span>
-                      </Radio>
-                    ))}
-                  </RadioGroup>
-                  {errors.waterType ? (
-                    <p className="text-sm text-rose-600" role="alert">
-                      {errors.waterType.message}
-                    </p>
-                  ) : null}
-                  <input type="hidden" {...register("waterType", { required: t("tanks.form.water_type_required") })} />
-                </Field>
-              ) : editor?.tank?.water_type ? (
-                <p className="text-sm text-slate-600">
-                  <span className="font-medium text-slate-700">{t("tanks.form.water_type")}: </span>
-                  {t(`tanks.form.water_type_${editor.tank.water_type}`)}
-                </p>
-              ) : null}
-
-              <TextField
-                label={t("tanks.form.name")}
-                error={errors.name?.message}
-                {...register("name", { required: t("tanks.form.name_required") })}
-              />
-
-              <div className="grid gap-1.5">
-                <span className="text-sm font-medium text-slate-700">{t("tanks.photo")}</span>
-                <label className="inline-flex h-11 cursor-pointer items-center rounded-xl border border-slate-200 px-3 text-sm font-medium text-ink">
-                  {file ? file.name : t("tanks.photo_pick")}
-                  <input
-                    type="file"
-                    accept=".png,.gif,.svg,.jpeg,.jpg,image/png,image/gif,image/svg+xml,image/jpeg"
-                    onChange={onFile}
-                    className="sr-only"
-                  />
-                </label>
-                <span className="text-sm text-slate-500">{t("tanks.photo_hint")}</span>
-              </div>
-              {fileError ? <Notice>{fileError}</Notice> : null}
-              {preview ? (
-                <img src={preview} alt={t("tanks.form.current_photo")} className="h-32 w-full rounded-2xl bg-cyan-50 object-contain" />
-              ) : (
-                <TankPhoto token={token} tank={editor?.tank} className="h-32 w-full rounded-2xl bg-cyan-50 object-contain p-3" />
-              )}
-
-              {!editing ? (
-                <TankParameterPicker
-                  catalog={catalog.parameters}
-                  catalogLoading={catalog.loading}
-                  catalogError={catalog.error}
-                  parameterIds={parameterIds}
-                  onToggleParameter={toggleParameter}
-                  onSelectFiltered={selectFiltered}
-                  onResetDefaults={() => applyDefaults(waterType, true)}
-                  paramQuery={paramQuery}
-                  onParamQueryChange={setParamQuery}
-                  pendingCustoms={customParameters}
-                  onAddPendingCustom={() => addCustomParameter()}
-                  onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
-                  customDraft={customDraft}
-                  onCustomDraftChange={setCustomDraft}
-                  customError={customError}
-                />
-              ) : (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-3 py-3">
-                  <p className="text-sm text-slate-600">{t("tanks.form.parameters_edit_hint")}</p>
-                  <QuietButton
-                    type="button"
-                    className="mt-3"
-                    onClick={() => onOpenParameters(editor.tank)}
-                  >
-                    {t("tanks.form.parameters_button")}
-                  </QuietButton>
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <QuietButton type="button" onClick={onClose} className="flex-1">
-                  {t("tanks.form.cancel")}
-                </QuietButton>
-                <PrimaryButton type="submit" disabled={isSubmitting} className="flex-1">
-                  {editing ? t("tanks.form.edit_button") : t("tanks.form.create_button")}
-                </PrimaryButton>
-              </div>
-            </form>
-          </div>
-        </DialogPanel>
-      </div>
-    </Dialog>
-  );
-}
-
-function TankParametersDialog({ tank, token, onClose, onSaved }) {
-  const { t } = useTranslation();
-  const open = Boolean(tank);
-  const [failures, setFailures] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [catalog, setCatalog] = useState([]);
-  const [parameterIds, setParameterIds] = useState([]);
-  const [linkedCustoms, setLinkedCustoms] = useState([]);
-  const [paramQuery, setParamQuery] = useState("");
-  const [baseline, setBaseline] = useState({ catalogEnabled: [], customs: [] });
-  const {
-    customParameters,
-    setCustomParameters,
-    customDraft,
-    setCustomDraft,
-    customError,
-    resetCustoms,
-    addCustomParameter,
-  } = usePendingCustoms();
-
-  useEffect(() => {
-    if (!open || !token || !tank) return undefined;
-    let cancelled = false;
-    setFailures([]);
-    setParamQuery("");
-    resetCustoms();
-    setLoading(true);
-    Promise.all([listParameters(token), listTankParameters(token, tank.id)])
-      .then(([parameters, tankParameters]) => {
-        if (cancelled) return;
-        const catalogList = Array.isArray(parameters) ? parameters : [];
-        const rows = Array.isArray(tankParameters) ? tankParameters : [];
-        const linkedCatalogIds = rows.filter((row) => !row.is_custom).map((row) => row.parameter.id);
-        const enabledCatalog = rows
-          .filter((row) => !row.is_custom && row.enabled)
-          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
-          .map((row) => row.parameter.id);
-        const customs = rows
-          .filter((row) => row.is_custom)
-          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id)
-          .map((row) => ({
-            parameterId: row.parameter.id,
-            name: row.parameter.name,
-            unit: row.parameter.sub_name,
-            enabled: row.enabled,
-            sortOrder: row.sort_order ?? 0,
-          }));
-        setCatalog(catalogList);
-        setParameterIds(enabledCatalog);
-        setLinkedCustoms(customs);
-        setBaseline({ linkedCatalogIds, customs });
-        setLoading(false);
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        setCatalog([]);
-        setParameterIds([]);
-        setLinkedCustoms([]);
-        setFailures([error]);
-        setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [open, token, tank]);
-
-  const toggleParameter = (id, checked) => {
-    setParameterIds((current) => (checked ? [...new Set([...current, id])] : current.filter((value) => value !== id)));
-  };
-
-  const selectFiltered = (ids, checked) => {
-    setParameterIds((current) => {
-      const next = new Set(current);
-      ids.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return [...next];
-    });
-  };
-
-  const applyDefaults = () => {
-    const type = tank?.water_type || "seawater";
-    setParameterIds(presetParameterIds(catalog, type));
-  };
-
-  const onSave = async () => {
-    setSaving(true);
+  const onSaveParameters = async () => {
+    if (!editing || !editor?.tank) return;
+    setParamsSaving(true);
     setFailures([]);
     try {
       const enabledOrder = [
@@ -649,76 +594,192 @@ function TankParametersDialog({ tank, token, onClose, onSaved }) {
       }));
       const patch = [...catalogPatch, ...customPatch];
       if (patch.length > 0) {
-        await updateTankParameters(token, tank.id, patch);
+        await updateTankParameters(token, editor.tank.id, patch);
       }
       for (const item of customParameters) {
-        await createCustomTankParameter(token, tank.id, { name: item.name, unit: item.unit });
+        await createCustomTankParameter(token, editor.tank.id, { name: item.name, unit: item.unit });
       }
-      onSaved(tank.name);
+      onParametersUpdated(editor.tank.name);
       onClose();
     } catch (error) {
       setFailures([error]);
     } finally {
-      setSaving(false);
+      setParamsSaving(false);
     }
   };
 
+  const footerBusy = isSubmitting || paramsSaving;
+  const showCreateSave = !editing;
+  const showGeneralSave = editing && selectedTab === TAB_GENERAL;
+  const showParametersSave = editing && selectedTab === TAB_PARAMETERS;
+
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
-      <DialogBackdrop className="fixed inset-0 bg-slate-900/40" />
-      <div className="fixed inset-0 flex items-end justify-center p-4 sm:items-center">
-        <DialogPanel className="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl">
-          <div className="overflow-y-auto p-5">
-            <DialogTitle className="text-lg font-semibold text-ink">
-              {t("tanks.form.parameters_edit_title", { name: tank?.name })}
-            </DialogTitle>
-            {tank?.water_type ? (
-              <p className="mt-1 text-sm text-slate-500">
-                {t(`tanks.form.water_type_${tank.water_type}`)} — {t("tanks.form.water_type_immutable")}
-              </p>
-            ) : null}
+      <DialogBackdrop className="fixed inset-0 bg-slate-900/50" />
+      <div className="fixed inset-0 flex items-stretch justify-center sm:items-center sm:p-4">
+        <DialogPanel className="flex h-full w-full max-w-3xl flex-col overflow-hidden bg-white shadow-2xl sm:h-[min(92vh,880px)] sm:rounded-3xl">
+          <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-6">
+            <div>
+              <DialogTitle className="text-xl font-semibold text-ink">
+                {editing ? t("tanks.form.edit_title") : t("tanks.form.create_title")}
+              </DialogTitle>
+              {editing && editor?.tank?.name ? (
+                <p className="mt-1 text-sm text-slate-500">{editor.tank.name}</p>
+              ) : (
+                <p className="mt-1 text-sm text-slate-500">{t("tanks.form.edit_sheet_hint")}</p>
+              )}
+            </div>
+            <QuietButton type="button" onClick={onClose} className="shrink-0 px-3" aria-label={t("tanks.form.cancel")}>
+              ✕
+            </QuietButton>
+          </div>
 
-            <div className="mt-4 grid gap-4">
-              {failures.map((error) => (
-                <Notice key={error.functionName || error.message}>{describeError(error, t)}</Notice>
-              ))}
-              {loading ? <Spinner label={t("loading")} /> : null}
-              {!loading ? (
-                <TankParameterPicker
-                  catalog={catalog}
-                  parameterIds={parameterIds}
-                  onToggleParameter={toggleParameter}
-                  onSelectFiltered={selectFiltered}
-                  onResetDefaults={applyDefaults}
-                  paramQuery={paramQuery}
-                  onParamQueryChange={setParamQuery}
-                  pendingCustoms={customParameters}
-                  onAddPendingCustom={() =>
-                    addCustomParameter(linkedCustoms.map((item) => item.name).concat(customParameters.map((item) => item.name)))
-                  }
-                  onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
-                  customDraft={customDraft}
-                  onCustomDraftChange={setCustomDraft}
-                  customError={customError}
-                  linkedCustoms={linkedCustoms}
-                  onToggleLinkedCustom={(parameterId, enabled) => {
-                    setLinkedCustoms((current) =>
-                      current.map((item) => (item.parameterId === parameterId ? { ...item, enabled } : item)),
-                    );
-                  }}
-                  laterHint
+          <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab} className="flex min-h-0 flex-1 flex-col">
+            <TabList className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1 sm:mx-6">
+              <Tab className="rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 outline-none transition data-[selected]:bg-white data-[selected]:text-ink data-[selected]:shadow-sm data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-sea">
+                {t("tanks.form.tab_general")}
+              </Tab>
+              <Tab className="rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 outline-none transition data-[selected]:bg-white data-[selected]:text-ink data-[selected]:shadow-sm data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-sea">
+                {t("tanks.form.tab_parameters")}
+              </Tab>
+            </TabList>
+
+            <TabPanels className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+              <TabPanel className="grid gap-4 outline-none">
+                {failures.map((error) => (
+                  <Notice key={error.functionName || error.message} title={error.code === "missing_endpoint" ? t("api.missing_title") : undefined}>
+                    {describeError(error, t)}
+                  </Notice>
+                ))}
+
+                {!editing ? (
+                  <Field className="grid gap-2">
+                    <Label className="text-sm font-medium text-slate-700">{t("tanks.form.water_type")}</Label>
+                    <RadioGroup value={waterType} onChange={onWaterTypeChange} className="grid gap-2 sm:grid-cols-2">
+                      {["seawater", "freshwater"].map((type) => (
+                        <Radio
+                          key={type}
+                          value={type}
+                          className="group cursor-pointer rounded-2xl border border-slate-200 px-3 py-3 transition data-[checked]:border-sea data-[checked]:bg-cyan-50 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-sea"
+                        >
+                          <span className="block text-sm font-semibold text-ink">{t(`tanks.form.water_type_${type}`)}</span>
+                          <span className="mt-1 block text-xs text-slate-500">{t(`tanks.form.water_type_${type}_hint`)}</span>
+                        </Radio>
+                      ))}
+                    </RadioGroup>
+                    {errors.waterType ? (
+                      <p className="text-sm text-rose-600" role="alert">
+                        {errors.waterType.message}
+                      </p>
+                    ) : null}
+                    <input type="hidden" {...register("waterType", { required: t("tanks.form.water_type_required") })} />
+                  </Field>
+                ) : editor?.tank?.water_type ? (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("tanks.form.water_type")}</p>
+                    <p className="mt-1 text-sm font-semibold text-ink">{t(`tanks.form.water_type_${editor.tank.water_type}`)}</p>
+                    <p className="mt-1 text-xs text-slate-500">{t("tanks.form.water_type_immutable")}</p>
+                  </div>
+                ) : null}
+
+                <TextField
+                  label={t("tanks.form.name")}
+                  error={errors.name?.message}
+                  {...register("name", { required: t("tanks.form.name_required") })}
                 />
+
+                <div className="grid gap-1.5">
+                  <span className="text-sm font-medium text-slate-700">{t("tanks.photo")}</span>
+                  <label className="inline-flex h-11 cursor-pointer items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-ink shadow-sm">
+                    {file ? file.name : t("tanks.photo_pick")}
+                    <input
+                      type="file"
+                      accept=".png,.gif,.svg,.jpeg,.jpg,image/png,image/gif,image/svg+xml,image/jpeg"
+                      onChange={onFile}
+                      className="sr-only"
+                    />
+                  </label>
+                  <span className="text-sm text-slate-500">{t("tanks.photo_hint")}</span>
+                </div>
+                {fileError ? <Notice>{fileError}</Notice> : null}
+                {preview ? (
+                  <img src={preview} alt={t("tanks.form.current_photo")} className="h-44 w-full rounded-2xl bg-cyan-50 object-cover" />
+                ) : (
+                  <TankPhoto token={token} tank={editor?.tank} className="h-44 w-full rounded-2xl bg-cyan-50 object-cover" />
+                )}
+              </TabPanel>
+
+              <TabPanel className="grid gap-4 outline-none">
+                {failures.map((error) => (
+                  <Notice key={`params-${error.functionName || error.message}`}>{describeError(error, t)}</Notice>
+                ))}
+                {editing && paramsLoading ? <Spinner label={t("loading")} /> : null}
+                {!editing ? (
+                  <TankParameterPicker
+                    catalog={catalog.parameters}
+                    catalogLoading={catalog.loading}
+                    catalogError={catalog.error}
+                    parameterIds={createParameterIds}
+                    onToggleParameter={toggleCreateParameter}
+                    onSelectFiltered={selectFilteredCreate}
+                    onResetDefaults={() => applyDefaults(waterType, true)}
+                    paramQuery={paramQuery}
+                    onParamQueryChange={setParamQuery}
+                    pendingCustoms={customParameters}
+                    onAddPendingCustom={() => addCustomParameter()}
+                    onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
+                    customDraft={customDraft}
+                    onCustomDraftChange={setCustomDraft}
+                    customError={customError}
+                  />
+                ) : null}
+                {editing && !paramsLoading ? (
+                  <TankParameterPicker
+                    catalog={catalog.parameters}
+                    catalogLoading={catalog.loading}
+                    catalogError={catalog.error}
+                    parameterIds={parameterIds}
+                    onToggleParameter={toggleEditParameter}
+                    onSelectFiltered={selectFilteredEdit}
+                    onResetDefaults={applyEditDefaults}
+                    paramQuery={paramQuery}
+                    onParamQueryChange={setParamQuery}
+                    pendingCustoms={customParameters}
+                    onAddPendingCustom={() =>
+                      addCustomParameter(linkedCustoms.map((item) => item.name).concat(customParameters.map((item) => item.name)))
+                    }
+                    onRemovePendingCustom={(key) => setCustomParameters((current) => current.filter((entry) => entry.key !== key))}
+                    customDraft={customDraft}
+                    onCustomDraftChange={setCustomDraft}
+                    customError={customError}
+                    linkedCustoms={linkedCustoms}
+                    onToggleLinkedCustom={(parameterId, enabled) => {
+                      setLinkedCustoms((current) =>
+                        current.map((item) => (item.parameterId === parameterId ? { ...item, enabled } : item)),
+                      );
+                    }}
+                    laterHint
+                  />
+                ) : null}
+              </TabPanel>
+            </TabPanels>
+
+            <div className="flex gap-2 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+              <QuietButton type="button" onClick={onClose} className="flex-1 border-slate-300 text-slate-800" disabled={footerBusy}>
+                {t("tanks.form.cancel")}
+              </QuietButton>
+              {showCreateSave || showGeneralSave ? (
+                <PrimaryButton type="button" onClick={onSubmitGeneral} disabled={footerBusy} className="flex-1">
+                  {editing ? t("tanks.form.edit_button") : t("tanks.form.create_button")}
+                </PrimaryButton>
               ) : null}
-              <div className="flex gap-2">
-                <QuietButton type="button" onClick={onClose} className="flex-1" disabled={saving}>
-                  {t("tanks.form.cancel")}
-                </QuietButton>
-                <PrimaryButton type="button" onClick={onSave} disabled={saving || loading} className="flex-1">
+              {showParametersSave ? (
+                <PrimaryButton type="button" onClick={onSaveParameters} disabled={footerBusy || paramsLoading} className="flex-1">
                   {t("tanks.form.parameters_save")}
                 </PrimaryButton>
-              </div>
+              ) : null}
             </div>
-          </div>
+          </TabGroup>
         </DialogPanel>
       </div>
     </Dialog>
