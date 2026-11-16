@@ -158,9 +158,21 @@ export function splitIsoDateTime(value) {
 /** Join ISO date + HH:mm into YYYY-MM-DDTHH:mm. */
 export function joinIsoDateTime(date, time) {
   if (!date || !isValidIsoDate(date)) return "";
-  const match = /^(\d{2}):(\d{2})$/.exec(String(time ?? "").trim());
+  const normalized = normalizeTimeHHmm(time);
+  if (!normalized) return "";
+  return `${date}T${normalized}`;
+}
+
+/** Normalize a typed 24h time to HH:mm, or "" if invalid. */
+export function normalizeTimeHHmm(text) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return "";
+  const match = /^(\d{1,2}):(\d{1,2})$/.exec(raw);
   if (!match) return "";
-  return `${date}T${match[1]}:${match[2]}`;
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  if (!Number.isInteger(hour) || !Number.isInteger(minute) || hour > 23 || minute > 59) return "";
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
 export function startOfDay(value) {
