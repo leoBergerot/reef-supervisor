@@ -1,8 +1,14 @@
-<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'
-        'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
-<svg enable-background="new -0.891 -22.184 141.732 141.732" height="141.732px" id="Livello_1" version="1.1"
-     width="141.732px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="100%" height="100%" fill="white"/>
-    <path transform="translate(0.891, 22.184)"
-          d="M32.909,24.472c0-5.621-4.535-10.181-10.129-10.181c-5.594,0-10.127,4.56-10.127,10.181S17.186,34.65,22.78,34.65   C28.374,34.65,32.909,30.094,32.909,24.472 M9.717,87.969c0,0-0.098,0.134-0.239,0.354h120.996   c-0.011-0.013-0.019-0.021-0.027-0.037L89.151,32.069c0,0-4.896-6.664-9.789,0L53.807,66.86l-9.4-12.805c0,0-4.895-6.662-9.787,0   L9.717,87.969z M134.567,91.956H5.382V5.409h129.186V91.956L134.567,91.956z M139.951,94.66V2.705c0-1.494-1.205-2.705-2.69-2.705   H2.692C1.206,0,0,1.211,0,2.705V94.66c0,1.494,1.205,2.705,2.691,2.705h134.57C138.746,97.365,139.951,96.154,139.951,94.66"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-hidden="true">
+  <rect width="160" height="100" rx="12" fill="#ecfeff"/>
+  <rect x="14" y="18" width="132" height="64" rx="8" fill="#a5f3fc" stroke="#0891b2" stroke-width="3"/>
+  <path d="M22 54c12 8 28 8 40 0s28-8 40 0 20 6 28 2" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="48" cy="42" r="5.5" fill="#0e7490"/>
+  <path d="M48 42l12-4v8z" fill="#0e7490"/>
+  <circle cx="112" cy="48" r="4" fill="#155e75"/>
+  <path d="M112 48l-9-3.5v7z" fill="#155e75"/>
+  <circle cx="128" cy="36" r="2.2" fill="#67e8f9" opacity=".9"/>
+  <circle cx="133" cy="30" r="1.5" fill="#67e8f9" opacity=".75"/>
+  <circle cx="124" cy="28" r="1.1" fill="#67e8f9" opacity=".65"/>
+  <path d="M34 70c4-8 8-8 12 0s8 8 12 0" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
+  <path d="M38 70v-10M46 70v-12M54 70v-9" stroke="#0f766e" stroke-width="2" stroke-linecap="round"/>
 </svg>

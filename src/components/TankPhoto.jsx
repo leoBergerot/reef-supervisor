@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { fetchTankPhoto } from "../api/client";
 
+const OBJECT_FIT_RE = /\bobject-(?:contain|cover|fill|none|scale-down)\b/g;
+const OBJECT_PADDING_RE = /\bp-\[\d+%\]\b/g;
+
+function placeholderClassName(className) {
+  return `${className.replace(OBJECT_FIT_RE, "").replace(OBJECT_PADDING_RE, "").replace(/\s+/g, " ").trim()} object-contain`;
+}
+
 export function TankPhoto({ token, tank, className = "h-40 w-full bg-cyan-50 object-cover" }) {
   const [src, setSrc] = useState(null);
 
@@ -29,11 +36,13 @@ export function TankPhoto({ token, tank, className = "h-40 w-full bg-cyan-50 obj
     };
   }, [token, tank?.id, tank?.photo_url]);
 
+  const hasPhoto = Boolean(src);
+
   return (
     <img
       src={src || "/tank-placeholder.svg"}
       alt=""
-      className={src ? className : `${className} object-contain p-[12%]`}
+      className={hasPhoto ? className : placeholderClassName(className)}
     />
   );
 }
