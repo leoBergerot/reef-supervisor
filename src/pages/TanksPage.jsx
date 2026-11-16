@@ -36,7 +36,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTankSelection } from "../context/TankContext";
 import { useToast } from "../context/ToastContext";
 import { imageExtensionOk } from "../lib/format";
-import { presetParameterIds } from "../lib/tankPresets";
+import { presetParameterIds, waterTypeAccent } from "../lib/tankPresets";
 
 const TAB_GENERAL = 0;
 const TAB_PARAMETERS = 1;
@@ -121,7 +121,9 @@ export function TanksPage() {
               <span className="block px-4 pt-3 text-lg font-semibold leading-snug text-ink">{tank.name}</span>
               {tank.water_type ? (
                 <span className="mt-1.5 inline-flex px-4 pb-3">
-                  <span className="rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-sea">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${waterTypeAccent(tank.water_type).pill}`}
+                  >
                     {t(`tanks.form.water_type_${tank.water_type}`)}
                   </span>
                 </span>
@@ -629,7 +631,7 @@ function TankEditorSheet({ editor, token, onClose, onCreated, onUpdated, onParam
                         <Radio
                           key={type}
                           value={type}
-                          className="group cursor-pointer rounded-2xl border border-slate-200 px-3 py-3 transition data-[checked]:border-sea data-[checked]:bg-cyan-50 data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-sea"
+                          className={`group cursor-pointer rounded-2xl border px-3 py-3 transition data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 ${waterTypeAccent(type).radio}`}
                         >
                           <span className="block text-sm font-semibold text-ink">{t(`tanks.form.water_type_${type}`)}</span>
                           <span className="mt-1 block text-xs text-slate-500">{t(`tanks.form.water_type_${type}_hint`)}</span>
@@ -644,7 +646,9 @@ function TankEditorSheet({ editor, token, onClose, onCreated, onUpdated, onParam
                     <input type="hidden" {...register("waterType", { required: t("tanks.form.water_type_required") })} />
                   </Field>
                 ) : editor?.tank?.water_type ? (
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div
+                    className={`rounded-2xl border px-4 py-3 ${waterTypeAccent(editor.tank.water_type).panel}`}
+                  >
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("tanks.form.water_type")}</p>
                     <p className="mt-1 text-sm font-semibold text-ink">{t(`tanks.form.water_type_${editor.tank.water_type}`)}</p>
                     <p className="mt-1 text-xs text-slate-500">{t("tanks.form.water_type_immutable")}</p>

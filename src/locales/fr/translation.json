@@ -92,7 +92,7 @@
       "water_type_seawater": "Eau de mer / récifal",
       "water_type_seawater_hint": "Coraux, KH, Ca, Mg…",
       "water_type_freshwater": "Eau douce",
-      "water_type_freshwater_hint": "Communautaire, pH, KH, NO₂…",
+      "water_type_freshwater_hint": "Poissons, plantes, pH, KH…",
       "replace_defaults": "Remplacer la sélection par les défauts {{type}} ?",
       "parameters_title": "Paramètres suivis",
       "parameters_selected": "{{count}} sélectionné(s)",
