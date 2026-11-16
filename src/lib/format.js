@@ -6,6 +6,16 @@ function tokenPayload(token) {
   return JSON.parse(atob(padded));
 }
 
+/** Email claim from a JWT access token, or null if missing/invalid. */
+export function tokenEmail(token) {
+  try {
+    const email = tokenPayload(token)?.email;
+    return typeof email === "string" && email.trim() ? email.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function isTokenExpired(token) {
   try {
     const payload = tokenPayload(token);
