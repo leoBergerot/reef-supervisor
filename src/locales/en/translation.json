@@ -92,7 +92,7 @@
       "water_type_seawater": "Seawater / reef",
       "water_type_seawater_hint": "Corals, KH, Ca, Mg…",
       "water_type_freshwater": "Freshwater",
-      "water_type_freshwater_hint": "Community, pH, KH, NO₂…",
+      "water_type_freshwater_hint": "Fish, plants, pH, KH…",
       "replace_defaults": "Replace the selection with {{type}} defaults?",
       "parameters_title": "Tracked parameters",
       "parameters_selected": "{{count}} selected",
