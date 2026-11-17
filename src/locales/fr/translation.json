@@ -250,6 +250,16 @@
     "missing_title": "Action indisponible",
     "missing_body": "L'appel {{name}} n'a pas d'endpoint sur l'API. Rien n'a été modifié."
   },
+  "turnstile": {
+    "required": "Merci de terminer la vérification de sécurité avant de continuer.",
+    "terms": {
+      "first": "Cette page est protégée par Cloudflare Turnstile pour vérifier que vous n'êtes pas un robot. Consultez la",
+      "privacy": "politique de confidentialité",
+      "and": "et les",
+      "terms": "conditions d'utilisation",
+      "second": "de Cloudflare."
+    }
+  },
   "error": {
     "no_network": "Connexion à l'API impossible",
     "500": "Une erreur est survenue",

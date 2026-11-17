@@ -3,6 +3,8 @@ services:
     build:
       context: .
       target: production
+      args:
+        REACT_APP_TURNSTILE_SITE_KEY: ${REACT_APP_TURNSTILE_SITE_KEY}
     ports:
       - "8081:80"
     environment:

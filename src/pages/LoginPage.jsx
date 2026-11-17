@@ -3,17 +3,21 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { activateAccount, describeError, login } from "../api/client";
+import { ConditionTurnstile } from "../components/ConditionTurnstile";
+import { Turnstile } from "../components/Turnstile";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enable } = useParams();
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const [activationError, setActivationError] = useState(null);
   const [activatedEmail, setActivatedEmail] = useState("");
   const [formError, setFormError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const {
     register,
     handleSubmit,
@@ -27,12 +31,18 @@ export function LoginPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError("");
+    if (!turnstileToken) {
+      setFormError(t("turnstile.required"));
+      return;
+    }
     try {
-      const result = await login(values.email.trim(), values.password);
+      const result = await login(values.email.trim(), values.password, turnstileToken);
       signIn(result.access_token);
       navigate("/tanks", { replace: true });
     } catch (error) {
       setFormError(describeError(error, t));
+      setTurnstileToken(null);
+      setTurnstileReset((n) => n + 1);
     }
   });
 
@@ -85,7 +95,12 @@ export function LoginPage() {
           error={errors.password?.message}
           {...register("password", { required: t("login.password") })}
         />
-        <PrimaryButton type="submit" disabled={isSubmitting}>
+        <Turnstile
+          onToken={setTurnstileToken}
+          resetSignal={turnstileReset}
+          language={i18n.language?.slice(0, 2)}
+        />
+        <PrimaryButton type="submit" disabled={isSubmitting || !turnstileToken}>
           {t("login.sign_in_button")}
         </PrimaryButton>
       </form>
@@ -100,6 +115,9 @@ export function LoginPage() {
           {t("login.sign_up")}
         </Link>
       </p>
+      <div className="mt-4">
+        <ConditionTurnstile />
+      </div>
     </section>
   );
 }

@@ -3,13 +3,18 @@ import { useForm } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { describeError, resetPassword } from "../api/client";
+import { ConditionTurnstile } from "../components/ConditionTurnstile";
+import { Turnstile } from "../components/Turnstile";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
 
 export function RecoverPasswordPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id, token } = useParams();
   const [failure, setFailure] = useState(null);
   const [updated, setUpdated] = useState(null);
+  const [formError, setFormError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const {
     register,
     handleSubmit,
@@ -19,11 +24,25 @@ export function RecoverPasswordPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFailure(null);
     setUpdated(null);
+    setFormError("");
+    if (!turnstileToken) {
+      setFormError(t("turnstile.required"));
+      return;
+    }
     try {
-      const result = await resetPassword({ id, token: decodeURIComponent(token), password: values.password });
+      const result = await resetPassword({
+        id,
+        token: decodeURIComponent(token),
+        password: values.password,
+        turnstileToken,
+      });
       setUpdated(result);
+      setTurnstileToken(null);
+      setTurnstileReset((n) => n + 1);
     } catch (error) {
       setFailure(error);
+      setTurnstileToken(null);
+      setTurnstileReset((n) => n + 1);
     }
   });
 
@@ -40,6 +59,11 @@ export function RecoverPasswordPage() {
           <Notice>{describeError(failure, t)}</Notice>
         </div>
       ) : null}
+      {formError ? (
+        <div className="mt-4">
+          <Notice>{formError}</Notice>
+        </div>
+      ) : null}
       <form className="mt-5 grid gap-4" onSubmit={onSubmit} noValidate>
         <TextField
           label={t("recover.password")}
@@ -52,7 +76,12 @@ export function RecoverPasswordPage() {
               t("recover.error_password"),
           })}
         />
-        <PrimaryButton type="submit" disabled={isSubmitting}>
+        <Turnstile
+          onToken={setTurnstileToken}
+          resetSignal={turnstileReset}
+          language={i18n.language?.slice(0, 2)}
+        />
+        <PrimaryButton type="submit" disabled={isSubmitting || !turnstileToken}>
           {t("recover.button")}
         </PrimaryButton>
       </form>
@@ -61,6 +90,9 @@ export function RecoverPasswordPage() {
           {t("login.sign_in")}
         </Link>
       </p>
+      <div className="mt-4">
+        <ConditionTurnstile />
+      </div>
     </section>
   );
 }
