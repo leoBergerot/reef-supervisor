@@ -167,12 +167,22 @@ export function activateAccount(token) {
   return request("/account-activations/confirm", { method: "POST", body: { token } });
 }
 
+/**
+ * Request a password-reset email.
+ * Planned Python/Mailjet routes: POST /forgot-password (Nest-compatible name).
+ * Body: { email, turnstileToken }. Success must not expose a raw reset token.
+ */
 export function requestPasswordReset(email, turnstileToken) {
-  return request("/password-resets", { method: "POST", body: { email, turnstileToken } });
+  return request("/forgot-password", { method: "POST", body: { email, turnstileToken } });
 }
 
+/**
+ * Confirm password reset using the token from the email URL only.
+ * Planned route: POST /recover-password
+ * Body: { id, token, password, turnstileToken } (Python field `password`; Nest used `newPassword`).
+ */
 export function resetPassword({ id, token, password, turnstileToken }) {
-  return request("/password-resets/confirm", {
+  return request("/recover-password", {
     method: "POST",
     body: { id: Number(id), token, password, turnstileToken },
   });

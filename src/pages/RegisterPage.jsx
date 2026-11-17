@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { activateAccount, createUser, describeError, requestAccountActivation } from "../api/client";
+import { createUser, describeError, requestAccountActivation } from "../api/client";
 import { ConditionTurnstile } from "../components/ConditionTurnstile";
 import { Turnstile } from "../components/Turnstile";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
@@ -10,10 +10,7 @@ import { Notice, PrimaryButton, TextField } from "../components/ui";
 export function RegisterPage() {
   const { t, i18n } = useTranslation();
   const [created, setCreated] = useState(null);
-  const [activation, setActivation] = useState(null);
-  const [activated, setActivated] = useState(null);
   const [activationError, setActivationError] = useState(null);
-  const [confirming, setConfirming] = useState(false);
   const [formError, setFormError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState(null);
   const [turnstileReset, setTurnstileReset] = useState(0);
@@ -26,8 +23,6 @@ export function RegisterPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFormError("");
     setCreated(null);
-    setActivation(null);
-    setActivated(null);
     setActivationError(null);
     if (!turnstileToken) {
       setFormError(t("turnstile.required"));
@@ -43,8 +38,8 @@ export function RegisterPage() {
       setTurnstileToken(null);
       setTurnstileReset((n) => n + 1);
       try {
-        const issued = await requestAccountActivation(values.email.trim());
-        setActivation(issued);
+        // Triggers activation email when the API sends mail; discard any returned token.
+        await requestAccountActivation(values.email.trim());
       } catch (error) {
         setActivationError(error);
       }
@@ -55,48 +50,21 @@ export function RegisterPage() {
     }
   });
 
-  const confirmActivation = async () => {
-    if (!activation) return;
-    setConfirming(true);
-    setActivationError(null);
-    try {
-      const result = await activateAccount(activation.token);
-      setActivated(result);
-    } catch (error) {
-      setActivationError(error);
-    } finally {
-      setConfirming(false);
-    }
-  };
-
   return (
     <section className="rounded-3xl border border-white/70 bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-semibold text-ink">{t("register.title")}</h1>
       <div className="mt-4 grid gap-3">
         {created ? (
-          <Notice tone="success">
-            {t("register.account_created", {
-              first_name: created.firstName,
-              last_name: created.lastName,
-              email: created.email,
-            })}
-          </Notice>
-        ) : null}
-        {activated ? <Notice tone="success">{t("register.activated", { email: activated.email })}</Notice> : null}
-        {activation && !activated ? (
-          <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-            <p className="text-sm text-slate-700">{t("register.token_help")}</p>
-            <p className="break-all font-mono text-xs text-ink">{activation.token}</p>
-            <PrimaryButton type="button" onClick={confirmActivation} disabled={confirming}>
-              {t("register.activate")}
-            </PrimaryButton>
-            <Link
-              className="text-sm font-semibold text-ink underline-offset-4 hover:underline"
-              to={`/login/${encodeURIComponent(activation.token)}`}
-            >
-              {t("register.open_activation")}
-            </Link>
-          </div>
+          <>
+            <Notice tone="success">
+              {t("register.account_created", {
+                first_name: created.firstName,
+                last_name: created.lastName,
+                email: created.email,
+              })}
+            </Notice>
+            <Notice tone="success">{t("register.check_email", { email: created.email })}</Notice>
+          </>
         ) : null}
         {activationError ? <Notice>{describeError(activationError, t)}</Notice> : null}
         {formError ? <Notice>{formError}</Notice> : null}

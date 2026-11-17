@@ -11,10 +11,9 @@
     "forgotten_password": "Forgot password",
     "invalid": "Incorrect email or password.",
     "enable_pending": "Account activation",
-    "token": "Activation token",
+    "activating": "Activating your account…",
     "activate": "Activate account",
-    "activated": "Account {{email}} is activated. You can sign in.",
-    "token_required": "Please enter the activation token"
+    "activated": "Account {{email}} is activated. You can sign in."
   },
   "register": {
     "title": "Register",
@@ -24,10 +23,8 @@
     "password": "Password",
     "button": "Register",
     "account_created": "{{first_name}} {{last_name}}, the account {{email}} is created.",
-    "token_help": "No email is sent. Activate the account with this token.",
-    "activate": "Activate account",
+    "check_email": "Check your email ({{email}}) to activate your account.",
     "activated": "Account {{email}} is activated. You can sign in.",
-    "open_activation": "Open the activation screen",
     "has_account": "Already have an account?",
     "error": {
       "first_name": "Please enter your first name",
@@ -40,13 +37,12 @@
   },
   "forgot_password": {
     "title": "Forgot password",
-    "subtitle": "No email is sent. The reset token is shown here.",
+    "subtitle": "Enter your email and we will send you a reset link.",
     "email": "Email",
     "button": "Send reset instructions",
     "error_email": "Please enter an email address",
     "unknown": "This email is not linked to an account",
-    "issued": "Token for {{email}}",
-    "open": "Choose a new password"
+    "email_sent": "Check your email ({{email}}) for a link to reset your password."
   },
   "recover": {
     "title": "Reset your password",
