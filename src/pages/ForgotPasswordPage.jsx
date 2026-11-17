@@ -3,12 +3,17 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { describeError, requestPasswordReset } from "../api/client";
+import { ConditionTurnstile } from "../components/ConditionTurnstile";
+import { Turnstile } from "../components/Turnstile";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
 
 export function ForgotPasswordPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [failure, setFailure] = useState(null);
   const [issued, setIssued] = useState(null);
+  const [formError, setFormError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const {
     register,
     handleSubmit,
@@ -18,11 +23,20 @@ export function ForgotPasswordPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFailure(null);
     setIssued(null);
+    setFormError("");
+    if (!turnstileToken) {
+      setFormError(t("turnstile.required"));
+      return;
+    }
     try {
-      const result = await requestPasswordReset(values.email.trim());
+      const result = await requestPasswordReset(values.email.trim(), turnstileToken);
       setIssued(result);
+      setTurnstileToken(null);
+      setTurnstileReset((n) => n + 1);
     } catch (error) {
       setFailure(error);
+      setTurnstileToken(null);
+      setTurnstileReset((n) => n + 1);
     }
   });
 
@@ -47,6 +61,11 @@ export function ForgotPasswordPage() {
           <Notice>{describeError(failure, t)}</Notice>
         </div>
       ) : null}
+      {formError ? (
+        <div className="mt-4">
+          <Notice>{formError}</Notice>
+        </div>
+      ) : null}
       <form className="mt-5 grid gap-4" onSubmit={onSubmit} noValidate>
         <TextField
           label={t("forgot_password.email")}
@@ -58,7 +77,12 @@ export function ForgotPasswordPage() {
             pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t("register.error.email") },
           })}
         />
-        <PrimaryButton type="submit" disabled={isSubmitting}>
+        <Turnstile
+          onToken={setTurnstileToken}
+          resetSignal={turnstileReset}
+          language={i18n.language?.slice(0, 2)}
+        />
+        <PrimaryButton type="submit" disabled={isSubmitting || !turnstileToken}>
           {t("forgot_password.button")}
         </PrimaryButton>
       </form>
@@ -67,6 +91,9 @@ export function ForgotPasswordPage() {
           {t("login.sign_in")}
         </Link>
       </p>
+      <div className="mt-4">
+        <ConditionTurnstile />
+      </div>
     </section>
   );
 }

@@ -250,6 +250,16 @@
     "missing_title": "Action unavailable",
     "missing_body": "The call {{name}} has no API endpoint. Nothing was changed."
   },
+  "turnstile": {
+    "required": "Please complete the security check before continuing.",
+    "terms": {
+      "first": "This page is protected by Cloudflare Turnstile to ensure you are not a robot. See Cloudflare's",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "terms": "Terms of Service",
+      "second": "."
+    }
+  },
   "error": {
     "no_network": "Cannot reach the API",
     "500": "Something went wrong",

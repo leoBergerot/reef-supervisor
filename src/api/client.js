@@ -46,15 +46,16 @@ async function request(path, { method = "GET", body, token, form } = {}) {
   return data;
 }
 
-export function login(email, password) {
+export function login(email, password, turnstileToken) {
   const form = new URLSearchParams();
   form.set("username", email);
   form.set("password", password);
+  if (turnstileToken) form.set("turnstileToken", turnstileToken);
   return request("/token", { method: "POST", form });
 }
 
-export function createUser({ email, password }) {
-  return request("/users", { method: "POST", body: { email, password } });
+export function createUser({ email, password, turnstileToken }) {
+  return request("/users", { method: "POST", body: { email, password, turnstileToken } });
 }
 
 /** PATCH /users — authenticated update of email + password for the current user. */
@@ -166,14 +167,14 @@ export function activateAccount(token) {
   return request("/account-activations/confirm", { method: "POST", body: { token } });
 }
 
-export function requestPasswordReset(email) {
-  return request("/password-resets", { method: "POST", body: { email } });
+export function requestPasswordReset(email, turnstileToken) {
+  return request("/password-resets", { method: "POST", body: { email, turnstileToken } });
 }
 
-export function resetPassword({ id, token, password }) {
+export function resetPassword({ id, token, password, turnstileToken }) {
   return request("/password-resets/confirm", {
     method: "POST",
-    body: { id: Number(id), token, password },
+    body: { id: Number(id), token, password, turnstileToken },
   });
 }
 

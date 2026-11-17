@@ -10,6 +10,8 @@ CMD ["npm", "run", "dev"]
 
 FROM deps AS build
 COPY . .
+ARG REACT_APP_TURNSTILE_SITE_KEY
+ENV REACT_APP_TURNSTILE_SITE_KEY=$REACT_APP_TURNSTILE_SITE_KEY
 RUN npm run build
 
 FROM nginx:1.27-alpine AS production
