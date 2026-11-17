@@ -11,10 +11,9 @@
     "forgotten_password": "Mot de passe oublié",
     "invalid": "E-mail ou mot de passe incorrect.",
     "enable_pending": "Activation du compte",
-    "token": "Jeton d'activation",
+    "activating": "Activation de votre compte…",
     "activate": "Activer le compte",
-    "activated": "Le compte {{email}} est activé. Vous pouvez vous connecter.",
-    "token_required": "Merci d'entrer le jeton d'activation"
+    "activated": "Le compte {{email}} est activé. Vous pouvez vous connecter."
   },
   "register": {
     "title": "S'enregistrer",
@@ -24,10 +23,8 @@
     "password": "Mot de passe",
     "button": "S'enregistrer",
     "account_created": "{{first_name}} {{last_name}}, le compte {{email}} est créé.",
-    "token_help": "Aucun e-mail n'est envoyé. Activez le compte avec ce jeton.",
-    "activate": "Activer le compte",
+    "check_email": "Consultez votre e-mail ({{email}}) pour activer votre compte.",
     "activated": "Le compte {{email}} est activé. Vous pouvez vous connecter.",
-    "open_activation": "Ouvrir l'écran d'activation",
     "has_account": "Déjà un compte ?",
     "error": {
       "first_name": "Merci d'entrer votre prénom",
@@ -40,13 +37,12 @@
   },
   "forgot_password": {
     "title": "Mot de passe oublié",
-    "subtitle": "Aucun e-mail n'est envoyé. Le jeton de réinitialisation s'affiche ici.",
+    "subtitle": "Saisissez votre e-mail : nous vous enverrons un lien de réinitialisation.",
     "email": "E-mail",
     "button": "Réinitialiser mon mot de passe",
     "error_email": "Merci d'entrer une adresse e-mail",
     "unknown": "Cet e-mail n'est pas lié à un compte",
-    "issued": "Jeton pour {{email}}",
-    "open": "Choisir un nouveau mot de passe"
+    "email_sent": "Consultez votre e-mail ({{email}}) pour réinitialiser votre mot de passe."
   },
   "recover": {
     "title": "Réinitialiser votre mot de passe",
