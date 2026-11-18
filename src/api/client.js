@@ -54,8 +54,10 @@ export function login(email, password, turnstileToken) {
   return request("/token", { method: "POST", form });
 }
 
-export function createUser({ email, password, turnstileToken }) {
-  return request("/users", { method: "POST", body: { email, password, turnstileToken } });
+export function createUser({ email, password, turnstileToken, locale }) {
+  const body = { email, password, turnstileToken };
+  if (locale) body.locale = locale;
+  return request("/users", { method: "POST", body });
 }
 
 /** PATCH /users — authenticated update of email + password for the current user. */
@@ -159,8 +161,12 @@ export async function fetchTankPhoto(token, photoUrl) {
   return URL.createObjectURL(await response.blob());
 }
 
-export function requestAccountActivation(email) {
-  return request("/account-activations", { method: "POST", body: { email } });
+/** Resend activation email only (registration already sends one via POST /users). */
+export function requestAccountActivation(email, { turnstileToken, locale } = {}) {
+  const body = { email };
+  if (turnstileToken) body.turnstileToken = turnstileToken;
+  if (locale) body.locale = locale;
+  return request("/account-activations", { method: "POST", body });
 }
 
 export function activateAccount(token) {
@@ -172,8 +178,10 @@ export function activateAccount(token) {
  * Planned Python/Mailjet routes: POST /forgot-password (Nest-compatible name).
  * Body: { email, turnstileToken }. Success must not expose a raw reset token.
  */
-export function requestPasswordReset(email, turnstileToken) {
-  return request("/forgot-password", { method: "POST", body: { email, turnstileToken } });
+export function requestPasswordReset(email, turnstileToken, { locale } = {}) {
+  const body = { email, turnstileToken };
+  if (locale) body.locale = locale;
+  return request("/forgot-password", { method: "POST", body });
 }
 
 /**
