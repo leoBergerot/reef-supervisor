@@ -30,7 +30,9 @@ export function ForgotPasswordPage() {
     }
     const email = values.email.trim();
     try {
-      await requestPasswordReset(email, turnstileToken);
+      await requestPasswordReset(email, turnstileToken, {
+        locale: i18n.language?.slice(0, 2) || "fr",
+      });
       setSentEmail(email);
       setTurnstileToken(null);
       setTurnstileReset((n) => n + 1);

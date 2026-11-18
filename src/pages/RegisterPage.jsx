@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { createUser, describeError, requestAccountActivation } from "../api/client";
+import { createUser, describeError } from "../api/client";
 import { ConditionTurnstile } from "../components/ConditionTurnstile";
 import { Turnstile } from "../components/Turnstile";
 import { Notice, PrimaryButton, TextField } from "../components/ui";
@@ -10,7 +10,6 @@ import { Notice, PrimaryButton, TextField } from "../components/ui";
 export function RegisterPage() {
   const { t, i18n } = useTranslation();
   const [created, setCreated] = useState(null);
-  const [activationError, setActivationError] = useState(null);
   const [formError, setFormError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState(null);
   const [turnstileReset, setTurnstileReset] = useState(0);
@@ -23,26 +22,21 @@ export function RegisterPage() {
   const onSubmit = handleSubmit(async (values) => {
     setFormError("");
     setCreated(null);
-    setActivationError(null);
     if (!turnstileToken) {
       setFormError(t("turnstile.required"));
       return;
     }
     try {
+      // POST /users sends the single activation email; do not also call /account-activations.
       await createUser({
         email: values.email.trim(),
         password: values.password,
         turnstileToken,
+        locale: i18n.language?.slice(0, 2) || "fr",
       });
       setCreated(values);
       setTurnstileToken(null);
       setTurnstileReset((n) => n + 1);
-      try {
-        // Triggers activation email when the API sends mail; discard any returned token.
-        await requestAccountActivation(values.email.trim());
-      } catch (error) {
-        setActivationError(error);
-      }
     } catch (error) {
       setFormError(describeError(error, t));
       setTurnstileToken(null);
@@ -66,7 +60,6 @@ export function RegisterPage() {
             <Notice tone="success">{t("register.check_email", { email: created.email })}</Notice>
           </>
         ) : null}
-        {activationError ? <Notice>{describeError(activationError, t)}</Notice> : null}
         {formError ? <Notice>{formError}</Notice> : null}
       </div>
       <form className="mt-5 grid gap-4" onSubmit={onSubmit} noValidate>
